@@ -164,3 +164,52 @@ describe('LangGraph wiring (needs npm install)', async () => {
     assert.equal(done.state!.approval!.by, 'rajender')
   })
 })
+
+describe('in-browser agent edges (published card)', () => {
+  it('answers every failure type from native-schema snapshots and verifies each', async () => {
+    const { buildFixtureDataset, emitRawBundle, mapRawBundle } = await import('@pj/core')
+    const { snapshotTools } = await import('../src/web-tools')
+    const raw = emitRawBundle(buildFixtureDataset(Date.parse('2026-11-01T03:30:00Z')))
+    const an = analyze(mapRawBundle(raw))
+    const firstPerRule = new Map<string, string>()
+    for (const f of an.failures) if (!firstPerRule.has(f.recommendation.ruleId)) firstPerRule.set(f.recommendation.ruleId, f.id)
+    assert.ok(firstPerRule.size >= 10)
+    for (const [rule, fid] of firstPerRule) {
+      const s = await runWorkflow(fid, { analysis: () => an, tools: snapshotTools(raw), llm: null, maxIterations: 2 })
+      assert.ok(s.evidence.filter((e) => e.ok).length >= 2, `${rule}: runtime evidence returned`)
+      assert.ok(s.evidence.filter((e) => e.server).every((e) => e.server === 'snapshot'), `${rule}: labelled as snapshot`)
+      assert.equal(s.verification!.passed, true, `${rule}: ${s.verification!.checks.filter((c) => !c.ok).map((c) => c.name)}`)
+    }
+  })
+  it('uses Claude through the sample capability and falls back on refusal or bad shape', async () => {
+    const { sampleLlm } = await import('../src/web-tools')
+    const prompts: string[] = []
+    const ok = sampleLlm({ async json(p: string, o?: Record<string, unknown>) { prompts.push(`${o?.modelTier}`); return { items: [{ kind: 'dt_latency', why: 'p95' }] } } })
+    assert.deepEqual(await ok.structured('plan', 'sys', 'user'), { items: [{ kind: 'dt_latency', why: 'p95' }] })
+    assert.equal(prompts[0], 'quick')
+    const denied = sampleLlm({ json: () => Promise.reject({ code: 'not_granted', message: 'declined' }) })
+    await assert.rejects(denied.structured('hypothesis', 's', 'u'), /not_granted/)
+    const wrong = sampleLlm({ json: async () => ({ nope: 1 }) })
+    await assert.rejects(wrong.structured('recommendation', 's', 'u'), /shape/)
+    // the node falls back to rules when Claude is unavailable
+    const s = await runWorkflow(regression.id, deps(fakeTools(), denied))
+    assert.equal(s.hypothesis!.engine, 'rules')
+    assert.ok(s.log.some((l) => l.includes('not_granted')))
+  })
+})
+
+describe('LangGraph web graph (needs npm install)', async () => {
+  const lg = await import('@langchain/langgraph/web').catch(() => null)
+  it('pauses before approval in the browser build and resumes', { skip: !lg && 'install dependencies to run' }, async () => {
+    const { createWebAgent } = await import('../src/web')
+    const agent = createWebAgent({ now: Date.parse('2026-11-01T03:30:00Z') })
+    const fid = agent.findings[0]
+    const steps: string[] = []
+    const v = await agent.start(fid, (n) => steps.push(n))
+    assert.equal(v.status, 'awaiting_approval', v.error)
+    assert.ok(steps.includes('verify') && steps.includes('recommend') && !steps.includes('approve'))
+    const done = await agent.resume(v.id, 'approve', 'rajender')
+    assert.equal(done.status, 'approved')
+    assert.equal(done.state!.approval!.by, 'rajender')
+  })
+})

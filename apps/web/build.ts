@@ -38,4 +38,22 @@ ${body(`<script>window.VM=${vm};</script>\n`)}`
 mkdirSync(`${here}dist-demo`, { recursive: true })
 writeFileSync(`${here}dist-demo/product-journey.html`, demo)
 
-console.log(`dist/index.html ${(served.length / 1024).toFixed(0)} KB · dist-demo/product-journey.html ${(demo.length / 1024).toFixed(0)} KB`)
+// In-browser agent for the published card: LangGraph.js (web entry) + the same agent nodes + core,
+// loaded only when someone taps Investigate. Needs npm install (LangGraph); skipped otherwise.
+let agentNote = 'agent.js skipped (LangGraph not installed)'
+try {
+  await import('@langchain/langgraph/web')
+  const { build } = await import('esbuild')
+  const r = await build({
+    entryPoints: [`${here}../../packages/agent/src/web.ts`], bundle: true, format: 'iife', platform: 'browser', target: 'safari15',
+    minify: true, legalComments: 'none', outfile: `${here}dist-demo/agent.js`, metafile: true, logLevel: 'warning',
+    alias: { '@pj/core': `${here}../../packages/core/src/index.ts` },
+    define: { 'process.env.NODE_ENV': '"production"' },
+  })
+  const bytes = Object.values(r.metafile!.outputs)[0].bytes
+  agentNote = `dist-demo/agent.js ${(bytes / 1024).toFixed(0)} KB`
+} catch (e) {
+  if (!/Cannot find (package|module) '@langchain\/langgraph/.test((e as Error).message)) throw e
+}
+
+console.log(`dist/index.html ${(served.length / 1024).toFixed(0)} KB · dist-demo/product-journey.html ${(demo.length / 1024).toFixed(0)} KB · ${agentNote}`)

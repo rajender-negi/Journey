@@ -63,6 +63,8 @@ const RULE_PLANS: Record<string, EvidenceKind[]> = {
   'FX-FLAKY-TEST': ['gh_job_log'],
   'FX-VULN-GATE': ['gh_job_log', 'gh_pr_files'],
   'FX-CHANGE-WAIT': ['dt_deployment_events'],
+  // a problem with no deployment behind it: the runtime record itself is the evidence
+  'FX-NON-CHANGE': ['dt_problem', 'dt_error_rate', 'dt_latency', 'k8s_events'],
 }
 
 export const KIND_SOURCE: Record<EvidenceKind, SourceName> = {

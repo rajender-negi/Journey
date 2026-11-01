@@ -5,6 +5,8 @@
   'use strict'
   var VM = window.VM || null
   var SERVED = !window.VM
+  // published card: the LangGraph agent runs in this page (agent.js, loaded on first Investigate)
+  if (VM && !VM.agent) VM.agent = { enabled: true, local: true, llm: null, mcpServers: [] }
   var NOW = Date.now()
   var S = { pid: 'all', tab: 'overview', outcome: 'all', pillar: 'all', limit: 20, openJ: {}, openG: null, ai: {}, runs: {}, openA: null, itest: {}, paste: {} }
   var h = location.hash.replace('#', '')
@@ -136,26 +138,55 @@
     return fetch(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
       .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || ('HTTP ' + r.status)); return j }) })
   }
+  // in-page agent (published card): load agent.js once, Claude via the sample capability when allowed
+  var localAgentPromise = null
+  function localAgent() {
+    if (!localAgentPromise) {
+      localAgentPromise = new Promise(function (resolve, reject) {
+        if (window.PJAgent) return resolve(window.PJAgent)
+        var sc = document.createElement('script')
+        sc.src = 'agent.js'
+        sc.onload = function () { window.PJAgent ? resolve(window.PJAgent) : reject(new Error('agent.js loaded without PJAgent')) }
+        sc.onerror = function () { reject(new Error('Could not load agent.js')) }
+        document.head.appendChild(sc)
+      }).then(function (A) {
+        return getSample().then(function (sample) { return A.create({ now: Date.parse(VM.at), sample: sample }) })
+      })
+      localAgentPromise.catch(function () { localAgentPromise = null })
+    }
+    return localAgentPromise
+  }
+  var NODE_LABEL = { classify: 'Classified', plan_evidence: 'Planned evidence', gather: 'Gathered evidence', hypothesize: 'Formed hypothesis', verify: 'Verified against evidence', recommend: 'Recommended actions' }
   function startAgent(fid) {
-    S.runs[fid] = { busy: true }
+    S.runs[fid] = { busy: true, steps: [] }
     render()
-    agentCall('api/agent/investigate', { findingId: fid }).then(function (v) { S.runs[fid] = { view: v } }, function (e) { S.runs[fid] = { error: e.message } }).then(render)
+    var job = VM.agent.local
+      ? localAgent().then(function (ag) {
+          VM.agent.llm = ag.model
+          return ag.start(fid, function (node, log) { var st = S.runs[fid]; if (st && st.steps) { st.steps.push((NODE_LABEL[node] || node) + (log && log.length ? ': ' + log[log.length - 1].slice(9) : '')); render() } })
+        })
+      : agentCall('api/agent/investigate', { findingId: fid })
+    job.then(function (v) { S.runs[fid] = { view: v } }, function (e) { S.runs[fid] = { error: e.message } }).then(render)
   }
   function decideAgent(fid, decision) {
     var cur = S.runs[fid]
     S.runs[fid] = { busy: true, view: cur.view }
     render()
-    agentCall('api/agent/runs/' + encodeURIComponent(cur.view.id) + '/resume', { decision: decision, by: 'web user' })
-      .then(function (v) { S.runs[fid] = { view: v } }, function (e) { S.runs[fid] = { view: cur.view, error: e.message } }).then(render)
+    var job = VM.agent.local
+      ? localAgent().then(function (ag) { return ag.resume(cur.view.id, decision, 'you') })
+      : agentCall('api/agent/runs/' + encodeURIComponent(cur.view.id) + '/resume', { decision: decision, by: 'web user' })
+    job.then(function (v) { S.runs[fid] = { view: v } }, function (e) { S.runs[fid] = { view: cur.view, error: e.message } }).then(render)
   }
   var RUN_TONE = { awaiting_approval: 'tone-warn', approved: 'tone-good', rejected: 'sev-critical', failed: 'sev-critical', running: 'tone-accent' }
   function agentBox(fid) {
     var st = S.runs[fid] || {}
-    var mcp = VM.agent.mcpServers.length ? 'MCP: ' + VM.agent.mcpServers.join(', ') : 'No MCP servers connected; uses analysis evidence only'
-    var html = '<div class="ai agent"><div class="ai-head"><div><div class="eyebrow">Agent investigation</div><div class="ai-sub">LangGraph agent: plans evidence, fetches it through MCP (read only), tests its hypothesis against the evidence, and waits for your approval. ' + esc(mcp) + (VM.agent.llm ? ' · model ' + esc(VM.agent.llm) : ' · rules only (no AI key)') + '</div></div>'
+    var sub = VM.agent.local
+      ? 'LangGraph agent running in this page: plans evidence, fetches it from native-schema snapshots (the same shapes Dynatrace, GitHub, Argo CD and Kubernetes MCP servers return), tests its hypothesis against the evidence, and waits for your approval. Claude is the model when you allow it; otherwise rules.'
+      : 'LangGraph agent: plans evidence, fetches it through MCP (read only), tests its hypothesis against the evidence, and waits for your approval. ' + (VM.agent.mcpServers.length ? 'MCP: ' + VM.agent.mcpServers.join(', ') : 'No MCP servers connected; uses analysis evidence only') + (VM.agent.llm ? ' · model ' + VM.agent.llm : ' · rules only (no AI key)')
+    var html = '<div class="ai agent"><div class="ai-head"><div><div class="eyebrow">Agent investigation</div><div class="ai-sub">' + esc(sub) + '</div></div>'
     if (!st.view || st.view.status === 'failed') html += '<button class="btn primary" data-act="agent" data-id="' + esc(fid) + '"' + (st.busy ? ' disabled' : '') + '>' + (st.busy ? 'Investigating…' : 'Investigate') + '</button>'
     html += '</div>'
-    if (st.busy && !st.view) html += '<div class="ai-wait">Running: classify, plan, gather through MCP, hypothesize, verify. This can take a minute.</div>'
+    if (st.busy && !st.view) html += '<div class="ai-wait">' + (st.steps && st.steps.length ? '<ol class="ai-actions">' + st.steps.map(function (x) { return '<li>' + esc(x) + '</li>' }).join('') + '</ol>' : 'Starting the agent. Each Claude step can take up to a minute.') + '</div>'
     if (st.error) html += '<p class="note">' + esc(st.error) + '</p>'
     var v = st.view
     if (v && v.state) {

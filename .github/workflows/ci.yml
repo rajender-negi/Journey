@@ -37,12 +37,15 @@ jobs:
       - name: Test (core, agent incl. LangGraph wiring, server)
         run: npm test
 
-      - name: Build UI and demo page
+      - name: Build UI, demo page and in-browser agent
         run: npm run build
 
-      - name: Upload demo page
+      - name: Check the in-browser agent bundle exists
+        run: test -s apps/web/dist-demo/agent.js && ls -l apps/web/dist-demo
+
+      - name: Upload demo page and agent bundle
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: product-journey-demo
-          path: apps/web/dist-demo/product-journey.html
+          path: apps/web/dist-demo/
           retention-days: 14
