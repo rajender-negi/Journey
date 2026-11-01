@@ -111,6 +111,10 @@ export function verifyHypothesis(ctx: InvestigationContext, h: Hypothesis, ev: E
   checks.push({ name: 'citations exist', ok: unknown.length === 0, detail: unknown.length ? `unknown ids: ${unknown.join(', ')}` : `${cited.length} citations` })
   const failedCited = cited.filter((id) => byId.get(id) && !byId.get(id)!.ok)
   checks.push({ name: 'citations usable', ok: failedCited.length === 0, detail: failedCited.length ? `cites unavailable evidence: ${failedCited.join(', ')}` : 'all cited evidence returned data' })
+  // a step that names a source must cite evidence from that source (the analysis record E0 counts for any)
+  const NAMED: [RegExp, string][] = [[/\b(kubernetes|k8s)\b/i, 'kubernetes'], [/\bdynatrace\b/i, 'dynatrace'], [/\bargo(\s?cd)?\b/i, 'argocd'], [/\b(github|pull request|job log)\b/i, 'github']]
+  const mismatched = h.chain.filter((c) => NAMED.some(([re, src]) => re.test(c.step) && !c.evidenceIds.some((id) => { const e = byId.get(id); return e && (e.source === src || e.source === 'analysis') })))
+  checks.push({ name: 'citations match claims', ok: mismatched.length === 0, detail: mismatched.length ? `step cites evidence from another source: "${mismatched[0].step.slice(0, 80)}"` : 'each named source is cited' })
   const runtimeSources = ['dynatrace', 'kubernetes', 'argocd']
   const needsRuntime = ['deployment', 'problem', 'runtime'].includes(ctx.source)
   const runtimeOk = ev.some((e) => e.ok && runtimeSources.includes(e.source) && cited.includes(e.id))

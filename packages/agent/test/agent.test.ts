@@ -134,6 +134,18 @@ describe('workflow (same routing as the graph)', () => {
     assert.ok(v.checks.find((c) => c.name === 'citations exist' && !c.ok))
     assert.ok(v.checks.find((c) => c.name === 'figures grounded' && !c.ok))
   })
+  it('fails verification when a step names one source but cites another', () => {
+    const ctx = buildContext(a, compile.id)
+    const ev = [
+      { id: 'E0', kind: 'analysis' as const, source: 'analysis' as const, ok: true, summary: 's', data: 'd', at: '' },
+      { id: 'E1', kind: 'gh_job_log' as const, source: 'github' as const, ok: true, summary: 's', data: 'error TS2322', at: '' },
+    ]
+    const bad = verifyHypothesis(ctx, { rootCause: 'OOM', chain: [{ step: 'Kubernetes events show the container OOMKilled', evidenceIds: ['E1'] }], confidence: 'high', engine: 'llm' }, ev, [])
+    assert.equal(bad.passed, false)
+    assert.ok(bad.checks.find((c) => c.name === 'citations match claims' && !c.ok))
+    const good = verifyHypothesis(ctx, { rootCause: 'type error', chain: [{ step: 'The GitHub job log shows TS2322', evidenceIds: ['E1'] }], confidence: 'high', engine: 'llm' }, ev, [])
+    assert.equal(good.passed, true)
+  })
   it('drives the LLM path and drops actions citing unknown rules', async () => {
     const llm: AgentLlm = {
       name: 'fake-model',
