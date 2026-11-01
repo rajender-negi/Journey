@@ -1,9 +1,8 @@
 // Browser-side edges of the agent, free of LangGraph so they are unit tested anywhere:
 //   snapshotTools  answers the agent's MCP operations from native-schema records
-//   sampleLlm      Claude through the artifact runtime's `sample` capability
+//   withSnapshot   MCP first, snapshot for any source with no MCP server configured (server side)
 
 import type { RawBundle } from '@pj/core'
-import type { AgentLlm, SchemaName } from './nodes'
 import type { ToolRunner } from './evidence'
 import type { Op } from './toolmap'
 import { DEFAULT_TOOL_MAP } from './toolmap'
@@ -69,34 +68,18 @@ export function snapshotTools(raw: RawBundle): ToolRunner {
   }
 }
 
-// ---------- Claude as the model, through the artifact runtime ----------
-
-export interface SampleFn {
-  json: (input: string, opts?: Record<string, unknown>) => Promise<unknown>
-}
-
-const SHAPES: Record<SchemaName, string> = {
-  plan: '{"items":[{"kind":"<one of the listed kinds>","why":"<short reason>"}]} (at most 5 items)',
-  hypothesis: '{"rootCause":"<one paragraph>","chain":[{"step":"<what happened>","evidenceIds":["E0"]}],"confidence":"high|medium|low"}',
-  recommendation: '{"headline":"<one line>","rootCause":"<short>","impact":"<short>","actions":[{"priority":1,"action":"<imperative>","ruleId":"<allowed rule id>","horizon":"now|this-sprint|this-quarter","owner":"<team>"}],"evidenceUsed":["E0"]}',
-}
-
-export function sampleLlm(sample: SampleFn): AgentLlm {
+/**
+ * MCP where a server is configured for the source; the loaded native-schema data otherwise.
+ * Real MCP failures (timeouts, refusals) are returned as failures, never papered over.
+ */
+export function withSnapshot(primary: ToolRunner | null, snapshot: () => ToolRunner): ToolRunner {
   return {
-    name: 'Claude',
-    async structured<T>(schema: SchemaName, system: string, user: string): Promise<T> {
-      const prompt = `${system}\n\n${user}\n\nReply with only one JSON object of this shape, no other text:\n${SHAPES[schema]}`
-      let out: unknown
-      try {
-        out = await sample.json(prompt, { modelTier: schema === 'plan' ? 'quick' : 'default' })
-      } catch (e) {
-        const err = e as { code?: string; message?: string }
-        throw new Error(`Claude ${err.code ?? 'error'}: ${err.message ?? ''}`.trim())
+    async op(op, params) {
+      if (primary) {
+        const r = await primary.op(op, params)
+        if (r.ok || !/^no MCP server configured/.test(r.error ?? '')) return r
       }
-      const o = out as Record<string, unknown>
-      const okShape = schema === 'plan' ? Array.isArray(o?.items) : schema === 'hypothesis' ? Array.isArray(o?.chain) && typeof o?.rootCause === 'string' : Array.isArray(o?.actions) && typeof o?.headline === 'string'
-      if (!okShape) throw new Error(`Claude reply did not match the ${schema} shape`)
-      return out as T
+      return snapshot().op(op, params)
     },
   }
 }

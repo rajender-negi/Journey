@@ -195,17 +195,34 @@ describe('in-browser agent edges (published card)', () => {
       assert.equal(s.verification!.passed, true, `${rule}: ${s.verification!.checks.filter((c) => !c.ok).map((c) => c.name)}`)
     }
   })
-  it('uses Claude through the sample capability and falls back on refusal or bad shape', async () => {
-    const { sampleLlm } = await import('../src/web-tools')
-    const prompts: string[] = []
-    const ok = sampleLlm({ async json(p: string, o?: Record<string, unknown>) { prompts.push(`${o?.modelTier}`); return { items: [{ kind: 'dt_latency', why: 'p95' }] } } })
-    assert.deepEqual(await ok.structured('plan', 'sys', 'user'), { items: [{ kind: 'dt_latency', why: 'p95' }] })
-    assert.equal(prompts[0], 'quick')
-    const denied = sampleLlm({ json: () => Promise.reject({ code: 'not_granted', message: 'declined' }) })
+  it('uses MCP where configured and the loaded data only for sources without a server', async () => {
+    const { withSnapshot } = await import('../src/web-tools')
+    const snap: ToolRunner = { async op() { return { ok: true, text: '{"records":[1]}', server: 'snapshot', tool: 'x' } } }
+    const noServer: ToolRunner = { async op() { return { ok: false, text: '', error: 'no MCP server configured for dynatrace' } } }
+    const timedOut: ToolRunner = { async op() { return { ok: false, text: '', error: 'dynatrace-mcp:execute_dql timed out' } } }
+    assert.equal((await withSnapshot(noServer, () => snap).op('dql', {})).server, 'snapshot')
+    assert.equal((await withSnapshot(null, () => snap).op('dql', {})).server, 'snapshot')
+    const real = await withSnapshot(timedOut, () => snap).op('dql', {})
+    assert.equal(real.ok, false, 'a real MCP failure is reported, not replaced with snapshot data')
+  })
+})
+
+describe('Claude via LangChain in the card (needs npm install)', async () => {
+  const lc = await import('@langchain/core/language_models/chat_models').catch(() => null)
+  it('parses Claude replies through LangChain and the shared zod schema', { skip: !lc && 'install dependencies to run' }, async () => {
+    const { langchainClaudeLlm } = await import('../src/web-llm')
+    const tiers: string[] = []
+    const llm = langchainClaudeLlm(async (_p: string, o?: Record<string, unknown>) => {
+      tiers.push(String(o?.modelTier))
+      return { text: 'Here you go:\n```json\n{"items":[{"kind":"dt_latency","why":"p95"}]}\n```' }
+    })
+    assert.equal(llm.name, 'Claude via LangChain')
+    assert.deepEqual(await llm.structured('plan', 'sys', 'user'), { items: [{ kind: 'dt_latency', why: 'p95' }] })
+    assert.equal(tiers[0], 'quick')
+    const denied = langchainClaudeLlm(() => Promise.reject({ code: 'not_granted', message: 'declined' }))
     await assert.rejects(denied.structured('hypothesis', 's', 'u'), /not_granted/)
-    const wrong = sampleLlm({ json: async () => ({ nope: 1 }) })
-    await assert.rejects(wrong.structured('recommendation', 's', 'u'), /shape/)
-    // the node falls back to rules when Claude is unavailable
+    const wrong = langchainClaudeLlm(async () => ({ text: '{"chain":"not a list"}' }))
+    await assert.rejects(wrong.structured('hypothesis', 's', 'u'), /schema/)
     const s = await runWorkflow(regression.id, deps(fakeTools(), denied))
     assert.equal(s.hypothesis!.engine, 'rules')
     assert.ok(s.log.some((l) => l.includes('not_granted')))
@@ -220,7 +237,7 @@ describe('LangGraph web graph (needs npm install)', async () => {
     const fid = agent.findings[0]
     const steps: string[] = []
     const v = await agent.start(fid, (n) => steps.push(n))
-    assert.equal(v.status, 'awaiting_approval', v.error)
+    assert.equal(v.status, 'awaiting_approval', v.error ?? '')
     assert.ok(steps.includes('verify') && steps.includes('recommend') && !steps.includes('approve'))
     const done = await agent.resume(v.id, 'approve', 'rajender')
     assert.equal(done.status, 'approved')

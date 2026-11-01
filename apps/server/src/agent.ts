@@ -1,7 +1,8 @@
 // Agent runtime: the app's MCP client hub, the LLM, and the LangGraph run manager.
-// Every piece degrades cleanly: no MCP config -> evidence from the analysis only;
+// Every piece degrades cleanly: a source with no MCP server -> the agent reads the loaded
+// native-schema data for it (live API, snapshot or dummy tier) through the same operations;
 // no AI key -> deterministic nodes; LangGraph not installed -> clear 503 on agent routes.
-import { AgentRuns, McpHub, createAgentLlm, loadMcpConfig, type ServerStatus, type ToolRunner } from '@pj/agent'
+import { AgentRuns, McpHub, createAgentLlm, loadMcpConfig, snapshotTools, withSnapshot, type ServerStatus } from '@pj/agent'
 import { config } from './config'
 import { store } from './store'
 
@@ -12,12 +13,6 @@ export const agent: {
   llm: string | null
   notes: string[]
 } = { hub: null, servers: [], runs: null, llm: null, notes: [] }
-
-const noTools: ToolRunner = {
-  async op() {
-    return { ok: false, text: '', error: 'no MCP servers configured: copy mcp.servers.example.json to mcp.servers.json' }
-  },
-}
 
 export async function initAgent(): Promise<void> {
   const cfg = loadMcpConfig(config.mcpConfigPath)
@@ -30,7 +25,7 @@ export async function initAgent(): Promise<void> {
       agent.notes.push((e as Error).message)
     }
   } else {
-    agent.notes.push(`No MCP config at ${config.mcpConfigPath}; the agent will use analysis evidence only.`)
+    agent.notes.push(`No MCP config at ${config.mcpConfigPath}; the agent reads the loaded source data (dummy until sources are configured) through the same operations.`)
   }
   const llm = await createAgentLlm(config.ai).catch((e: Error) => {
     agent.notes.push(`LLM not loaded: ${e.message}`)
@@ -38,7 +33,7 @@ export async function initAgent(): Promise<void> {
   })
   agent.llm = llm?.name ?? null
   if (!llm) agent.notes.push('No AI_API_KEY: agent runs its deterministic path.')
-  agent.runs = new AgentRuns({ analysis: () => store.get().analysis, tools: agent.hub ?? noTools, llm, maxIterations: config.agent.maxIterations })
+  agent.runs = new AgentRuns({ analysis: () => store.get().analysis, tools: withSnapshot(agent.hub, () => snapshotTools(store.get().raw)), llm, maxIterations: config.agent.maxIterations })
 }
 
 export async function agentStatus() {

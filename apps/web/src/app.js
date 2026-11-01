@@ -181,8 +181,8 @@
   function agentBox(fid) {
     var st = S.runs[fid] || {}
     var sub = VM.agent.local
-      ? 'LangGraph agent running in this page: plans evidence, fetches it from native-schema snapshots (the same shapes Dynatrace, GitHub, Argo CD and Kubernetes MCP servers return), tests its hypothesis against the evidence, and waits for your approval. Claude is the model when you allow it; otherwise rules.'
-      : 'LangGraph agent: plans evidence, fetches it through MCP (read only), tests its hypothesis against the evidence, and waits for your approval. ' + (VM.agent.mcpServers.length ? 'MCP: ' + VM.agent.mcpServers.join(', ') : 'No MCP servers connected; uses analysis evidence only') + (VM.agent.llm ? ' · model ' + VM.agent.llm : ' · rules only (no AI key)')
+      ? 'LangGraph agent running in this page: plans evidence, fetches it from native-schema snapshots (the same shapes Dynatrace, GitHub, Argo CD and Kubernetes MCP servers return), tests its hypothesis against the evidence, and waits for your approval. Claude is the model through LangChain when you allow it; otherwise rules.'
+      : 'LangGraph agent: plans evidence, fetches it through MCP (read only), tests its hypothesis against the evidence, and waits for your approval. ' + (VM.agent.mcpServers.length ? 'MCP: ' + VM.agent.mcpServers.join(', ') : 'No MCP servers: reads the loaded source data through the same operations') + (VM.agent.llm ? ' · model ' + VM.agent.llm : ' · rules only (no AI key)')
     var html = '<div class="ai agent"><div class="ai-head"><div><div class="eyebrow">Agent investigation</div><div class="ai-sub">' + esc(sub) + '</div></div>'
     if (!st.view || st.view.status === 'failed') html += '<button class="btn primary" data-act="agent" data-id="' + esc(fid) + '"' + (st.busy ? ' disabled' : '') + '>' + (st.busy ? 'Investigating…' : 'Investigate') + '</button>'
     html += '</div>'

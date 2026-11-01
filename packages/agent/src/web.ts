@@ -6,15 +6,16 @@
 //     pr_files, job_log, k8s_events) from native-schema records: Grail DQL results, Argo CD
 //     Applications, core/v1 Events, GitHub REST. In the card that is the demo bundle; a page could
 //     equally feed it MCP output pasted from Cursor.
-//   - The model is Claude through the artifact's `sample` capability: no API key in the page.
+//   - The model is Claude in the Claude app (artifact `sample` capability) wrapped as a LangChain
+//     chat model (web-llm.ts), with the same zod schemas as the server: no API key in the page.
 // Built with esbuild into apps/web/dist-demo/agent.js and exposed as window.PJAgent.
 
 import { Annotation, END, MemorySaver, START, StateGraph } from '@langchain/langgraph/web'
 import { analyze, buildFixtureDataset, emitRawBundle, mapRawBundle, type Analysis } from '@pj/core'
 import { classify, gather, hypothesize, plan, recommend, routeAfterVerify, verify, type AgentDeps, type AgentState } from './nodes'
 import type { Approval, Evidence, Hypothesis, InvestigationContext, PlanItem, Recommendation, Verification } from './types'
-import { sampleLlm, snapshotTools, type SampleFn } from './web-tools'
-export { sampleLlm, snapshotTools, type SampleFn } from './web-tools'
+import { snapshotTools } from './web-tools'
+import { langchainClaudeLlm, type SampleText } from './web-llm'
 
 // ---------- the graph (web entry point) ----------
 
@@ -69,10 +70,10 @@ export interface WebRunView {
   startedAt: string; updatedAt: string; error?: string; state: Partial<AgentState> | null
 }
 
-export function createWebAgent(opts: { now: number; sample?: SampleFn | null; maxIterations?: number }) {
+export function createWebAgent(opts: { now: number; sample?: SampleText | null; maxIterations?: number }) {
   const raw = emitRawBundle(buildFixtureDataset(opts.now))
   const analysis: Analysis = analyze(mapRawBundle(raw))
-  const deps: AgentDeps = { analysis: () => analysis, tools: snapshotTools(raw), llm: opts.sample ? sampleLlm(opts.sample) : null, maxIterations: opts.maxIterations ?? 2 }
+  const deps: AgentDeps = { analysis: () => analysis, tools: snapshotTools(raw), llm: opts.sample ? langchainClaudeLlm(opts.sample) : null, maxIterations: opts.maxIterations ?? 2 }
   const graph = buildWebGraph(deps)
   const runs = new Map<string, WebRunView>()
   const cfg = (id: string) => ({ configurable: { thread_id: id } })

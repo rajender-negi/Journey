@@ -16,22 +16,7 @@ export interface LlmConfig {
 
 export async function createAgentLlm(cfg: LlmConfig): Promise<AgentLlm | null> {
   if (!cfg.apiKey || (cfg.provider === 'openai-compatible' && !cfg.baseUrl)) return null
-  const { z } = await import('zod')
-  const schemas: Record<SchemaName, unknown> = {
-    plan: z.object({ items: z.array(z.object({ kind: z.string().describe('one of the listed evidence kinds'), why: z.string() })).max(5) }),
-    hypothesis: z.object({
-      rootCause: z.string(),
-      chain: z.array(z.object({ step: z.string(), evidenceIds: z.array(z.string()).describe('ids like E0, E1') })).min(1),
-      confidence: z.enum(['high', 'medium', 'low']),
-    }),
-    recommendation: z.object({
-      headline: z.string(),
-      rootCause: z.string(),
-      impact: z.string(),
-      actions: z.array(z.object({ priority: z.number().int(), action: z.string(), ruleId: z.string(), horizon: z.enum(['now', 'this-sprint', 'this-quarter']), owner: z.string() })).min(1),
-      evidenceUsed: z.array(z.string()),
-    }),
-  }
+  const { AGENT_SCHEMAS: schemas } = await import('./schemas')
   let model: { withStructuredOutput: (s: unknown, o?: unknown) => { invoke: (m: unknown) => Promise<unknown> } }
   if (cfg.provider === 'anthropic') {
     const { ChatAnthropic } = await import('@langchain/anthropic')
