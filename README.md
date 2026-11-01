@@ -4,15 +4,65 @@ Live product performance for product teams and leadership: every change from mer
 
 Dynatrace is the hub. ServiceNow CMDB is the product identity. GitHub, Argo CD, Kubernetes, AWS and Azure fill in the rest. Nothing is written back to Dynatrace.
 
-## Run it
+## Run it on a laptop
 
-Requires Node 20+.
+**Prerequisites:** Node.js 22 LTS (20+ works; CI uses 22) from nodejs.org, and Git. Check with `node -v` and `git --version`. Works on macOS, Windows and Linux.
+
+**1. Get the code.** The repo is private, so sign in to GitHub first (`gh auth login`, GitHub Desktop, or a credential prompt on first clone).
+
+```bash
+git clone https://github.com/rajender-negi/Journey.git
+cd Journey
+```
+
+**2. Install.** Pulls LangGraph, the LangChain model adapters, the MCP SDK, zod, TypeScript and tsx.
 
 ```bash
 npm install
-npm start              # builds the UI, then API + UI on http://localhost:8787 (dummy data until sources are configured)
-npm test               # core engines + end-to-end API tests
 ```
+
+**3. Optional: verify.** Builds the UI, then runs 40 tests (engines, LangGraph agent with approval pause and resume, every API route).
+
+```bash
+npm test
+```
+
+**4. Start.** Builds the UI and starts the API and UI together.
+
+```bash
+npm start
+```
+
+Open http://localhost:8787. The console prints each source's tier; with no configuration all seven are `dummy`, the agent runs its rules path, and everything in the UI works, including **Investigate**.
+
+**5. Connect real systems (any order, one at a time).**
+
+```bash
+cp .env.example .env                              # Windows: copy .env.example .env
+cp mcp.servers.example.json mcp.servers.json      # Windows: copy mcp.servers.example.json mcp.servers.json
+```
+
+| To turn on | Set | Check |
+|---|---|---|
+| AI briefs and the model-driven agent | `AI_API_KEY` in `.env` (`AI_PROVIDER`, `AI_BASE_URL` for a gateway) | `GET /api/health` shows `ai.configured: true` |
+| MCP tools for the agent | server URLs in `mcp.servers.json`; tokens in `.env`, referenced as `${env:VAR}` | `GET /api/agent/status` lists servers and tool counts |
+| Collection through MCP | add the source under `"collect"` in `mcp.servers.json` | Sources view shows tier `mcp` |
+| A source over its REST API | that source's block in `.env` (ServiceNow, GitHub, Dynatrace, Argo CD, Kubernetes, AWS, Azure) | Sources view shows tier `live`; compare `GET /api/raw/<source>` with `fixtures/raw/<source>.json` |
+
+Restart `npm start` after changing `.env` or `mcp.servers.json`.
+
+**6. Open it on your phone from the laptop (same Wi-Fi).** Find the laptop's IP (macOS: `ipconfig getifaddr en0`; Windows: `ipconfig`; Linux: `hostname -I`) and open `http://<laptop-ip>:8787` on the phone. Allow Node through the firewall if asked. There is no login yet, so do this only on a network you trust, or use Tailscale.
+
+**Troubleshooting**
+
+| Symptom | Fix |
+|---|---|
+| `EADDRINUSE :8787` | another process holds the port: set `PORT=8788` in `.env` |
+| `npm install` 403 or ENOTFOUND | corporate proxy or registry policy: set `npm config set registry <your mirror>` or run in Codespaces |
+| Agent status `langgraph: false` | `npm install` did not finish; rerun it |
+| Agent step falls back to rules | model unreachable or slower than `AI_TIMEOUT_MS` (default 45000) |
+
+**No laptop handy:** on GitHub, Code > Codespaces > Create codespace on main, then `npm start`; port 8787 opens in the browser (works from a phone).
 
 ## CI and Codespaces
 
@@ -115,6 +165,6 @@ Copy `cursor-kit/.cursor` into the repo root. `mcp.json` lists the MCP servers (
 
 ## What was verified and what was not
 
-- Verified: 16 core tests (schema round trip, all phases, AI contract) and 8 end-to-end API tests (dummy tier, every route, gzipped view model, snapshot ingest with schema rejection, LLM path against a local OpenAI-compatible mock with invented rule ids dropped). UI checked in Chromium at iPhone 13 size with 4x CPU throttle and at laptop size, light and dark. Not checked on a physical iPhone.
+- Verified in CI (GitHub Actions, real packages installed): 40 tests pass, including the LangGraph graph pausing for approval and resuming, and the API agent route. Locally: core tests (schema round trip, all phases, AI contract) and end-to-end API tests (dummy tier, every route, gzipped view model, snapshot ingest with schema rejection, LLM path against a local OpenAI-compatible mock with invented rule ids dropped). UI checked in Chromium at iPhone 13 size with 4x CPU throttle and at laptop size, light and dark. Not checked on a physical iPhone.
 - Agent: 11 tests of the agent logic (policy, MCP config and tool resolution, evidence planning, the full node sequence with the same routing as the graph, LLM path with invented rules dropped) and an API test. The LangGraph wiring test (pause for approval, resume) runs after `npm install`; it was skipped here because this sandbox has no npm registry access, so LangGraph, the LangChain adapters and the MCP SDK were not installed or executed here.
 - Not verified against live systems: the adapters' calls to ServiceNow, GitHub, Dynatrace, Argo CD, Kubernetes, AWS and Azure. Field names follow each API's documented schema; DQL field names depend on your OpenPipeline configuration. Run one source live at a time and compare `GET /api/raw/<source>` with `fixtures/raw/<source>.json`.
