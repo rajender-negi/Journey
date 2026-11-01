@@ -1,0 +1,7 @@
+{
+  "name": "Product Journey",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "postCreateCommand": "npm install",
+  "forwardPorts": [8787],
+  "portsAttributes": { "8787": { "label": "Product Journey", "onAutoForward": "openBrowser" } }
+}

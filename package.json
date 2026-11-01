@@ -1,0 +1,24 @@
+{
+  "name": "product-journey",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "start": "npm run build && npm run start -w @pj/server",
+    "dev": "npm run dev -w @pj/server",
+    "build": "npm run build -w @pj/web",
+    "fixtures": "npm run fixtures -w @pj/server",
+    "test": "tsx --test packages/core/test/*.test.ts packages/agent/test/*.test.ts apps/server/test/*.test.ts",
+    "typecheck": "tsc -p packages/core && tsc -p packages/agent && tsc -p apps/server && tsc -p apps/web"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "esbuild": "^0.24.0"
+  }
+}

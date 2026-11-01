@@ -1,0 +1,31 @@
+---
+description: Rules for agents that collect signals and extend the Product Journey app
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Product Journey: agent rules
+
+## Data contract
+- Every collected payload is written in the source's **native schema**, exactly as the source API or MCP tool returns it. Never reshape it by hand.
+- The contract for each source is the file in `fixtures/raw/<source>.json`. Compare field names before you push.
+- Push with `POST http://localhost:8787/api/ingest/<source>`. A 422 means the shape is wrong: fix the payload, never the validator.
+- Raw to normalized mapping lives only in `packages/core/src/sources.ts`. Tenant-specific field names (custom CMDB fields, OpenPipeline enrichment) change only in `FIELD_MAP`.
+
+## Product identity
+- ServiceNow `cmdb_ci_business_app` is the only source of product identity. Repos, Dynatrace services, k8s namespaces and cost tags come from its fields. Do not invent a product mapping elsewhere.
+
+## Dynatrace
+- Dynatrace is the hub. Read only. No write-back of any kind: no events, no settings, no dashboards.
+- Use the DQL in `DQL` (packages/core/src/sources.ts). Keep queries scoped (`from:` window, `fields`/`summarize`) to control Grail scan cost.
+- DORA values already computed in Dynatrace win over computed values; differences above 25% are reported as drift, not overwritten.
+
+## Engines
+- Deterministic first. A failure category, a code finding or a cost action must come from a rule in core. The LLM explains and ranks; it never creates a category or a number.
+- Every recommendation cites an official source from `packages/core/src/refs.ts`. Add the reference there before using it.
+- New failure signature: add a rule to `FAILURE_RULES` with a test in `packages/core/test`, ordered before broader rules.
+- New code rule: add it to `FILE_RULES` or `crossSignalFindings`. Cross-signal rules must state the runtime evidence threshold.
+
+## Change discipline
+- `npm test` and `npm run typecheck` pass before any commit.
+- Reuse existing platform services before proposing new ones (the cache-aside rule checks for an existing ElastiCache line first).

@@ -1,0 +1,148 @@
+{
+  "events": [
+    {
+      "metadata": {
+        "name": "checkout-api.31A0EFD8",
+        "namespace": "checkout-staging",
+        "uid": "evt-87"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "checkout-api-31A0E",
+        "namespace": "checkout-staging"
+      },
+      "reason": "ImagePullBackOff",
+      "message": "Failed to pull image \"123456789012.dkr.ecr.ap-south-1.amazonaws.com/app:sha-9f2c1\": manifest unknown. Pod status ImagePullBackOff. Argo CD health: Degraded.",
+      "type": "Warning",
+      "lastTimestamp": "2026-10-09T14:44:35.551Z"
+    },
+    {
+      "metadata": {
+        "name": "catalog-api.C7FD707A",
+        "namespace": "catalog",
+        "uid": "evt-443"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "catalog-api-C7FD7",
+        "namespace": "catalog"
+      },
+      "reason": "Unhealthy",
+      "message": "Readiness probe failed: HTTP probe failed with statuscode: 503. Deployment exceeded its progress deadline. Argo CD rolled back.",
+      "type": "Warning",
+      "lastTimestamp": "2026-10-03T13:06:58.184Z"
+    },
+    {
+      "metadata": {
+        "name": "notifications-worker.AC7BDF51",
+        "namespace": "notifications",
+        "uid": "evt-763"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "notifications-worker-AC7BD",
+        "namespace": "notifications"
+      },
+      "reason": "OOMKilled",
+      "message": "Container worker terminated. Reason: OOMKilled (exit code 137). Memory limit 512Mi. Rollout progress deadline exceeded, rolled back to previous ReplicaSet.",
+      "type": "Warning",
+      "lastTimestamp": "2026-10-07T12:34:00.418Z"
+    },
+    {
+      "metadata": {
+        "name": "notifications-worker.A0774F3F",
+        "namespace": "notifications",
+        "uid": "evt-787"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "notifications-worker-A0774",
+        "namespace": "notifications"
+      },
+      "reason": "OOMKilled",
+      "message": "Container worker terminated. Reason: OOMKilled (exit code 137). Memory limit 512Mi. Rollout progress deadline exceeded, rolled back to previous ReplicaSet.",
+      "type": "Warning",
+      "lastTimestamp": "2026-10-11T17:58:10.217Z"
+    },
+    {
+      "metadata": {
+        "name": "notifications-worker.9E798AB0",
+        "namespace": "notifications-staging",
+        "uid": "evt-795"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "notifications-worker-9E798",
+        "namespace": "notifications-staging"
+      },
+      "reason": "CrashLoopBackOff",
+      "message": "Back-off restarting failed container api in pod. CrashLoopBackOff. Last log: Error: missing required environment variable DATABASE_URL.",
+      "type": "Warning",
+      "lastTimestamp": "2026-10-12T16:17:28.985Z"
+    },
+    {
+      "metadata": {
+        "name": "notifications-worker.8265A339",
+        "namespace": "notifications",
+        "uid": "evt-824"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "notifications-worker-8265A",
+        "namespace": "notifications"
+      },
+      "reason": "OOMKilled",
+      "message": "Container worker terminated. Reason: OOMKilled (exit code 137). Memory limit 512Mi. Rollout progress deadline exceeded, rolled back to previous ReplicaSet.",
+      "type": "Warning",
+      "lastTimestamp": "2026-10-18T14:10:47.440Z"
+    },
+    {
+      "metadata": {
+        "name": "notifications-worker.89636FA7",
+        "namespace": "notifications-staging",
+        "uid": "evt-839"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "notifications-worker-89636",
+        "namespace": "notifications-staging"
+      },
+      "reason": "CrashLoopBackOff",
+      "message": "Back-off restarting failed container api in pod. CrashLoopBackOff. Last log: Error: missing required environment variable DATABASE_URL.",
+      "type": "Warning",
+      "lastTimestamp": "2026-10-21T17:34:04.200Z"
+    },
+    {
+      "metadata": {
+        "name": "notifications-worker.0D5E2F45",
+        "namespace": "notifications-staging",
+        "uid": "evt-859"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "notifications-worker-0D5E2",
+        "namespace": "notifications-staging"
+      },
+      "reason": "CrashLoopBackOff",
+      "message": "Back-off restarting failed container api in pod. CrashLoopBackOff. Last log: Error: missing required environment variable DATABASE_URL.",
+      "type": "Warning",
+      "lastTimestamp": "2026-10-25T14:22:51.054Z"
+    },
+    {
+      "metadata": {
+        "name": "notifications-worker.0E59B3AA",
+        "namespace": "notifications",
+        "uid": "evt-876"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "notifications-worker-0E59B",
+        "namespace": "notifications"
+      },
+      "reason": "OOMKilled",
+      "message": "Container worker terminated. Reason: OOMKilled (exit code 137). Memory limit 512Mi. Rollout progress deadline exceeded, rolled back to previous ReplicaSet.",
+      "type": "Warning",
+      "lastTimestamp": "2026-10-30T15:30:31.187Z"
+    }
+  ]
+}

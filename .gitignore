@@ -1,0 +1,6 @@
+node_modules/
+data/
+apps/web/dist/
+apps/web/dist-demo/
+.env
+mcp.servers.json

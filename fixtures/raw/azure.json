@@ -1,0 +1,130 @@
+{
+  "costManagement": {
+    "properties": {
+      "columns": [
+        {
+          "name": "PreTaxCost",
+          "type": "Number"
+        },
+        {
+          "name": "BillingMonth",
+          "type": "Datetime"
+        },
+        {
+          "name": "ServiceName",
+          "type": "String"
+        },
+        {
+          "name": "TagValue",
+          "type": "String"
+        },
+        {
+          "name": "Environment",
+          "type": "String"
+        },
+        {
+          "name": "Currency",
+          "type": "String"
+        }
+      ],
+      "rows": [
+        [
+          1338,
+          "2026-06-01T00:00:00",
+          "Key Vault and HSM",
+          "payments",
+          "prod",
+          "USD"
+        ],
+        [
+          1279,
+          "2026-07-01T00:00:00",
+          "Key Vault and HSM",
+          "payments",
+          "prod",
+          "USD"
+        ],
+        [
+          1281,
+          "2026-08-01T00:00:00",
+          "Key Vault and HSM",
+          "payments",
+          "prod",
+          "USD"
+        ],
+        [
+          1323,
+          "2026-09-01T00:00:00",
+          "Key Vault and HSM",
+          "payments",
+          "prod",
+          "USD"
+        ],
+        [
+          1297,
+          "2026-10-01T00:00:00",
+          "Key Vault and HSM",
+          "payments",
+          "prod",
+          "USD"
+        ],
+        [
+          1300,
+          "2026-11-01T00:00:00",
+          "Key Vault and HSM",
+          "payments",
+          "prod",
+          "USD"
+        ],
+        [
+          4512,
+          "2026-06-01T00:00:00",
+          "Entra ID P2 and App Service",
+          "identity",
+          "prod",
+          "USD"
+        ],
+        [
+          4646,
+          "2026-07-01T00:00:00",
+          "Entra ID P2 and App Service",
+          "identity",
+          "prod",
+          "USD"
+        ],
+        [
+          4585,
+          "2026-08-01T00:00:00",
+          "Entra ID P2 and App Service",
+          "identity",
+          "prod",
+          "USD"
+        ],
+        [
+          4477,
+          "2026-09-01T00:00:00",
+          "Entra ID P2 and App Service",
+          "identity",
+          "prod",
+          "USD"
+        ],
+        [
+          4674,
+          "2026-10-01T00:00:00",
+          "Entra ID P2 and App Service",
+          "identity",
+          "prod",
+          "USD"
+        ],
+        [
+          4635,
+          "2026-11-01T00:00:00",
+          "Entra ID P2 and App Service",
+          "identity",
+          "prod",
+          "USD"
+        ]
+      ]
+    }
+  }
+}

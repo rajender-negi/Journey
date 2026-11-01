@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "paths": { "@pj/core": ["../../packages/core/src/index.ts"], "@pj/agent": ["../../packages/agent/src/index.ts"] }
+  },
+  "include": ["src", "test"]
+}

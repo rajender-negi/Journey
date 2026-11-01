@@ -1,0 +1,2575 @@
+{
+  "costExplorer": [
+    {
+      "environment": "prod",
+      "byService": {
+        "ResultsByTime": [
+          {
+            "TimePeriod": {
+              "Start": "2026-06-01",
+              "End": "2026-07-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "21544.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8674.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "EC2 - Other",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2114.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9234.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "7216.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "26775.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "14373.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Virtual Private Cloud",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "3190.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Simple Storage Service",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1927.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8463.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon ElastiCache",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1473.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "5341.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Simple Queue Service",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "882.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "EC2 - Other",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "700.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-07-01",
+              "End": "2026-08-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "21733.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8901.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "EC2 - Other",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2149.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9540.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "7058.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "26871.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "15633.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Virtual Private Cloud",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "3196.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Simple Storage Service",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1971.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8359.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon ElastiCache",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1487.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "5307.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Simple Queue Service",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "954.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "EC2 - Other",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "704.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-08-01",
+              "End": "2026-09-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "22169.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9094.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "EC2 - Other",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2273.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9542.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "7506.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "29604.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "16341.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Virtual Private Cloud",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "3350.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Simple Storage Service",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2027.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8673.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon ElastiCache",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1517.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "5096.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Simple Queue Service",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "986.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "EC2 - Other",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "719.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-09-01",
+              "End": "2026-10-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "22913.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9611.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "EC2 - Other",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2387.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9492.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "7277.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "31855.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "18279.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Virtual Private Cloud",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "3424.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Simple Storage Service",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2136.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8571.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon ElastiCache",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1506.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "5232.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Simple Queue Service",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1022.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "EC2 - Other",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "685.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-10-01",
+              "End": "2026-11-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "24279.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9567.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "EC2 - Other",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2527.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "10009.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "7561.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "32340.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "19453.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Virtual Private Cloud",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "3623.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Simple Storage Service",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2188.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8786.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon ElastiCache",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1494.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "5131.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Simple Queue Service",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1093.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "EC2 - Other",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "692.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-11-01",
+              "End": "2026-12-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "24079.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9534.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "EC2 - Other",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2614.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9704.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "7433.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "35556.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Relational Database Service",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "20106.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Virtual Private Cloud",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "5822.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Simple Storage Service",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2199.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8667.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon ElastiCache",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1466.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "5093.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "Amazon Simple Queue Service",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1149.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "EC2 - Other",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "692.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "byUsageType": {
+        "ResultsByTime": [
+          {
+            "TimePeriod": {
+              "Start": "2026-06-01",
+              "End": "2026-07-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "21544.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8674.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-EBS:VolumeUsage.gp2",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2114.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m6g.xlarge",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9234.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r6g.xlarge",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "7216.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "26775.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r5.4xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "14373.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-NatGateway-Bytes",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "3190.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-TimedStorage-ByteHrs",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1927.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.xlarge",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8463.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-NodeUsage:cache.r6g.large",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1473.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:c5.2xlarge",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "5341.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-EBS:VolumeUsage.gp2",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "700.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-07-01",
+              "End": "2026-08-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "21733.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8901.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-EBS:VolumeUsage.gp2",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2149.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m6g.xlarge",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9540.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r6g.xlarge",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "7058.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "26871.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r5.4xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "15633.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-NatGateway-Bytes",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "3196.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-TimedStorage-ByteHrs",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1971.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.xlarge",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8359.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-NodeUsage:cache.r6g.large",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1487.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:c5.2xlarge",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "5307.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-EBS:VolumeUsage.gp2",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "704.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-08-01",
+              "End": "2026-09-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "22169.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9094.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-EBS:VolumeUsage.gp2",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2273.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m6g.xlarge",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9542.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r6g.xlarge",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "7506.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "29604.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r5.4xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "16341.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-NatGateway-Bytes",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "3350.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-TimedStorage-ByteHrs",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2027.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.xlarge",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8673.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-NodeUsage:cache.r6g.large",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1517.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:c5.2xlarge",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "5096.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-EBS:VolumeUsage.gp2",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "719.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-09-01",
+              "End": "2026-10-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "22913.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9611.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-EBS:VolumeUsage.gp2",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2387.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m6g.xlarge",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9492.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r6g.xlarge",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "7277.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "31855.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r5.4xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "18279.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-NatGateway-Bytes",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "3424.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-TimedStorage-ByteHrs",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2136.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.xlarge",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8571.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-NodeUsage:cache.r6g.large",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1506.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:c5.2xlarge",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "5232.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-EBS:VolumeUsage.gp2",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "685.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-10-01",
+              "End": "2026-11-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "24279.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9567.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-EBS:VolumeUsage.gp2",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2527.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m6g.xlarge",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "10009.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r6g.xlarge",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "7561.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "32340.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r5.4xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "19453.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-NatGateway-Bytes",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "3623.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-TimedStorage-ByteHrs",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2188.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.xlarge",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8786.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-NodeUsage:cache.r6g.large",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1494.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:c5.2xlarge",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "5131.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-EBS:VolumeUsage.gp2",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "692.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-11-01",
+              "End": "2026-12-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "24079.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9534.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-EBS:VolumeUsage.gp2",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2614.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m6g.xlarge",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9704.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r6g.xlarge",
+                  "product$payments"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "7433.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "35556.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-InstanceUsage:db.r5.4xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "20106.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-NatGateway-Bytes",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "5822.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-TimedStorage-ByteHrs",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "2199.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.xlarge",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "8667.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-NodeUsage:cache.r6g.large",
+                  "product$identity"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "1466.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-BoxUsage:c5.2xlarge",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "5093.00",
+                    "Unit": "USD"
+                  }
+                }
+              },
+              {
+                "Keys": [
+                  "APS3-EBS:VolumeUsage.gp2",
+                  "product$notifications"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "692.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "environment": "staging",
+      "byService": {
+        "ResultsByTime": [
+          {
+            "TimePeriod": {
+              "Start": "2026-06-01",
+              "End": "2026-07-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "6111.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-07-01",
+              "End": "2026-08-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "6240.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-08-01",
+              "End": "2026-09-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "6229.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-09-01",
+              "End": "2026-10-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "6250.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-10-01",
+              "End": "2026-11-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "6083.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-11-01",
+              "End": "2026-12-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "6110.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "byUsageType": {
+        "ResultsByTime": [
+          {
+            "TimePeriod": {
+              "Start": "2026-06-01",
+              "End": "2026-07-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "6111.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-07-01",
+              "End": "2026-08-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "6240.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-08-01",
+              "End": "2026-09-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "6229.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-09-01",
+              "End": "2026-10-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "6250.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-10-01",
+              "End": "2026-11-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "6083.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-11-01",
+              "End": "2026-12-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$checkout"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "6110.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "environment": "dev",
+      "byService": {
+        "ResultsByTime": [
+          {
+            "TimePeriod": {
+              "Start": "2026-06-01",
+              "End": "2026-07-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9774.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-07-01",
+              "End": "2026-08-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9871.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-08-01",
+              "End": "2026-09-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "10456.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-09-01",
+              "End": "2026-10-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "10200.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-10-01",
+              "End": "2026-11-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "10478.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-11-01",
+              "End": "2026-12-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "Amazon Elastic Compute Cloud - Compute",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "10561.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "byUsageType": {
+        "ResultsByTime": [
+          {
+            "TimePeriod": {
+              "Start": "2026-06-01",
+              "End": "2026-07-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9774.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-07-01",
+              "End": "2026-08-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "9871.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-08-01",
+              "End": "2026-09-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "10456.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-09-01",
+              "End": "2026-10-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "10200.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-10-01",
+              "End": "2026-11-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "10478.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "TimePeriod": {
+              "Start": "2026-11-01",
+              "End": "2026-12-01"
+            },
+            "Groups": [
+              {
+                "Keys": [
+                  "APS3-BoxUsage:m5.2xlarge",
+                  "product$catalog"
+                ],
+                "Metrics": {
+                  "UnblendedCost": {
+                    "Amount": "10561.00",
+                    "Unit": "USD"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "commitmentCoverage": {
+    "BA0001|Amazon Elastic Compute Cloud - Compute|prod": 0.35,
+    "BA0001|Amazon Relational Database Service|prod": 0.5,
+    "BA0001|EC2 - Other|prod": 0,
+    "BA0002|Amazon Elastic Compute Cloud - Compute|prod": 0.72,
+    "BA0002|Amazon Relational Database Service|prod": 0.7,
+    "BA0003|Amazon Elastic Compute Cloud - Compute|prod": 0.2,
+    "BA0003|Amazon Relational Database Service|prod": 0.25,
+    "BA0003|Amazon Virtual Private Cloud|prod": 0,
+    "BA0003|Amazon Simple Storage Service|prod": 0,
+    "BA0004|Amazon Elastic Compute Cloud - Compute|prod": 0.4,
+    "BA0004|Amazon ElastiCache|prod": 0.5,
+    "BA0005|Amazon Elastic Compute Cloud - Compute|prod": 0,
+    "BA0005|Amazon Simple Queue Service|prod": 0,
+    "BA0005|EC2 - Other|prod": 0,
+    "BA0001|Amazon Elastic Compute Cloud - Compute|staging": 0,
+    "BA0003|Amazon Elastic Compute Cloud - Compute|dev": 0
+  }
+}

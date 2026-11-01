@@ -1,0 +1,304 @@
+{
+  "applications": [
+    {
+      "metadata": {
+        "name": "checkout-staging",
+        "namespace": "argocd"
+      },
+      "spec": {
+        "destination": {
+          "namespace": "checkout-staging"
+        },
+        "source": {
+          "repoURL": "https://github.com/acme/checkout-web.git",
+          "targetRevision": "HEAD"
+        }
+      },
+      "status": {
+        "sync": {
+          "status": "Synced",
+          "revision": "c2bca80"
+        },
+        "health": {
+          "status": "Healthy"
+        },
+        "operationState": {
+          "phase": "Succeeded",
+          "message": "successfully synced (all tasks run)",
+          "startedAt": "2026-10-31T14:52:50.289Z",
+          "finishedAt": "2026-10-31T14:57:50.289Z"
+        }
+      }
+    },
+    {
+      "metadata": {
+        "name": "checkout-prod",
+        "namespace": "argocd"
+      },
+      "spec": {
+        "destination": {
+          "namespace": "checkout"
+        },
+        "source": {
+          "repoURL": "https://github.com/acme/checkout-web.git",
+          "targetRevision": "HEAD"
+        }
+      },
+      "status": {
+        "sync": {
+          "status": "Synced",
+          "revision": "c2bca80"
+        },
+        "health": {
+          "status": "Healthy"
+        },
+        "operationState": {
+          "phase": "Succeeded",
+          "message": "successfully synced (all tasks run)",
+          "startedAt": "2026-10-31T15:08:53.054Z",
+          "finishedAt": "2026-10-31T15:14:53.054Z"
+        }
+      }
+    },
+    {
+      "metadata": {
+        "name": "payments-staging",
+        "namespace": "argocd"
+      },
+      "spec": {
+        "destination": {
+          "namespace": "payments-staging"
+        },
+        "source": {
+          "repoURL": "https://github.com/acme/payments-service.git",
+          "targetRevision": "HEAD"
+        }
+      },
+      "status": {
+        "sync": {
+          "status": "Synced",
+          "revision": "d2d26ea"
+        },
+        "health": {
+          "status": "Healthy"
+        },
+        "operationState": {
+          "phase": "Succeeded",
+          "message": "successfully synced (all tasks run)",
+          "startedAt": "2026-10-30T09:33:25.877Z",
+          "finishedAt": "2026-10-30T09:38:25.877Z"
+        }
+      }
+    },
+    {
+      "metadata": {
+        "name": "payments-prod",
+        "namespace": "argocd"
+      },
+      "spec": {
+        "destination": {
+          "namespace": "payments"
+        },
+        "source": {
+          "repoURL": "https://github.com/acme/payments-service.git",
+          "targetRevision": "HEAD"
+        }
+      },
+      "status": {
+        "sync": {
+          "status": "Synced",
+          "revision": "d2d26ea"
+        },
+        "health": {
+          "status": "Healthy"
+        },
+        "operationState": {
+          "phase": "Succeeded",
+          "message": "successfully synced (all tasks run)",
+          "startedAt": "2026-10-31T01:15:58.690Z",
+          "finishedAt": "2026-10-31T01:21:58.690Z"
+        }
+      }
+    },
+    {
+      "metadata": {
+        "name": "catalog-staging",
+        "namespace": "argocd"
+      },
+      "spec": {
+        "destination": {
+          "namespace": "catalog-staging"
+        },
+        "source": {
+          "repoURL": "https://github.com/acme/catalog-api.git",
+          "targetRevision": "HEAD"
+        }
+      },
+      "status": {
+        "sync": {
+          "status": "Synced",
+          "revision": "4c30c84"
+        },
+        "health": {
+          "status": "Healthy"
+        },
+        "operationState": {
+          "phase": "Succeeded",
+          "message": "successfully synced (all tasks run)",
+          "startedAt": "2026-10-31T09:50:43.167Z",
+          "finishedAt": "2026-10-31T09:55:43.167Z"
+        }
+      }
+    },
+    {
+      "metadata": {
+        "name": "catalog-prod",
+        "namespace": "argocd"
+      },
+      "spec": {
+        "destination": {
+          "namespace": "catalog"
+        },
+        "source": {
+          "repoURL": "https://github.com/acme/catalog-api.git",
+          "targetRevision": "HEAD"
+        }
+      },
+      "status": {
+        "sync": {
+          "status": "Synced",
+          "revision": "4c30c84"
+        },
+        "health": {
+          "status": "Healthy"
+        },
+        "operationState": {
+          "phase": "Succeeded",
+          "message": "successfully synced (all tasks run)",
+          "startedAt": "2026-10-31T10:06:30.680Z",
+          "finishedAt": "2026-10-31T10:12:30.680Z"
+        }
+      }
+    },
+    {
+      "metadata": {
+        "name": "identity-staging",
+        "namespace": "argocd"
+      },
+      "spec": {
+        "destination": {
+          "namespace": "identity-staging"
+        },
+        "source": {
+          "repoURL": "https://github.com/acme/identity-service.git",
+          "targetRevision": "HEAD"
+        }
+      },
+      "status": {
+        "sync": {
+          "status": "Synced",
+          "revision": "6e84119"
+        },
+        "health": {
+          "status": "Healthy"
+        },
+        "operationState": {
+          "phase": "Succeeded",
+          "message": "successfully synced (all tasks run)",
+          "startedAt": "2026-10-28T12:30:38.258Z",
+          "finishedAt": "2026-10-28T12:35:38.258Z"
+        }
+      }
+    },
+    {
+      "metadata": {
+        "name": "identity-prod",
+        "namespace": "argocd"
+      },
+      "spec": {
+        "destination": {
+          "namespace": "identity"
+        },
+        "source": {
+          "repoURL": "https://github.com/acme/identity-service.git",
+          "targetRevision": "HEAD"
+        }
+      },
+      "status": {
+        "sync": {
+          "status": "Synced",
+          "revision": "6e84119"
+        },
+        "health": {
+          "status": "Healthy"
+        },
+        "operationState": {
+          "phase": "Succeeded",
+          "message": "successfully synced (all tasks run)",
+          "startedAt": "2026-10-28T12:47:18.868Z",
+          "finishedAt": "2026-10-28T12:53:18.868Z"
+        }
+      }
+    },
+    {
+      "metadata": {
+        "name": "notifications-staging",
+        "namespace": "argocd"
+      },
+      "spec": {
+        "destination": {
+          "namespace": "notifications-staging"
+        },
+        "source": {
+          "repoURL": "https://github.com/acme/notifications-worker.git",
+          "targetRevision": "HEAD"
+        }
+      },
+      "status": {
+        "sync": {
+          "status": "Synced",
+          "revision": "30cd347"
+        },
+        "health": {
+          "status": "Healthy"
+        },
+        "operationState": {
+          "phase": "Succeeded",
+          "message": "successfully synced (all tasks run)",
+          "startedAt": "2026-10-30T15:10:08.541Z",
+          "finishedAt": "2026-10-30T15:15:08.541Z"
+        }
+      }
+    },
+    {
+      "metadata": {
+        "name": "notifications-prod",
+        "namespace": "argocd"
+      },
+      "spec": {
+        "destination": {
+          "namespace": "notifications"
+        },
+        "source": {
+          "repoURL": "https://github.com/acme/notifications-worker.git",
+          "targetRevision": "HEAD"
+        }
+      },
+      "status": {
+        "sync": {
+          "status": "Synced",
+          "revision": "30cd347-rb"
+        },
+        "health": {
+          "status": "Healthy"
+        },
+        "operationState": {
+          "phase": "Succeeded",
+          "message": "successfully synced (all tasks run)",
+          "startedAt": "2026-10-30T17:44:55.700Z",
+          "finishedAt": "2026-10-30T17:50:55.700Z"
+        }
+      }
+    }
+  ]
+}

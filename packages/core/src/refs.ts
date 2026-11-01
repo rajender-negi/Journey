@@ -1,0 +1,85 @@
+import type { Reference } from './types'
+
+// Official / canonical sources only. Every recommendation cites from here.
+const r = (title: string, url: string): Reference => ({ title, url })
+
+export const REF = {
+  // DORA
+  doraMetrics: r('DORA: software delivery performance metrics', 'https://dora.dev/guides/dora-metrics-four-keys/'),
+  doraChangeApproval: r('DORA capability: streamlining change approval', 'https://dora.dev/capabilities/streamlining-change-approval/'),
+  doraTestAutomation: r('DORA capability: test automation', 'https://dora.dev/capabilities/test-automation/'),
+  doraDbChange: r('DORA capability: database change management', 'https://dora.dev/capabilities/database-change-management/'),
+  doraContinuousDelivery: r('DORA capability: continuous delivery', 'https://dora.dev/capabilities/continuous-delivery/'),
+  doraMonitoring: r('DORA capability: monitoring and observability', 'https://dora.dev/capabilities/monitoring-and-observability/'),
+  doraSmallBatches: r('DORA capability: working in small batches', 'https://dora.dev/capabilities/working-in-small-batches/'),
+  doraTrunk: r('DORA capability: trunk-based development', 'https://dora.dev/capabilities/trunk-based-development/'),
+  // Kubernetes
+  k8sImages: r('Kubernetes: images and ImagePullBackOff', 'https://kubernetes.io/docs/concepts/containers/images/'),
+  k8sDebugPods: r('Kubernetes: debug pods', 'https://kubernetes.io/docs/tasks/debug/debug-application/debug-pods/'),
+  k8sProbes: r('Kubernetes: liveness, readiness and startup probes', 'https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/'),
+  k8sResources: r('Kubernetes: resource management for pods and containers', 'https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'),
+  k8sMemory: r('Kubernetes: assign memory resources', 'https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/'),
+  k8sConfigMap: r('Kubernetes: ConfigMaps', 'https://kubernetes.io/docs/concepts/configuration/configmap/'),
+  k8sPdb: r('Kubernetes: PodDisruptionBudget', 'https://kubernetes.io/docs/tasks/run-application/configure-pdb/'),
+  k8sPss: r('Kubernetes: Pod Security Standards', 'https://kubernetes.io/docs/concepts/security/pod-security-standards/'),
+  // Argo
+  argoHooks: r('Argo CD: resource hooks', 'https://argo-cd.readthedocs.io/en/stable/user-guide/resource_hooks/'),
+  argoWaves: r('Argo CD: sync phases and waves', 'https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/'),
+  argoRolloutsAnalysis: r('Argo Rollouts: analysis and progressive delivery', 'https://argoproj.github.io/argo-rollouts/features/analysis/'),
+  externalSecrets: r('External Secrets Operator', 'https://external-secrets.io/latest/'),
+  // GitHub
+  ghRerun: r('GitHub Actions: re-running workflows and jobs', 'https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/re-running-workflows-and-jobs'),
+  ghHardening: r('GitHub Actions: security hardening', 'https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions'),
+  ghProtectedBranches: r('GitHub: protected branches and required status checks', 'https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches'),
+  ghDependabot: r('GitHub: configuring Dependabot version updates', 'https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuring-dependabot-version-updates'),
+  ghCodeowners: r('GitHub: about code owners', 'https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners'),
+  // Security
+  owaspSqli: r('OWASP: SQL injection prevention cheat sheet', 'https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html'),
+  owaspSecrets: r('OWASP: secrets management cheat sheet', 'https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html'),
+  owaspJwt: r('OWASP: JSON Web Token cheat sheet', 'https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html'),
+  trivy: r('Trivy documentation', 'https://trivy.dev/latest/docs/'),
+  dockerBest: r('Docker: building best practices', 'https://docs.docker.com/build/building/best-practices/'),
+  // Architecture patterns
+  cacheAside: r('Azure Architecture Center: cache-aside pattern', 'https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside'),
+  circuitBreaker: r('Azure Architecture Center: circuit breaker pattern', 'https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker'),
+  retryPattern: r('Azure Architecture Center: retry pattern', 'https://learn.microsoft.com/en-us/azure/architecture/patterns/retry'),
+  awsTimeouts: r('AWS Builders Library: timeouts, retries and backoff with jitter', 'https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/'),
+  redisCaching: r('AWS whitepaper: database caching strategies using Redis', 'https://docs.aws.amazon.com/whitepapers/latest/database-caching-strategies-using-redis/welcome.html'),
+  parallelChange: r('Martin Fowler: parallel change (expand and contract)', 'https://martinfowler.com/bliki/ParallelChange.html'),
+  springJpaQueries: r('Spring Data JPA: query methods and entity graphs', 'https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html'),
+  // Dynatrace
+  dtSrg: r('Dynatrace: Site Reliability Guardian', 'https://docs.dynatrace.com/docs/deliver/site-reliability-guardian'),
+  dtOpenPipeline: r('Dynatrace: OpenPipeline', 'https://docs.dynatrace.com/docs/platform/openpipeline'),
+  // Cloud / IaC / cost
+  awsCostPillar: r('AWS Well-Architected: cost optimization pillar', 'https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html'),
+  awsSavingsPlans: r('AWS: Savings Plans user guide', 'https://docs.aws.amazon.com/savingsplans/latest/userguide/what-is-savings-plans.html'),
+  awsEbsTypes: r('AWS: Amazon EBS volume types (gp3)', 'https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html'),
+  awsGraviton: r('AWS Graviton processors', 'https://aws.amazon.com/ec2/graviton/'),
+  awsGatewayEndpoints: r('AWS: gateway VPC endpoints', 'https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html'),
+  awsScheduler: r('AWS Solutions: Instance Scheduler', 'https://aws.amazon.com/solutions/implementations/instance-scheduler-on-aws/'),
+  karpenter: r('Karpenter documentation', 'https://karpenter.sh/docs/'),
+  s3BlockPublic: r('Amazon S3: block public access', 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html'),
+  tfBackend: r('Terraform: backend configuration', 'https://developer.hashicorp.com/terraform/language/backend'),
+  ecrTagImmutability: r('Amazon ECR: image tag mutability', 'https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-tag-mutability.html'),
+  // Architecture patterns and principles (design advisor)
+  healthEndpoint: r('Azure Architecture Center: health endpoint monitoring pattern', 'https://learn.microsoft.com/en-us/azure/architecture/patterns/health-endpoint-monitoring'),
+  externalConfig: r('Azure Architecture Center: external configuration store pattern', 'https://learn.microsoft.com/en-us/azure/architecture/patterns/external-configuration-store'),
+  chattyIo: r('Azure Architecture Center: chatty I/O antipattern', 'https://learn.microsoft.com/en-us/azure/architecture/antipatterns/chatty-io/'),
+  antiCorruption: r('Azure Architecture Center: anti-corruption layer pattern', 'https://learn.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer'),
+  bff: r('Azure Architecture Center: backends for frontends pattern', 'https://learn.microsoft.com/en-us/azure/architecture/patterns/backends-for-frontends'),
+  pipesFilters: r('Azure Architecture Center: pipes and filters pattern', 'https://learn.microsoft.com/en-us/azure/architecture/patterns/pipes-and-filters'),
+  gatewayAggregation: r('Azure Architecture Center: gateway aggregation pattern', 'https://learn.microsoft.com/en-us/azure/architecture/patterns/gateway-aggregation'),
+  cqrs: r('Azure Architecture Center: CQRS pattern', 'https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs'),
+  gatekeeper: r('Azure Architecture Center: gatekeeper pattern', 'https://learn.microsoft.com/en-us/azure/architecture/patterns/gatekeeper'),
+  hexagonal: r('Alistair Cockburn: hexagonal architecture (ports and adapters)', 'https://alistair.cockburn.us/hexagonal-architecture/'),
+  specification: r('Evans and Fowler: specifications', 'https://martinfowler.com/apsupp/spec.pdf'),
+  twelveConfig: r('The Twelve-Factor App: config', 'https://12factor.net/config'),
+  twelveBuild: r('The Twelve-Factor App: build, release, run', 'https://12factor.net/build-release-run'),
+  awsReliability: r('AWS Well-Architected: reliability pillar', 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html'),
+  sreBook: r('Google SRE book', 'https://sre.google/sre-book/table-of-contents/'),
+  slsa: r('SLSA: supply-chain levels for software artifacts', 'https://slsa.dev/'),
+  owaspTop10: r('OWASP Top 10', 'https://owasp.org/www-project-top-ten/'),
+  owaspLlm: r('OWASP Top 10 for LLM applications', 'https://owasp.org/www-project-top-10-for-large-language-model-applications/'),
+  mcpSpec: r('Model Context Protocol specification', 'https://modelcontextprotocol.io/specification'),
+  langgraph: r('LangGraph.js', 'https://github.com/langchain-ai/langgraphjs'),
+} as const

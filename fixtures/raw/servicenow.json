@@ -1,0 +1,2267 @@
+{
+  "businessApps": [
+    {
+      "sys_id": "sys_ba0001",
+      "number": "BA0001",
+      "name": "Checkout",
+      "owned_by": {
+        "value": "usr_ananya",
+        "display_value": "Ananya Rao"
+      },
+      "support_group": {
+        "value": "grp_commerce",
+        "display_value": "Commerce"
+      },
+      "business_criticality": "1 - most critical",
+      "u_repositories": "acme/checkout-api,acme/checkout-web",
+      "u_dynatrace_services": "checkout-api,checkout-web",
+      "u_k8s_namespaces": "checkout",
+      "u_cost_tag": "checkout",
+      "u_downtime_cost_per_min": "1800"
+    },
+    {
+      "sys_id": "sys_ba0002",
+      "number": "BA0002",
+      "name": "Payments",
+      "owned_by": {
+        "value": "usr_vikram",
+        "display_value": "Vikram Sethi"
+      },
+      "support_group": {
+        "value": "grp_fintechcore",
+        "display_value": "Fintech Core"
+      },
+      "business_criticality": "1 - most critical",
+      "u_repositories": "acme/payments-service",
+      "u_dynatrace_services": "payments-service",
+      "u_k8s_namespaces": "payments",
+      "u_cost_tag": "payments",
+      "u_downtime_cost_per_min": "2500"
+    },
+    {
+      "sys_id": "sys_ba0003",
+      "number": "BA0003",
+      "name": "Catalog",
+      "owned_by": {
+        "value": "usr_meera",
+        "display_value": "Meera Iyer"
+      },
+      "support_group": {
+        "value": "grp_discovery",
+        "display_value": "Discovery"
+      },
+      "business_criticality": "2 - somewhat critical",
+      "u_repositories": "acme/catalog-api",
+      "u_dynatrace_services": "catalog-api",
+      "u_k8s_namespaces": "catalog",
+      "u_cost_tag": "catalog",
+      "u_downtime_cost_per_min": "600"
+    },
+    {
+      "sys_id": "sys_ba0004",
+      "number": "BA0004",
+      "name": "Identity",
+      "owned_by": {
+        "value": "usr_rohit",
+        "display_value": "Rohit Malhotra"
+      },
+      "support_group": {
+        "value": "grp_platformsecurity",
+        "display_value": "Platform Security"
+      },
+      "business_criticality": "1 - most critical",
+      "u_repositories": "acme/identity-service",
+      "u_dynatrace_services": "identity-service",
+      "u_k8s_namespaces": "identity",
+      "u_cost_tag": "identity",
+      "u_downtime_cost_per_min": "2000"
+    },
+    {
+      "sys_id": "sys_ba0005",
+      "number": "BA0005",
+      "name": "Notifications",
+      "owned_by": {
+        "value": "usr_sara",
+        "display_value": "Sara Khan"
+      },
+      "support_group": {
+        "value": "grp_engagement",
+        "display_value": "Engagement"
+      },
+      "business_criticality": "3 - less critical",
+      "u_repositories": "acme/notifications-worker",
+      "u_dynatrace_services": "notifications-worker",
+      "u_k8s_namespaces": "notifications",
+      "u_cost_tag": "notifications",
+      "u_downtime_cost_per_min": "120"
+    }
+  ],
+  "changes": [
+    {
+      "sys_id": "chg_CHG0010450",
+      "number": "CHG0010450",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-02 12:50:33",
+      "approval_set": "2026-10-02 12:53:45",
+      "start_date": "2026-10-02 12:58:45",
+      "end_date": "2026-10-02 14:58:45",
+      "closed_at": "2026-10-02 13:18:04",
+      "close_code": "unsuccessful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "ab73b0a"
+    },
+    {
+      "sys_id": "chg_CHG0010451",
+      "number": "CHG0010451",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-02 08:09:06",
+      "approval_set": "2026-10-02 15:16:43",
+      "start_date": "2026-10-02 19:35:26",
+      "end_date": "2026-10-02 21:35:26",
+      "closed_at": "2026-10-02 19:54:52",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "d7ba68a"
+    },
+    {
+      "sys_id": "chg_CHG0010452",
+      "number": "CHG0010452",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-03 17:08:52",
+      "approval_set": "2026-10-03 17:16:01",
+      "start_date": "2026-10-03 17:21:01",
+      "end_date": "2026-10-03 19:21:01",
+      "closed_at": "2026-10-03 17:41:38",
+      "close_code": "successful_issues",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "1c66c57"
+    },
+    {
+      "sys_id": "chg_CHG0010453",
+      "number": "CHG0010453",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-04 15:03:16",
+      "approval_set": "2026-10-04 19:04:40",
+      "start_date": "2026-10-04 20:42:58",
+      "end_date": "2026-10-04 22:42:58",
+      "closed_at": "2026-10-04 21:06:24",
+      "close_code": "successful_issues",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "e3e4064"
+    },
+    {
+      "sys_id": "chg_CHG0010454",
+      "number": "CHG0010454",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-04 16:20:55",
+      "approval_set": "2026-10-04 16:22:58",
+      "start_date": "2026-10-04 16:27:58",
+      "end_date": "2026-10-04 18:27:58",
+      "closed_at": "2026-10-04 16:49:46",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "0270523"
+    },
+    {
+      "sys_id": "chg_CHG0010455",
+      "number": "CHG0010455",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-05 12:22:19",
+      "approval_set": "2026-10-05 12:29:15",
+      "start_date": "2026-10-05 12:34:15",
+      "end_date": "2026-10-05 14:34:15",
+      "closed_at": "2026-10-05 12:54:17",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "afa6a91"
+    },
+    {
+      "sys_id": "chg_CHG0010456",
+      "number": "CHG0010456",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-06 15:57:27",
+      "approval_set": "2026-10-06 15:59:29",
+      "start_date": "2026-10-06 16:04:29",
+      "end_date": "2026-10-06 18:04:29",
+      "closed_at": "2026-10-06 16:26:01",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "cfcb8a6"
+    },
+    {
+      "sys_id": "chg_CHG0010457",
+      "number": "CHG0010457",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-07 17:49:06",
+      "approval_set": "2026-10-07 23:00:52",
+      "start_date": "2026-10-08 03:24:20",
+      "end_date": "2026-10-08 05:24:20",
+      "closed_at": "2026-10-08 03:44:42",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "a1b170d"
+    },
+    {
+      "sys_id": "chg_CHG0010458",
+      "number": "CHG0010458",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-07 10:24:51",
+      "approval_set": "2026-10-07 10:24:54",
+      "start_date": "2026-10-07 10:29:54",
+      "end_date": "2026-10-07 12:29:54",
+      "closed_at": "2026-10-07 10:49:38",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "919a82f"
+    },
+    {
+      "sys_id": "chg_CHG0010459",
+      "number": "CHG0010459",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-08 16:33:56",
+      "approval_set": "2026-10-08 16:42:00",
+      "start_date": "2026-10-08 16:47:00",
+      "end_date": "2026-10-08 18:47:00",
+      "closed_at": "2026-10-08 17:09:20",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "80a19cc"
+    },
+    {
+      "sys_id": "chg_CHG0010460",
+      "number": "CHG0010460",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-09 08:32:01",
+      "approval_set": "2026-10-09 08:43:37",
+      "start_date": "2026-10-09 08:48:37",
+      "end_date": "2026-10-09 10:48:37",
+      "closed_at": "2026-10-09 09:12:32",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "567c7f5"
+    },
+    {
+      "sys_id": "chg_CHG0010461",
+      "number": "CHG0010461",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-10 09:49:46",
+      "approval_set": "2026-10-10 09:50:10",
+      "start_date": "2026-10-10 09:55:10",
+      "end_date": "2026-10-10 11:55:10",
+      "closed_at": "2026-10-10 10:15:31",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "e70e16d"
+    },
+    {
+      "sys_id": "chg_CHG0010462",
+      "number": "CHG0010462",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-11 16:43:12",
+      "approval_set": "2026-10-11 16:46:05",
+      "start_date": "2026-10-11 16:51:05",
+      "end_date": "2026-10-11 18:51:05",
+      "closed_at": "2026-10-11 17:11:14",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "e8b0b6d"
+    },
+    {
+      "sys_id": "chg_CHG0010463",
+      "number": "CHG0010463",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-12 16:22:58",
+      "approval_set": "2026-10-12 16:32:13",
+      "start_date": "2026-10-12 16:37:13",
+      "end_date": "2026-10-12 18:37:13",
+      "closed_at": "2026-10-12 16:57:25",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "a62e33c"
+    },
+    {
+      "sys_id": "chg_CHG0010464",
+      "number": "CHG0010464",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-12 14:37:10",
+      "approval_set": "2026-10-12 14:38:48",
+      "start_date": "2026-10-12 14:43:48",
+      "end_date": "2026-10-12 16:43:48",
+      "closed_at": "2026-10-12 15:07:47",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "3490994"
+    },
+    {
+      "sys_id": "chg_CHG0010465",
+      "number": "CHG0010465",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-14 16:25:30",
+      "approval_set": "2026-10-14 16:33:47",
+      "start_date": "2026-10-14 16:38:47",
+      "end_date": "2026-10-14 18:38:47",
+      "closed_at": "2026-10-14 16:58:42",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "6d106e6"
+    },
+    {
+      "sys_id": "chg_CHG0010466",
+      "number": "CHG0010466",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-15 18:04:53",
+      "approval_set": "2026-10-15 18:10:46",
+      "start_date": "2026-10-15 18:15:46",
+      "end_date": "2026-10-15 20:15:46",
+      "closed_at": "2026-10-15 18:39:08",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "7ab2ad6"
+    },
+    {
+      "sys_id": "chg_CHG0010467",
+      "number": "CHG0010467",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-16 11:53:18",
+      "approval_set": "2026-10-16 12:00:25",
+      "start_date": "2026-10-16 12:05:25",
+      "end_date": "2026-10-16 14:05:25",
+      "closed_at": "2026-10-16 12:28:55",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "742977c"
+    },
+    {
+      "sys_id": "chg_CHG0010468",
+      "number": "CHG0010468",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-17 09:58:10",
+      "approval_set": "2026-10-17 14:04:50",
+      "start_date": "2026-10-17 15:40:15",
+      "end_date": "2026-10-17 17:40:15",
+      "closed_at": "2026-10-17 16:02:31",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "2e67aa6"
+    },
+    {
+      "sys_id": "chg_CHG0010469",
+      "number": "CHG0010469",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-19 12:34:35",
+      "approval_set": "2026-10-19 15:35:29",
+      "start_date": "2026-10-19 21:17:34",
+      "end_date": "2026-10-19 23:17:34",
+      "closed_at": "2026-10-19 21:39:08",
+      "close_code": "successful_issues",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "5695e26"
+    },
+    {
+      "sys_id": "chg_CHG0010470",
+      "number": "CHG0010470",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-19 14:23:15",
+      "approval_set": "2026-10-19 18:49:36",
+      "start_date": "2026-10-19 21:07:22",
+      "end_date": "2026-10-19 23:07:22",
+      "closed_at": "2026-10-19 21:27:00",
+      "close_code": "unsuccessful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "82b3402"
+    },
+    {
+      "sys_id": "chg_CHG0010471",
+      "number": "CHG0010471",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-20 12:44:51",
+      "approval_set": "2026-10-20 22:12:38",
+      "start_date": "2026-10-21 00:56:22",
+      "end_date": "2026-10-21 02:56:22",
+      "closed_at": "2026-10-21 01:16:10",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "22f7bf7"
+    },
+    {
+      "sys_id": "chg_CHG0010472",
+      "number": "CHG0010472",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-21 09:05:01",
+      "approval_set": "2026-10-21 09:12:45",
+      "start_date": "2026-10-21 09:17:45",
+      "end_date": "2026-10-21 11:17:45",
+      "closed_at": "2026-10-21 09:41:07",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "db81c59"
+    },
+    {
+      "sys_id": "chg_CHG0010473",
+      "number": "CHG0010473",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-22 13:28:05",
+      "approval_set": "2026-10-22 17:05:30",
+      "start_date": "2026-10-22 20:48:18",
+      "end_date": "2026-10-22 22:48:18",
+      "closed_at": "2026-10-22 21:07:52",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "8446f2d"
+    },
+    {
+      "sys_id": "chg_CHG0010474",
+      "number": "CHG0010474",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-22 09:57:50",
+      "approval_set": "2026-10-22 13:01:54",
+      "start_date": "2026-10-22 14:12:58",
+      "end_date": "2026-10-22 16:12:58",
+      "closed_at": "2026-10-22 14:35:25",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "0b2eb76"
+    },
+    {
+      "sys_id": "chg_CHG0010475",
+      "number": "CHG0010475",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-23 16:49:03",
+      "approval_set": "2026-10-23 19:51:17",
+      "start_date": "2026-10-23 23:14:43",
+      "end_date": "2026-10-24 01:14:43",
+      "closed_at": "2026-10-23 23:34:06",
+      "close_code": "successful_issues",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "3ef403e"
+    },
+    {
+      "sys_id": "chg_CHG0010476",
+      "number": "CHG0010476",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-24 10:03:58",
+      "approval_set": "2026-10-24 10:13:40",
+      "start_date": "2026-10-24 10:18:40",
+      "end_date": "2026-10-24 12:18:40",
+      "closed_at": "2026-10-24 10:38:47",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "cf7a7b4"
+    },
+    {
+      "sys_id": "chg_CHG0010477",
+      "number": "CHG0010477",
+      "state": "-3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "requested",
+      "opened_at": "2026-10-25 15:02:41",
+      "approval_set": "",
+      "start_date": "2026-10-26 01:00:27",
+      "end_date": "2026-10-26 03:00:27",
+      "closed_at": "",
+      "close_code": "",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "dac9b3c"
+    },
+    {
+      "sys_id": "chg_CHG0010478",
+      "number": "CHG0010478",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-26 15:24:07",
+      "approval_set": "2026-10-26 23:03:34",
+      "start_date": "2026-10-27 03:13:22",
+      "end_date": "2026-10-27 05:13:22",
+      "closed_at": "2026-10-27 03:34:12",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "4bf7f4c"
+    },
+    {
+      "sys_id": "chg_CHG0010479",
+      "number": "CHG0010479",
+      "state": "-3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "requested",
+      "opened_at": "2026-10-27 10:29:46",
+      "approval_set": "",
+      "start_date": "2026-10-27 14:49:15",
+      "end_date": "2026-10-27 16:49:15",
+      "closed_at": "",
+      "close_code": "",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "69419ac"
+    },
+    {
+      "sys_id": "chg_CHG0010480",
+      "number": "CHG0010480",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-28 10:38:38",
+      "approval_set": "2026-10-28 15:19:48",
+      "start_date": "2026-10-28 17:50:51",
+      "end_date": "2026-10-28 19:50:51",
+      "closed_at": "2026-10-28 18:10:04",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "a2b8919"
+    },
+    {
+      "sys_id": "chg_CHG0010481",
+      "number": "CHG0010481",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-29 17:34:51",
+      "approval_set": "2026-10-29 17:39:05",
+      "start_date": "2026-10-29 17:44:05",
+      "end_date": "2026-10-29 19:44:05",
+      "closed_at": "2026-10-29 18:05:32",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "88080f4"
+    },
+    {
+      "sys_id": "chg_CHG0010482",
+      "number": "CHG0010482",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-29 14:11:23",
+      "approval_set": "2026-10-30 00:00:02",
+      "start_date": "2026-10-30 01:26:20",
+      "end_date": "2026-10-30 03:26:20",
+      "closed_at": "2026-10-30 01:49:28",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "af0db3b"
+    },
+    {
+      "sys_id": "chg_CHG0010483",
+      "number": "CHG0010483",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-30 08:22:31",
+      "approval_set": "2026-10-30 18:05:39",
+      "start_date": "2026-10-30 22:34:16",
+      "end_date": "2026-10-31 00:34:16",
+      "closed_at": "2026-10-30 22:54:29",
+      "close_code": "successful_issues",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "3cc265c"
+    },
+    {
+      "sys_id": "chg_CHG0010484",
+      "number": "CHG0010484",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-31 14:58:53",
+      "approval_set": "2026-10-31 15:01:10",
+      "start_date": "2026-10-31 15:06:10",
+      "end_date": "2026-10-31 17:06:10",
+      "closed_at": "2026-10-31 15:29:53",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0001",
+        "display_value": "Checkout"
+      },
+      "correlation_id": "c2bca80"
+    },
+    {
+      "sys_id": "chg_CHG0010485",
+      "number": "CHG0010485",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-02 11:54:41",
+      "approval_set": "2026-10-04 02:06:24",
+      "start_date": "2026-10-04 06:32:25",
+      "end_date": "2026-10-04 08:32:25",
+      "closed_at": "2026-10-04 06:52:24",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "be7867d"
+    },
+    {
+      "sys_id": "chg_CHG0010486",
+      "number": "CHG0010486",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-03 12:47:04",
+      "approval_set": "2026-10-04 10:51:13",
+      "start_date": "2026-10-04 13:59:53",
+      "end_date": "2026-10-04 15:59:53",
+      "closed_at": "2026-10-04 14:21:34",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "104ffee"
+    },
+    {
+      "sys_id": "chg_CHG0010487",
+      "number": "CHG0010487",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-04 13:37:26",
+      "approval_set": "2026-10-06 01:28:21",
+      "start_date": "2026-10-06 05:26:15",
+      "end_date": "2026-10-06 07:26:15",
+      "closed_at": "2026-10-06 05:48:25",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "1de7902"
+    },
+    {
+      "sys_id": "chg_CHG0010488",
+      "number": "CHG0010488",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-05 09:37:30",
+      "approval_set": "2026-10-06 19:38:44",
+      "start_date": "2026-10-06 23:47:11",
+      "end_date": "2026-10-07 01:47:11",
+      "closed_at": "2026-10-07 00:06:38",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "d322f63"
+    },
+    {
+      "sys_id": "chg_CHG0010489",
+      "number": "CHG0010489",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-07 09:57:20",
+      "approval_set": "2026-10-08 08:24:16",
+      "start_date": "2026-10-08 11:55:05",
+      "end_date": "2026-10-08 13:55:05",
+      "closed_at": "2026-10-08 12:17:07",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "3931729"
+    },
+    {
+      "sys_id": "chg_CHG0010490",
+      "number": "CHG0010490",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-08 13:05:09",
+      "approval_set": "2026-10-09 23:57:38",
+      "start_date": "2026-10-10 02:11:59",
+      "end_date": "2026-10-10 04:11:59",
+      "closed_at": "2026-10-10 02:31:30",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "e0263d9"
+    },
+    {
+      "sys_id": "chg_CHG0010491",
+      "number": "CHG0010491",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-09 15:26:19",
+      "approval_set": "2026-10-10 00:20:29",
+      "start_date": "2026-10-10 06:16:50",
+      "end_date": "2026-10-10 08:16:50",
+      "closed_at": "2026-10-10 06:36:15",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "9a227f2"
+    },
+    {
+      "sys_id": "chg_CHG0010492",
+      "number": "CHG0010492",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-10 08:14:09",
+      "approval_set": "2026-10-11 13:01:08",
+      "start_date": "2026-10-11 14:30:25",
+      "end_date": "2026-10-11 16:30:25",
+      "closed_at": "2026-10-11 14:54:07",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "ba76ca5"
+    },
+    {
+      "sys_id": "chg_CHG0010493",
+      "number": "CHG0010493",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-12 10:42:04",
+      "approval_set": "2026-10-12 17:42:01",
+      "start_date": "2026-10-12 22:24:06",
+      "end_date": "2026-10-13 00:24:06",
+      "closed_at": "2026-10-12 22:46:48",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "367f693"
+    },
+    {
+      "sys_id": "chg_CHG0010494",
+      "number": "CHG0010494",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-13 15:58:13",
+      "approval_set": "2026-10-14 02:56:12",
+      "start_date": "2026-10-14 08:54:38",
+      "end_date": "2026-10-14 10:54:38",
+      "closed_at": "2026-10-14 09:16:18",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "2c491e8"
+    },
+    {
+      "sys_id": "chg_CHG0010495",
+      "number": "CHG0010495",
+      "state": "-3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "requested",
+      "opened_at": "2026-10-14 12:20:50",
+      "approval_set": "",
+      "start_date": "2026-10-16 01:31:32",
+      "end_date": "2026-10-16 03:31:32",
+      "closed_at": "",
+      "close_code": "",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "47e2a60"
+    },
+    {
+      "sys_id": "chg_CHG0010496",
+      "number": "CHG0010496",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-15 11:37:36",
+      "approval_set": "2026-10-15 22:02:53",
+      "start_date": "2026-10-15 23:34:47",
+      "end_date": "2026-10-16 01:34:47",
+      "closed_at": "2026-10-15 23:54:58",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "bfdbb97"
+    },
+    {
+      "sys_id": "chg_CHG0010497",
+      "number": "CHG0010497",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-17 11:42:15",
+      "approval_set": "2026-10-18 04:38:15",
+      "start_date": "2026-10-18 06:48:39",
+      "end_date": "2026-10-18 08:48:39",
+      "closed_at": "2026-10-18 07:09:56",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "3574a58"
+    },
+    {
+      "sys_id": "chg_CHG0010498",
+      "number": "CHG0010498",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-18 14:40:28",
+      "approval_set": "2026-10-18 14:51:13",
+      "start_date": "2026-10-18 14:56:13",
+      "end_date": "2026-10-18 16:56:13",
+      "closed_at": "2026-10-18 15:19:30",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "b60e81d"
+    },
+    {
+      "sys_id": "chg_CHG0010499",
+      "number": "CHG0010499",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-20 17:16:08",
+      "approval_set": "2026-10-21 05:02:27",
+      "start_date": "2026-10-21 06:07:08",
+      "end_date": "2026-10-21 08:07:08",
+      "closed_at": "2026-10-21 06:28:24",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "d612440"
+    },
+    {
+      "sys_id": "chg_CHG0010500",
+      "number": "CHG0010500",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-22 16:16:13",
+      "approval_set": "2026-10-22 16:16:48",
+      "start_date": "2026-10-22 16:21:48",
+      "end_date": "2026-10-22 18:21:48",
+      "closed_at": "2026-10-22 16:45:24",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "a375bc0"
+    },
+    {
+      "sys_id": "chg_CHG0010501",
+      "number": "CHG0010501",
+      "state": "-3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "requested",
+      "opened_at": "2026-10-23 08:37:50",
+      "approval_set": "",
+      "start_date": "2026-10-23 08:53:33",
+      "end_date": "2026-10-23 10:53:33",
+      "closed_at": "",
+      "close_code": "",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "ab200de"
+    },
+    {
+      "sys_id": "chg_CHG0010502",
+      "number": "CHG0010502",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-24 16:39:10",
+      "approval_set": "2026-10-25 13:45:18",
+      "start_date": "2026-10-25 16:00:38",
+      "end_date": "2026-10-25 18:00:38",
+      "closed_at": "2026-10-25 16:22:39",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "3e56357"
+    },
+    {
+      "sys_id": "chg_CHG0010503",
+      "number": "CHG0010503",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-25 09:43:21",
+      "approval_set": "2026-10-26 22:26:43",
+      "start_date": "2026-10-26 23:08:58",
+      "end_date": "2026-10-27 01:08:58",
+      "closed_at": "2026-10-26 23:32:42",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "ceb9f02"
+    },
+    {
+      "sys_id": "chg_CHG0010504",
+      "number": "CHG0010504",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-27 12:18:44",
+      "approval_set": "2026-10-28 02:58:43",
+      "start_date": "2026-10-28 03:43:10",
+      "end_date": "2026-10-28 05:43:10",
+      "closed_at": "2026-10-28 04:06:41",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "82f46cd"
+    },
+    {
+      "sys_id": "chg_CHG0010505",
+      "number": "CHG0010505",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-28 16:42:21",
+      "approval_set": "2026-10-28 16:53:04",
+      "start_date": "2026-10-28 16:58:04",
+      "end_date": "2026-10-28 18:58:04",
+      "closed_at": "2026-10-28 17:20:42",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "b10b2ae"
+    },
+    {
+      "sys_id": "chg_CHG0010506",
+      "number": "CHG0010506",
+      "state": "-3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "requested",
+      "opened_at": "2026-10-29 17:21:15",
+      "approval_set": "",
+      "start_date": "2026-10-30 13:15:45",
+      "end_date": "2026-10-30 15:15:45",
+      "closed_at": "",
+      "close_code": "",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "0f54d7e"
+    },
+    {
+      "sys_id": "chg_CHG0010507",
+      "number": "CHG0010507",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-30 09:40:35",
+      "approval_set": "2026-10-30 19:33:14",
+      "start_date": "2026-10-31 01:13:44",
+      "end_date": "2026-10-31 03:13:44",
+      "closed_at": "2026-10-31 01:36:58",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0002",
+        "display_value": "Payments"
+      },
+      "correlation_id": "d2d26ea"
+    },
+    {
+      "sys_id": "chg_CHG0010508",
+      "number": "CHG0010508",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-02 11:33:17",
+      "approval_set": "2026-10-02 11:41:08",
+      "start_date": "2026-10-02 11:46:08",
+      "end_date": "2026-10-02 13:46:08",
+      "closed_at": "2026-10-02 12:10:01",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "aaadc17"
+    },
+    {
+      "sys_id": "chg_CHG0010509",
+      "number": "CHG0010509",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-02 12:04:35",
+      "approval_set": "2026-10-02 12:09:52",
+      "start_date": "2026-10-02 12:14:52",
+      "end_date": "2026-10-02 14:14:52",
+      "closed_at": "2026-10-02 12:38:02",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "d2942bb"
+    },
+    {
+      "sys_id": "chg_CHG0010510",
+      "number": "CHG0010510",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-03 12:51:38",
+      "approval_set": "2026-10-03 12:53:51",
+      "start_date": "2026-10-03 12:58:51",
+      "end_date": "2026-10-03 14:58:51",
+      "closed_at": "2026-10-03 13:21:58",
+      "close_code": "unsuccessful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "07dd1e6"
+    },
+    {
+      "sys_id": "chg_CHG0010511",
+      "number": "CHG0010511",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-04 12:08:48",
+      "approval_set": "2026-10-04 12:16:16",
+      "start_date": "2026-10-04 12:21:16",
+      "end_date": "2026-10-04 14:21:16",
+      "closed_at": "2026-10-04 12:41:27",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "2822cdc"
+    },
+    {
+      "sys_id": "chg_CHG0010512",
+      "number": "CHG0010512",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-05 10:27:23",
+      "approval_set": "2026-10-05 10:35:34",
+      "start_date": "2026-10-05 10:40:34",
+      "end_date": "2026-10-05 12:40:34",
+      "closed_at": "2026-10-05 11:02:20",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "bf8d1eb"
+    },
+    {
+      "sys_id": "chg_CHG0010513",
+      "number": "CHG0010513",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-07 10:49:02",
+      "approval_set": "2026-10-07 10:50:52",
+      "start_date": "2026-10-07 10:55:52",
+      "end_date": "2026-10-07 12:55:52",
+      "closed_at": "2026-10-07 11:18:41",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "0377d9a"
+    },
+    {
+      "sys_id": "chg_CHG0010514",
+      "number": "CHG0010514",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-07 16:56:44",
+      "approval_set": "2026-10-07 17:08:32",
+      "start_date": "2026-10-07 17:13:32",
+      "end_date": "2026-10-07 19:13:32",
+      "closed_at": "2026-10-07 17:32:43",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "9844329"
+    },
+    {
+      "sys_id": "chg_CHG0010515",
+      "number": "CHG0010515",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-08 14:03:35",
+      "approval_set": "2026-10-08 14:55:20",
+      "start_date": "2026-10-08 16:49:35",
+      "end_date": "2026-10-08 18:49:35",
+      "closed_at": "2026-10-08 17:11:16",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "e254689"
+    },
+    {
+      "sys_id": "chg_CHG0010516",
+      "number": "CHG0010516",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-09 16:23:46",
+      "approval_set": "2026-10-09 16:25:02",
+      "start_date": "2026-10-09 16:30:02",
+      "end_date": "2026-10-09 18:30:02",
+      "closed_at": "2026-10-09 16:52:12",
+      "close_code": "successful_issues",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "30522ea"
+    },
+    {
+      "sys_id": "chg_CHG0010517",
+      "number": "CHG0010517",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-10 10:15:52",
+      "approval_set": "2026-10-10 10:22:18",
+      "start_date": "2026-10-10 10:27:18",
+      "end_date": "2026-10-10 12:27:18",
+      "closed_at": "2026-10-10 10:50:19",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "b9f4480"
+    },
+    {
+      "sys_id": "chg_CHG0010518",
+      "number": "CHG0010518",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-13 13:36:34",
+      "approval_set": "2026-10-13 13:44:52",
+      "start_date": "2026-10-13 13:49:52",
+      "end_date": "2026-10-13 15:49:52",
+      "closed_at": "2026-10-13 14:12:12",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "3326e18"
+    },
+    {
+      "sys_id": "chg_CHG0010519",
+      "number": "CHG0010519",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-14 14:55:46",
+      "approval_set": "2026-10-14 15:06:08",
+      "start_date": "2026-10-14 15:11:08",
+      "end_date": "2026-10-14 17:11:08",
+      "closed_at": "2026-10-14 15:35:00",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "1926bf6"
+    },
+    {
+      "sys_id": "chg_CHG0010520",
+      "number": "CHG0010520",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-15 09:35:43",
+      "approval_set": "2026-10-15 09:37:52",
+      "start_date": "2026-10-15 09:42:52",
+      "end_date": "2026-10-15 11:42:52",
+      "closed_at": "2026-10-15 10:06:03",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "ce90b3a"
+    },
+    {
+      "sys_id": "chg_CHG0010521",
+      "number": "CHG0010521",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-16 17:31:51",
+      "approval_set": "2026-10-16 17:38:42",
+      "start_date": "2026-10-16 17:43:42",
+      "end_date": "2026-10-16 19:43:42",
+      "closed_at": "2026-10-16 18:06:53",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "0723de6"
+    },
+    {
+      "sys_id": "chg_CHG0010522",
+      "number": "CHG0010522",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-17 12:07:47",
+      "approval_set": "2026-10-17 12:10:56",
+      "start_date": "2026-10-17 12:15:56",
+      "end_date": "2026-10-17 14:15:56",
+      "closed_at": "2026-10-17 12:38:54",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "ad5d736"
+    },
+    {
+      "sys_id": "chg_CHG0010523",
+      "number": "CHG0010523",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-17 14:11:34",
+      "approval_set": "2026-10-17 14:21:53",
+      "start_date": "2026-10-17 14:26:53",
+      "end_date": "2026-10-17 16:26:53",
+      "closed_at": "2026-10-17 14:49:12",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "c4c7dc3"
+    },
+    {
+      "sys_id": "chg_CHG0010524",
+      "number": "CHG0010524",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-18 11:27:02",
+      "approval_set": "2026-10-18 11:34:04",
+      "start_date": "2026-10-18 11:39:04",
+      "end_date": "2026-10-18 13:39:04",
+      "closed_at": "2026-10-18 12:00:11",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "95301f9"
+    },
+    {
+      "sys_id": "chg_CHG0010525",
+      "number": "CHG0010525",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-20 13:10:34",
+      "approval_set": "2026-10-20 13:20:14",
+      "start_date": "2026-10-20 13:25:14",
+      "end_date": "2026-10-20 15:25:14",
+      "closed_at": "2026-10-20 13:46:01",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "4f64e38"
+    },
+    {
+      "sys_id": "chg_CHG0010526",
+      "number": "CHG0010526",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-21 11:26:41",
+      "approval_set": "2026-10-21 11:34:28",
+      "start_date": "2026-10-21 11:39:28",
+      "end_date": "2026-10-21 13:39:28",
+      "closed_at": "2026-10-21 11:58:44",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "13ac1ea"
+    },
+    {
+      "sys_id": "chg_CHG0010527",
+      "number": "CHG0010527",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-22 11:21:38",
+      "approval_set": "2026-10-22 11:22:36",
+      "start_date": "2026-10-22 11:27:36",
+      "end_date": "2026-10-22 13:27:36",
+      "closed_at": "2026-10-22 11:48:53",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "f711966"
+    },
+    {
+      "sys_id": "chg_CHG0010528",
+      "number": "CHG0010528",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-22 17:09:39",
+      "approval_set": "2026-10-22 17:14:19",
+      "start_date": "2026-10-22 17:19:19",
+      "end_date": "2026-10-22 19:19:19",
+      "closed_at": "2026-10-22 17:38:42",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "d5e2ca4"
+    },
+    {
+      "sys_id": "chg_CHG0010529",
+      "number": "CHG0010529",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-23 11:56:09",
+      "approval_set": "2026-10-23 11:59:38",
+      "start_date": "2026-10-23 12:04:38",
+      "end_date": "2026-10-23 14:04:38",
+      "closed_at": "2026-10-23 12:26:59",
+      "close_code": "successful_issues",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "4c61989"
+    },
+    {
+      "sys_id": "chg_CHG0010530",
+      "number": "CHG0010530",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-24 16:42:21",
+      "approval_set": "2026-10-24 16:52:05",
+      "start_date": "2026-10-24 16:57:05",
+      "end_date": "2026-10-24 18:57:05",
+      "closed_at": "2026-10-24 17:16:29",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "c01fd15"
+    },
+    {
+      "sys_id": "chg_CHG0010531",
+      "number": "CHG0010531",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-25 16:20:05",
+      "approval_set": "2026-10-25 16:26:02",
+      "start_date": "2026-10-25 16:31:02",
+      "end_date": "2026-10-25 18:31:02",
+      "closed_at": "2026-10-25 16:52:42",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "ae51c81"
+    },
+    {
+      "sys_id": "chg_CHG0010532",
+      "number": "CHG0010532",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-27 14:57:04",
+      "approval_set": "2026-10-27 14:58:59",
+      "start_date": "2026-10-27 15:03:59",
+      "end_date": "2026-10-27 17:03:59",
+      "closed_at": "2026-10-27 15:26:09",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "ef67526"
+    },
+    {
+      "sys_id": "chg_CHG0010533",
+      "number": "CHG0010533",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-27 16:08:15",
+      "approval_set": "2026-10-27 16:09:38",
+      "start_date": "2026-10-27 16:14:38",
+      "end_date": "2026-10-27 18:14:38",
+      "closed_at": "2026-10-27 16:36:53",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "541b8d7"
+    },
+    {
+      "sys_id": "chg_CHG0010534",
+      "number": "CHG0010534",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-29 14:07:43",
+      "approval_set": "2026-10-29 14:16:18",
+      "start_date": "2026-10-29 14:21:18",
+      "end_date": "2026-10-29 16:21:18",
+      "closed_at": "2026-10-29 14:42:55",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "06e4ba9"
+    },
+    {
+      "sys_id": "chg_CHG0010535",
+      "number": "CHG0010535",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-30 09:11:47",
+      "approval_set": "2026-10-30 09:18:25",
+      "start_date": "2026-10-30 09:23:25",
+      "end_date": "2026-10-30 11:23:25",
+      "closed_at": "2026-10-30 09:44:15",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "9de745f"
+    },
+    {
+      "sys_id": "chg_CHG0010536",
+      "number": "CHG0010536",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-31 09:57:45",
+      "approval_set": "2026-10-31 10:02:14",
+      "start_date": "2026-10-31 10:07:14",
+      "end_date": "2026-10-31 12:07:14",
+      "closed_at": "2026-10-31 10:27:30",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0003",
+        "display_value": "Catalog"
+      },
+      "correlation_id": "4c30c84"
+    },
+    {
+      "sys_id": "chg_CHG0010537",
+      "number": "CHG0010537",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-02 12:06:19",
+      "approval_set": "2026-10-02 12:07:06",
+      "start_date": "2026-10-02 12:12:06",
+      "end_date": "2026-10-02 14:12:06",
+      "closed_at": "2026-10-02 12:34:12",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0004",
+        "display_value": "Identity"
+      },
+      "correlation_id": "6fa621a"
+    },
+    {
+      "sys_id": "chg_CHG0010538",
+      "number": "CHG0010538",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-03 11:18:52",
+      "approval_set": "2026-10-03 11:28:41",
+      "start_date": "2026-10-03 11:33:41",
+      "end_date": "2026-10-03 13:33:41",
+      "closed_at": "2026-10-03 11:53:53",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0004",
+        "display_value": "Identity"
+      },
+      "correlation_id": "c0decc0"
+    },
+    {
+      "sys_id": "chg_CHG0010539",
+      "number": "CHG0010539",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-05 15:00:49",
+      "approval_set": "2026-10-06 17:01:41",
+      "start_date": "2026-10-06 20:52:01",
+      "end_date": "2026-10-06 22:52:01",
+      "closed_at": "2026-10-06 21:12:46",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0004",
+        "display_value": "Identity"
+      },
+      "correlation_id": "758047b"
+    },
+    {
+      "sys_id": "chg_CHG0010540",
+      "number": "CHG0010540",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-09 13:38:04",
+      "approval_set": "2026-10-10 16:04:27",
+      "start_date": "2026-10-10 20:13:34",
+      "end_date": "2026-10-10 22:13:34",
+      "closed_at": "2026-10-10 20:35:31",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0004",
+        "display_value": "Identity"
+      },
+      "correlation_id": "67b62a2"
+    },
+    {
+      "sys_id": "chg_CHG0010541",
+      "number": "CHG0010541",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-13 14:21:27",
+      "approval_set": "2026-10-13 14:28:26",
+      "start_date": "2026-10-13 14:33:26",
+      "end_date": "2026-10-13 16:33:26",
+      "closed_at": "2026-10-13 14:56:58",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0004",
+        "display_value": "Identity"
+      },
+      "correlation_id": "7e424e7"
+    },
+    {
+      "sys_id": "chg_CHG0010542",
+      "number": "CHG0010542",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-18 11:15:57",
+      "approval_set": "2026-10-18 11:25:08",
+      "start_date": "2026-10-18 11:30:08",
+      "end_date": "2026-10-18 13:30:08",
+      "closed_at": "2026-10-18 11:51:35",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0004",
+        "display_value": "Identity"
+      },
+      "correlation_id": "377855a"
+    },
+    {
+      "sys_id": "chg_CHG0010543",
+      "number": "CHG0010543",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-20 14:10:44",
+      "approval_set": "2026-10-20 14:14:23",
+      "start_date": "2026-10-20 14:19:23",
+      "end_date": "2026-10-20 16:19:23",
+      "closed_at": "2026-10-20 14:39:22",
+      "close_code": "successful_issues",
+      "cmdb_ci": {
+        "value": "sys_ba0004",
+        "display_value": "Identity"
+      },
+      "correlation_id": "450ece7"
+    },
+    {
+      "sys_id": "chg_CHG0010544",
+      "number": "CHG0010544",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-24 12:46:32",
+      "approval_set": "2026-10-25 07:39:34",
+      "start_date": "2026-10-25 10:12:52",
+      "end_date": "2026-10-25 12:12:52",
+      "closed_at": "2026-10-25 10:35:04",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0004",
+        "display_value": "Identity"
+      },
+      "correlation_id": "503eda1"
+    },
+    {
+      "sys_id": "chg_CHG0010545",
+      "number": "CHG0010545",
+      "state": "3",
+      "risk": "3",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-26 08:49:12",
+      "approval_set": "2026-10-27 10:32:38",
+      "start_date": "2026-10-27 15:10:18",
+      "end_date": "2026-10-27 17:10:18",
+      "closed_at": "2026-10-27 15:32:00",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0004",
+        "display_value": "Identity"
+      },
+      "correlation_id": "5cde7aa"
+    },
+    {
+      "sys_id": "chg_CHG0010546",
+      "number": "CHG0010546",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-28 12:38:07",
+      "approval_set": "2026-10-28 12:41:13",
+      "start_date": "2026-10-28 12:46:13",
+      "end_date": "2026-10-28 14:46:13",
+      "closed_at": "2026-10-28 13:08:18",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0004",
+        "display_value": "Identity"
+      },
+      "correlation_id": "6e84119"
+    },
+    {
+      "sys_id": "chg_CHG0010547",
+      "number": "CHG0010547",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-02 08:08:36",
+      "approval_set": "2026-10-02 08:18:46",
+      "start_date": "2026-10-02 08:23:46",
+      "end_date": "2026-10-02 10:23:46",
+      "closed_at": "2026-10-02 08:45:49",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "eec5dde"
+    },
+    {
+      "sys_id": "chg_CHG0010548",
+      "number": "CHG0010548",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-03 14:42:22",
+      "approval_set": "2026-10-03 14:48:52",
+      "start_date": "2026-10-03 14:53:52",
+      "end_date": "2026-10-03 16:53:52",
+      "closed_at": "2026-10-03 15:16:20",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "65d03c4"
+    },
+    {
+      "sys_id": "chg_CHG0010549",
+      "number": "CHG0010549",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-04 12:56:13",
+      "approval_set": "2026-10-04 12:57:28",
+      "start_date": "2026-10-04 13:02:28",
+      "end_date": "2026-10-04 15:02:28",
+      "closed_at": "2026-10-04 13:23:51",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "aa4b1a7"
+    },
+    {
+      "sys_id": "chg_CHG0010550",
+      "number": "CHG0010550",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-06 15:29:48",
+      "approval_set": "2026-10-06 15:33:54",
+      "start_date": "2026-10-06 15:38:54",
+      "end_date": "2026-10-06 17:38:54",
+      "closed_at": "2026-10-06 16:02:39",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "a4d776f"
+    },
+    {
+      "sys_id": "chg_CHG0010551",
+      "number": "CHG0010551",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-07 12:15:53",
+      "approval_set": "2026-10-07 12:21:37",
+      "start_date": "2026-10-07 12:26:37",
+      "end_date": "2026-10-07 14:26:37",
+      "closed_at": "2026-10-07 12:49:00",
+      "close_code": "unsuccessful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "a13dd9e"
+    },
+    {
+      "sys_id": "chg_CHG0010552",
+      "number": "CHG0010552",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-08 11:02:59",
+      "approval_set": "2026-10-08 11:13:01",
+      "start_date": "2026-10-08 11:18:01",
+      "end_date": "2026-10-08 13:18:01",
+      "closed_at": "2026-10-08 11:37:57",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "e6d956e"
+    },
+    {
+      "sys_id": "chg_CHG0010553",
+      "number": "CHG0010553",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-10 15:57:17",
+      "approval_set": "2026-10-10 16:03:19",
+      "start_date": "2026-10-10 16:08:19",
+      "end_date": "2026-10-10 18:08:19",
+      "closed_at": "2026-10-10 16:27:34",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "e2acd0a"
+    },
+    {
+      "sys_id": "chg_CHG0010554",
+      "number": "CHG0010554",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-11 17:40:28",
+      "approval_set": "2026-10-11 17:47:41",
+      "start_date": "2026-10-11 17:52:41",
+      "end_date": "2026-10-11 19:52:41",
+      "closed_at": "2026-10-11 18:13:10",
+      "close_code": "unsuccessful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "17bb81d"
+    },
+    {
+      "sys_id": "chg_CHG0010555",
+      "number": "CHG0010555",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-14 13:23:14",
+      "approval_set": "2026-10-14 13:24:39",
+      "start_date": "2026-10-14 13:29:39",
+      "end_date": "2026-10-14 15:29:39",
+      "closed_at": "2026-10-14 13:50:22",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "388d55f"
+    },
+    {
+      "sys_id": "chg_CHG0010556",
+      "number": "CHG0010556",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-15 17:58:25",
+      "approval_set": "2026-10-15 18:02:24",
+      "start_date": "2026-10-15 18:07:24",
+      "end_date": "2026-10-15 20:07:24",
+      "closed_at": "2026-10-15 18:27:51",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "a096470"
+    },
+    {
+      "sys_id": "chg_CHG0010557",
+      "number": "CHG0010557",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-17 13:09:57",
+      "approval_set": "2026-10-17 13:10:38",
+      "start_date": "2026-10-17 13:15:38",
+      "end_date": "2026-10-17 15:15:38",
+      "closed_at": "2026-10-17 13:39:05",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "3417699"
+    },
+    {
+      "sys_id": "chg_CHG0010558",
+      "number": "CHG0010558",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-18 13:55:54",
+      "approval_set": "2026-10-18 13:59:02",
+      "start_date": "2026-10-18 14:04:02",
+      "end_date": "2026-10-18 16:04:02",
+      "closed_at": "2026-10-18 14:25:47",
+      "close_code": "unsuccessful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "0346979"
+    },
+    {
+      "sys_id": "chg_CHG0010559",
+      "number": "CHG0010559",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-19 16:37:26",
+      "approval_set": "2026-10-19 16:43:18",
+      "start_date": "2026-10-19 16:48:18",
+      "end_date": "2026-10-19 18:48:18",
+      "closed_at": "2026-10-19 17:10:18",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "7a866dd"
+    },
+    {
+      "sys_id": "chg_CHG0010560",
+      "number": "CHG0010560",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-22 09:49:43",
+      "approval_set": "2026-10-22 09:56:33",
+      "start_date": "2026-10-22 10:01:33",
+      "end_date": "2026-10-22 12:01:33",
+      "closed_at": "2026-10-22 10:24:53",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "338852e"
+    },
+    {
+      "sys_id": "chg_CHG0010561",
+      "number": "CHG0010561",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-23 10:22:46",
+      "approval_set": "2026-10-23 10:28:26",
+      "start_date": "2026-10-23 10:33:26",
+      "end_date": "2026-10-23 12:33:26",
+      "closed_at": "2026-10-23 10:53:12",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "5a6b250"
+    },
+    {
+      "sys_id": "chg_CHG0010562",
+      "number": "CHG0010562",
+      "state": "3",
+      "risk": "2",
+      "type": "normal",
+      "approval": "approved",
+      "opened_at": "2026-10-29 09:32:47",
+      "approval_set": "2026-10-29 10:10:11",
+      "start_date": "2026-10-29 13:14:59",
+      "end_date": "2026-10-29 15:14:59",
+      "closed_at": "2026-10-29 13:38:00",
+      "close_code": "successful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "9ccff71"
+    },
+    {
+      "sys_id": "chg_CHG0010563",
+      "number": "CHG0010563",
+      "state": "3",
+      "risk": "4",
+      "type": "standard",
+      "approval": "approved",
+      "opened_at": "2026-10-30 15:17:28",
+      "approval_set": "2026-10-30 15:18:48",
+      "start_date": "2026-10-30 15:23:48",
+      "end_date": "2026-10-30 17:23:48",
+      "closed_at": "2026-10-30 15:45:31",
+      "close_code": "unsuccessful",
+      "cmdb_ci": {
+        "value": "sys_ba0005",
+        "display_value": "Notifications"
+      },
+      "correlation_id": "30cd347"
+    }
+  ]
+}

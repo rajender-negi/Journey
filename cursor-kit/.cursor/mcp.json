@@ -1,0 +1,46 @@
+{
+  "mcpServers": {
+    "dynatrace": {
+      "command": "npx",
+      "args": ["-y", "@dynatrace-oss/dynatrace-mcp-server@latest"],
+      "env": {
+        "DT_ENVIRONMENT": "https://<tenant>.apps.dynatrace.com",
+        "DT_PLATFORM_TOKEN": "${env:DT_PLATFORM_TOKEN}"
+      }
+    },
+    "github": {
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": { "Authorization": "Bearer ${env:PJ_GITHUB_TOKEN}" }
+    },
+    "argocd": {
+      "command": "npx",
+      "args": ["-y", "argocd-mcp@latest", "stdio"],
+      "env": {
+        "ARGOCD_BASE_URL": "https://argocd.<your-domain>",
+        "ARGOCD_API_TOKEN": "${env:ARGOCD_TOKEN}",
+        "MCP_READ_ONLY": "true"
+      }
+    },
+    "kubernetes": {
+      "command": "npx",
+      "args": ["-y", "kubernetes-mcp-server@latest", "--read-only"]
+    },
+    "aws-cost-explorer": {
+      "command": "uvx",
+      "args": ["awslabs.cost-explorer-mcp-server@latest"],
+      "env": { "AWS_PROFILE": "${env:AWS_PROFILE}", "AWS_REGION": "us-east-1" }
+    },
+    "azure": {
+      "command": "npx",
+      "args": ["-y", "@azure/mcp@latest", "server", "start", "--read-only"]
+    },
+    "servicenow": {
+      "command": "npx",
+      "args": ["-y", "<your-approved-servicenow-mcp-server>"],
+      "env": {
+        "SERVICENOW_INSTANCE_URL": "https://<instance>.service-now.com",
+        "SERVICENOW_AUTH": "${env:SNOW_TOKEN}"
+      }
+    }
+  }
+}
