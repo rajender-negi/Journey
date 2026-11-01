@@ -53,6 +53,7 @@ export const config = {
     model: env('AI_MODEL') ?? 'claude-sonnet-5-5',
     baseUrl: env('AI_BASE_URL'),
     maxTokens: Number(env('AI_MAX_TOKENS') ?? 1500),
+    timeoutMs: Number(env('AI_TIMEOUT_MS') ?? 45000),
   },
 }
 

@@ -36,7 +36,7 @@ before(async () => {
   }).listen(MOCK)
 
   api = spawn(process.execPath, ['--import', 'tsx', 'apps/server/src/index.ts'], {
-    env: { ...process.env, PORT: String(PORT), PJ_DATA_DIR: dataDir, AI_PROVIDER: 'openai-compatible', AI_BASE_URL: `http://127.0.0.1:${MOCK}`, AI_API_KEY: 'test', AI_MODEL: 'mock' },
+    env: { ...process.env, PORT: String(PORT), PJ_DATA_DIR: dataDir, AI_PROVIDER: 'openai-compatible', AI_BASE_URL: `http://127.0.0.1:${MOCK}`, AI_API_KEY: 'test', AI_MODEL: 'mock', AI_TIMEOUT_MS: '5000' },
     stdio: 'pipe',
   })
   for (let i = 0; i < 100; i++) {
@@ -105,7 +105,7 @@ describe('API', () => {
     assert.equal(r.body.output.actions.length, 1)
     assert.ok(lastPrompt.includes('Evidence pack'))
   })
-  it('reports agent status and runs an investigation when LangGraph is installed', async () => {
+  it('reports agent status and runs an investigation when LangGraph is installed', { timeout: 120000 }, async () => {
     const st = (await j('/api/agent/status')).body
     assert.equal(typeof st.langgraph, 'boolean')
     assert.ok(Array.isArray(st.notes))

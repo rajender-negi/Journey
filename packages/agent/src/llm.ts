@@ -10,6 +10,8 @@ export interface LlmConfig {
   model: string
   baseUrl?: string
   maxTokens: number
+  /** hard limit per model call; on expiry the node falls back to its rules path */
+  timeoutMs?: number
 }
 
 export async function createAgentLlm(cfg: LlmConfig): Promise<AgentLlm | null> {
@@ -33,16 +35,21 @@ export async function createAgentLlm(cfg: LlmConfig): Promise<AgentLlm | null> {
   let model: { withStructuredOutput: (s: unknown, o?: unknown) => { invoke: (m: unknown) => Promise<unknown> } }
   if (cfg.provider === 'anthropic') {
     const { ChatAnthropic } = await import('@langchain/anthropic')
-    model = new ChatAnthropic({ model: cfg.model, apiKey: cfg.apiKey, maxTokens: cfg.maxTokens, ...(cfg.baseUrl ? { anthropicApiUrl: cfg.baseUrl } : {}) }) as unknown as typeof model
+    model = new ChatAnthropic({ model: cfg.model, apiKey: cfg.apiKey, maxTokens: cfg.maxTokens, maxRetries: 1, ...(cfg.baseUrl ? { anthropicApiUrl: cfg.baseUrl } : {}) }) as unknown as typeof model
   } else {
     const { ChatOpenAI } = await import('@langchain/openai')
-    model = new ChatOpenAI({ model: cfg.model, apiKey: cfg.apiKey, maxTokens: cfg.maxTokens, configuration: { baseURL: cfg.baseUrl } }) as unknown as typeof model
+    model = new ChatOpenAI({ model: cfg.model, apiKey: cfg.apiKey, maxTokens: cfg.maxTokens, maxRetries: 1, timeout: cfg.timeoutMs ?? 45000, configuration: { baseURL: cfg.baseUrl } }) as unknown as typeof model
   }
   return {
     name: cfg.model,
     async structured<T>(schema: SchemaName, system: string, user: string): Promise<T> {
       const runnable = model.withStructuredOutput(schemas[schema], { name: schema })
-      return (await runnable.invoke([['system', system], ['human', user]])) as T
+      const ms = cfg.timeoutMs ?? 45000
+      let timer: ReturnType<typeof setTimeout> | undefined
+      const expired = new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error(`model call exceeded ${ms} ms`)), ms) })
+      try {
+        return (await Promise.race([runnable.invoke([['system', system], ['human', user]]), expired])) as T
+      } finally { clearTimeout(timer) }
     },
   }
 }
