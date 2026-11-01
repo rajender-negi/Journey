@@ -1,6 +1,6 @@
 // The LangGraph investigation agent.
 //
-//   START -> classify -> plan -> gather -> hypothesize -> verify --(passed or exhausted)--> recommend -> approve -> END
+//   START -> classify -> plan_evidence -> gather -> hypothesize -> verify --(passed or exhausted)--> recommend -> approve -> END
 //                          ^                                  |
 //                          +------(missing evidence)----------+
 //
@@ -47,18 +47,19 @@ export function buildInvestigationGraph(deps: AgentDeps) {
 
   return new StateGraph(InvestigationState)
     .addNode('classify', (s: GS) => classify(S(s), deps))
-    .addNode('plan', (s: GS) => plan(S(s), deps))
+    // node id differs from the 'plan' state channel: LangGraph forbids a node and a channel sharing a name
+    .addNode('plan_evidence', (s: GS) => plan(S(s), deps))
     .addNode('gather', (s: GS) => gather(S(s), deps))
     .addNode('hypothesize', (s: GS) => hypothesize(S(s), deps))
     .addNode('verify', (s: GS) => verify(S(s)))
     .addNode('recommend', (s: GS) => recommend(S(s), deps))
     .addNode('approve', approve)
     .addEdge(START, 'classify')
-    .addEdge('classify', 'plan')
-    .addEdge('plan', 'gather')
+    .addEdge('classify', 'plan_evidence')
+    .addEdge('plan_evidence', 'gather')
     .addEdge('gather', 'hypothesize')
     .addEdge('hypothesize', 'verify')
-    .addConditionalEdges('verify', (s: GS) => routeAfterVerify(S(s), deps.maxIterations), ['plan', 'recommend'])
+    .addConditionalEdges('verify', (s: GS) => (routeAfterVerify(S(s), deps.maxIterations) === 'plan' ? 'plan_evidence' : 'recommend'), ['plan_evidence', 'recommend'])
     .addEdge('recommend', 'approve')
     .addEdge('approve', END)
     .compile({ checkpointer: new MemorySaver() })

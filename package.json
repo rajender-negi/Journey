@@ -12,8 +12,9 @@
     "dev": "npm run dev -w @pj/server",
     "build": "npm run build -w @pj/web",
     "fixtures": "npm run fixtures -w @pj/server",
-    "test": "tsx --test packages/core/test/*.test.ts packages/agent/test/*.test.ts apps/server/test/*.test.ts",
-    "typecheck": "tsc -p packages/core && tsc -p packages/agent && tsc -p apps/server && tsc -p apps/web"
+    "typecheck": "tsc -p packages/core && tsc -p packages/agent && tsc -p apps/server && tsc -p apps/web",
+    "pretest": "npm run build",
+    "test": "tsx --test packages/core/test/*.test.ts packages/agent/test/*.test.ts apps/server/test/*.test.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
