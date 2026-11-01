@@ -1,0 +1,51 @@
+name: Demo build
+
+# Publishes the built card (product-journey.html + agent.js) to the demo-build branch,
+# so it can be fetched with git alone and published as a Claude artifact.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: demo-build
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write # push the demo-build branch only
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+
+      - name: Install
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
+
+      - name: Build card and in-browser agent
+        run: npm run build && test -s apps/web/dist-demo/agent.js
+
+      - name: Push to demo-build branch
+        env:
+          SRC_SHA: ${{ github.sha }}
+          TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          out="$RUNNER_TEMP/demo"
+          mkdir -p "$out" && cp apps/web/dist-demo/* "$out/"
+          cd "$out"
+          git init -q -b demo-build
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Demo build of ${SRC_SHA}"
+          git push -f -q "https://x-access-token:${TOKEN}@github.com/${REPO}.git" demo-build
