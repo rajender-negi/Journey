@@ -58,7 +58,8 @@ export async function plan(s: AgentState, d: AgentDeps): Promise<Partial<AgentSt
       const out = await d.llm.structured<{ items: { kind: string; why: string }[] }>('plan', SYSTEM,
         `Choose the evidence to fetch next for this failure (max 5). Only these kinds are available:\n${options.map((k) => `- ${k}: ${KIND_DESCRIPTION[k]}`).join('\n')}\n\nFailure: ${JSON.stringify({ rule: ctx.ruleId, category: ctx.category, evidence: ctx.evidenceText, product: ctx.productName, journey: ctx.journeyStages })}\nAlready gathered: ${[...have].join(', ') || 'none'}\nDefault plan: ${base.map((b) => b.kind).join(', ') || 'none'}`)
       const picked = out.items.filter((i) => options.includes(i.kind as EvidenceKind)).slice(0, 5).map((i) => ({ kind: i.kind as EvidenceKind, why: i.why }))
-      if (picked.length) { items = picked; engine = d.llm.name }
+      // the model adds to the rule's evidence, never replaces it: the rule plan is the floor
+      if (picked.length) { items = [...base, ...picked.filter((p) => !base.some((b) => b.kind === p.kind))].slice(0, Math.max(5, base.length)); engine = `rules + ${d.llm.name}` }
     } catch { /* keep rules plan */ }
   }
   const seen = new Set<string>()
@@ -71,7 +72,8 @@ export async function gather(s: AgentState, d: AgentDeps): Promise<Partial<Agent
   const start = s.evidence.length
   const got = await Promise.all(s.plan.map((p, i) => fetchEvidence(p.kind, ctx, d.tools, `E${start + i}`)))
   const ok = got.filter((e) => e.ok).length
-  return { evidence: got, log: [line(`gathered ${ok}/${got.length} via MCP${got.filter((e) => !e.ok).map((e) => `; ${e.kind}: ${e.summary}`).join('')}`)] }
+  const via = [...new Set(got.map((e) => (e.server === 'snapshot' ? 'snapshot' : 'MCP')))].join(' + ') || 'MCP'
+  return { evidence: got, log: [line(`gathered ${ok}/${got.length} via ${via}${got.filter((e) => !e.ok).map((e) => `; ${e.kind}: ${e.summary}`).join('')}`)] }
 }
 
 function rulesHypothesis(ctx: InvestigationContext, ev: Evidence[]): Hypothesis {

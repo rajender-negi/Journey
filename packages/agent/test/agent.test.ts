@@ -144,7 +144,9 @@ describe('workflow (same routing as the graph)', () => {
       },
     }
     const s = await runWorkflow(regression.id, deps(fakeTools(), llm))
-    assert.equal(s.plan[0].kind, 'dt_latency')
+    // model picks add to the rule plan; the invented kind is dropped
+    assert.ok(s.plan.some((p) => p.kind === 'dt_latency') && !s.plan.some((p) => p.kind === ('made_up' as never)))
+    assert.ok(s.log.some((l) => l.includes('plan (rules + fake-model)')))
     assert.equal(s.hypothesis!.engine, 'llm')
     assert.equal(s.recommendation!.engine, 'llm')
     assert.deepEqual(s.recommendation!.actions.map((x) => x.ruleId), ['FX-REGRESSION-SLOW'])
