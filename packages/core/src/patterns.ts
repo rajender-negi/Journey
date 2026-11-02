@@ -146,6 +146,14 @@ export const PATTERNS: Record<string, Pattern> = {
     tradeoffs: 'Requires trust in pipeline evidence; keep manual review for high-risk changes.',
     references: [REF.doraChangeApproval, REF.dtSrg],
   },
+  'infra-pipeline': {
+    id: 'infra-pipeline', name: 'Infrastructure changes through the pipeline', pillar: 'tool-integration',
+    principle: 'Production infrastructure changes the same way code does: reviewed, recorded, reversible.',
+    problem: 'A console or CLI change to production infrastructure bypassed review and the change record, and nobody linked it to the failure.',
+    solution: 'Infrastructure as code with remote locked state, plan reviewed in a pull request, apply from the pipeline with the change record attached; deny direct console writes in production.',
+    tradeoffs: 'Slower emergency changes; keep a break-glass path that still records the change.',
+    references: [REF.tfBackend, REF.doraChangeApproval, REF.awsReliability],
+  },
   'cost-efficiency': {
     id: 'cost-efficiency', name: 'Cost-optimised capacity', pillar: 'architecture',
     principle: 'Pay for what runs and commit to what is steady.',

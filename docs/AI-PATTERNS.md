@@ -2,6 +2,14 @@
 
 The agent's shape follows Anthropic's [Building effective agents](https://www.anthropic.com/research/building-effective-agents) (Dec 2024): start with the simplest thing that works and prefer workflows for well-defined tasks. Product Journey is a **workflow** (prompt chaining) with **routing** (the failure rule picks the evidence plan), **parallelization** (evidence fetched together), an **evaluator-optimizer** loop (the verifier, in code) and a human gate; **orchestrator-workers** is designed for specialist agents and added only if evaluation shows a gain. Backend integration follows the Azure Architecture Center patterns listed in DESIGN.md.
 
+**Buy the investigators, build the referee.** Product Journey does not diagnose failures with a model of its own. Each vendor's own AI agent investigates its layer: Dynatrace Intelligence (runtime), ServiceNow Now Assist (incident history), AWS DevOps Agent, Azure SRE Agent and Gemini Cloud Assist (cloud), K8sGPT (Kubernetes). They are asked in parallel through their MCP servers. What stays ours is small and deterministic (`agent/src/vendors.ts`):
+
+- **Product identity:** every answer is joined to one CMDB product and one change.
+- **Referee:** a vendor claim is an opinion until raw data from another tool backs it. When backed claims disagree, the one with more raw support wins (ties go to what the failure rule expects) and the other is shown as overruled. The verifier fails any story that cites an unbacked claim and asks for the raw evidence that would settle it.
+- **Design fix:** the winning cause is mapped to the design pattern that stops it recurring, with the product's own code findings that show the same gap. After approval it goes to the Copilot coding agent with the issue.
+
+The model, when one is configured, only writes the merged story from those verdicts; with no model the merge is fully rules-based.
+
 Every AI capability in Product Journey follows a pattern a company has published and measured. This page maps each one to its source and to our code, and says what is built and what is designed. Numbers in the "Their result" column are the companies' own published figures; ours come from `npm run eval`.
 
 | Capability | Pattern we follow | Source | Their result | Our implementation | Status |
@@ -21,7 +29,9 @@ Every AI capability in Product Journey follows a pattern a company has published
 | Measure each component | Report each part's effect on recall and errors | [LinkedIn SQL Bot](https://trino.io/assets/blog/trino-summit-2024/trino-summit-2024-linkedin-ai.pdf) | Rerankers +9% table recall | Separate retrieval metrics (precedent hit@5, runbook hit@3) from answer metrics | Built |
 | Tracing every agent step | Step-by-step traces to find where behaviour goes wrong | Klarna (LangSmith) | | `agent/src/trace.ts`: spans per run, step, model call and tool call with OpenTelemetry GenAI attribute names; OTLP/HTTP export to Dynatrace or any collector | Built |
 | Feedback loop in production | Users rate answers; ratings feed a dashboard | Uber Genie (48.9% rated helpful) | | Every Approve or Reject logged to `data/agent-feedback.jsonl`; `GET /api/agent/feedback` gives approval rate overall and per rule | Built |
-| Use vendor agents, don't rebuild them | Ask the specialist agent that already exists; cite its answer | [Dynatrace Intelligence agents](https://www.dynatrace.com/news/press-release/dynatrace-introduces-domain-specific-agents/), ServiceNow Now Assist | | Evidence `vendor_assessment` through their MCP servers (Dynatrace MCP, ServiceNow MCP Server Console) | Built, opt-in (tool names to confirm per tenant) |
+| Use vendor agents, don't rebuild them | Ask the specialist agent that already exists; cite its answer | [Dynatrace Intelligence agents](https://www.dynatrace.com/news/press-release/dynatrace-introduces-domain-specific-agents/), ServiceNow Now Assist, [AWS DevOps Agent](https://repost.aws/articles/ARYcX6Ay6PQWKfeXy4WQVCyg/querying-aws-devops-agent-investigations-from-kiro-cli-for-incident-response), [Azure SRE Agent](https://learn.microsoft.com/en-us/azure/sre-agent/mcp-server), [Gemini Cloud Assist](https://docs.cloud.google.com/cloud-assist/investigations), [K8sGPT](https://k8sgpt.ai/) | | `vendors.ts`: one evidence item per agent, each answer read from the vendor's own format into a claim | Built, opt-in. AWS (`call_aws`) and Azure (`sreagent_threads_create`) tool names are from vendor docs; Dynatrace, Now Assist, Gemini and K8sGPT names to confirm per tenant |
+| Referee across vendors | Evidence beats opinion: a claim counts only when raw data from another tool backs it; conflicts resolved by support | Our own (same idea as deterministic verdict arbitration) | | `judgeClaims`: corroborated, unsupported or overruled per claim; verifier check "vendor claims corroborated"; eval metric vendor discipline | Built |
+| Design fix from the cause | Map the cause to the published pattern that prevents it; link the product's code | [Azure Architecture Center patterns](https://learn.microsoft.com/en-us/azure/architecture/patterns/), AWS Builders Library, DORA | | `designFix`: cause text, then cause category, then the rule's pattern; matching code findings; second pattern when cause and rule differ | Built |
 | Hand code fixes to a coding agent | Issue in, draft PR out, a person reviews | [GitHub Copilot coding agent](https://github.blog/changelog/2025-09-25-copilot-coding-agent-is-now-generally-available/) | | After approval, an issue assigned to Copilot through the GitHub MCP server; write allowlisted; dry run in the card | Built, opt-in |
 | Managed retrieval and guardrails | Use the platform's RAG and safety services in production | Azure AI Search, Amazon Bedrock Knowledge Bases, Amazon Bedrock Guardrails | | `providers.ts`: `RAG_PROVIDER`, `GUARDRAIL_PROVIDER`; the built-in versions remain the offline fallback | Built (Azure AI Search tested against a stand-in; Bedrock not run against AWS) |
 | Multi-agent supervisor | Lead agent with parallel specialists | Anthropic research system | +90.2% on their test, ~15x tokens | Runtime, delivery, code and cost specialists | Designed: added only if evaluation shows the single agent falls short |
@@ -33,14 +43,17 @@ From `npm run eval` on the demo data (rules path, no model):
 
 | Metric | Score | Pass bar |
 | --- | --- | --- |
-| Evidence coverage | 99.3% | 90% |
+| Evidence coverage | 99.6% | 90% |
 | Verified investigations | 100% | 90% |
 | Citation validity | 100% | 100% |
 | Action grounding | 100% | 100% |
 | Past-incident precedent in top 5 | 90.9% | 80% |
 | Right runbook in top 3 | 100% | 90% |
-| Adversarial cases caught | 100% (3 of 3) | 100% |
+| Adversarial cases caught | 100% (4 of 4) | 100% |
 | Injection lines removed | 100% (5 of 5) | 100% |
+| Vendor discipline (no unbacked claim cited) | 100% | 100% |
+
+Vendor agents answered 52 times across the 28 cases; 47 answers were backed by raw data. In the demo data the vendors mostly agree because the data is consistent; real tenants will produce more overruled and unsupported claims, which is the point of the referee.
 
 What these numbers do and don't show: they come from the dummy data and our own adversarial cases, so they prove the pipeline behaves as designed, not how it performs on real incidents. The first run of the runbook metric scored 17.9%: near-identical past incidents crowded the runbook out, which led to the runbook slot in hybrid search. That is the point of the gate.
 

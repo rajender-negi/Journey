@@ -1,6 +1,7 @@
 // Shared agent types. Pure data, serializable, so LangGraph can checkpoint every step.
 
 import type { AiOutput } from '@pj/core'
+import type { DesignFix, VendorClaim, VendorVerdict } from './vendors'
 
 export type SourceName = 'dynatrace' | 'github' | 'argocd' | 'kubernetes' | 'servicenow' | 'aws' | 'azure' | 'gcp'
 
@@ -74,6 +75,8 @@ export interface Evidence {
   ms?: number
   /** e.g. 'injection_removed:2' when instruction-like lines were stripped from tool output */
   flags?: string[]
+  /** set when this evidence is a vendor agent's answer: an opinion, used only once raw data backs it */
+  claim?: VendorClaim
 }
 
 export interface Hypothesis {
@@ -81,6 +84,10 @@ export interface Hypothesis {
   chain: { step: string; evidenceIds: string[] }[]
   confidence: 'high' | 'medium' | 'low'
   engine: 'llm' | 'rules'
+  /** each vendor agent's claim, judged against the raw evidence */
+  vendors?: VendorVerdict[]
+  /** whether the root cause rests on a corroborated vendor claim or on the matched rule */
+  basis?: 'vendor' | 'rule'
 }
 
 export interface Verification {
@@ -98,4 +105,6 @@ export interface Approval {
 
 export interface Recommendation extends AiOutput {
   engine: 'llm' | 'rules'
+  /** the design pattern that stops this cause from recurring, with the product's matching code findings */
+  designFix?: DesignFix | null
 }

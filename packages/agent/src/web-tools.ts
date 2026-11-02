@@ -74,7 +74,11 @@ export function snapshotTools(raw: RawBundle, analysis?: Analysis): ToolRunner {
           return sig ? reply(op, params, sig.audit(op.slice(0, -6) as 'aws' | 'azure' | 'gcp', params.productId, params.from, params.to)) : { ok: false, text: '', error: 'no snapshot' }
         case 'security_alerts': return sig ? reply(op, params, sig.codeScanning(params.repo)) : { ok: false, text: '', error: 'no snapshot' }
         case 'vendor_dynatrace': { const v = sig?.vendorDynatrace(params.question, params.problemId); return v ? reply(op, params, v) : { ok: false, text: '', error: 'no Davis problem for this failure' } }
-        case 'vendor_servicenow': return sig ? reply(op, params, sig.vendorServiceNow(params.question)) : { ok: false, text: '', error: 'no snapshot' }
+        case 'vendor_servicenow': return sig ? reply(op, params, sig.vendorServiceNow(params.productId, params.at)) : { ok: false, text: '', error: 'no snapshot' }
+        case 'vendor_aws': return sig ? reply(op, params, sig.vendorAws(params.productId, params.at)) : { ok: false, text: '', error: 'no snapshot' }
+        case 'vendor_azure': return sig ? reply(op, params, sig.vendorAzure(params.productId, params.at, params.question)) : { ok: false, text: '', error: 'no snapshot' }
+        case 'vendor_gcp': return sig ? reply(op, params, sig.vendorGcp(params.productId, params.at)) : { ok: false, text: '', error: 'no snapshot' }
+        case 'vendor_k8sgpt': return sig ? reply(op, params, sig.vendorK8sgpt(params.namespace, params.at)) : { ok: false, text: '', error: 'no snapshot' }
         case 'copilot_issue': return { ok: true, text: JSON.stringify({ dryRun: true, wouldCreate: { repo: params.repo, title: params.title, assignees: ['Copilot'] } }), server: SNAPSHOT, tool: 'create_issue (dry run)' }
         default:
           return { ok: false, text: '', error: `${op} not in snapshot` }

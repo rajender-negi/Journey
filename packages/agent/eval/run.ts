@@ -4,7 +4,7 @@ import { runEval } from './golden'
 
 const r = await runEval()
 const pct = (x: number) => `${(x * 100).toFixed(1)}%`
-console.log(`Golden set: ${r.cases} investigations across ${r.rules} failure rules (${r.withPrecedent} with an earlier same-rule incident), ${r.adversarialCases} adversarial and ${r.injectionCases} injection cases\n`)
+console.log(`Golden set: ${r.cases} investigations across ${r.rules} failure rules (${r.withPrecedent} with an earlier same-rule incident), ${r.adversarialCases} adversarial and ${r.injectionCases} injection cases\nVendor agents answered ${r.vendorAnswers} times; ${r.vendorBacked} answers were backed by raw data and usable\n`)
 console.log('| Metric | Score | Pass bar | Result |\n| --- | --- | --- | --- |')
 for (const k of Object.keys(r.metrics) as (keyof typeof r.metrics)[]) {
   console.log(`| ${k} | ${pct(r.metrics[k])} | ${pct(r.thresholds[k])} | ${r.metrics[k] >= r.thresholds[k] ? 'pass' : 'FAIL'} |`)

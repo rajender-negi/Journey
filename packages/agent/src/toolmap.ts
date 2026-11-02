@@ -6,7 +6,7 @@
 import type { SourceName } from './types'
 
 export type Op = 'dql' | 'pr_files' | 'job_log' | 'argo_app' | 'argo_apps' | 'k8s_events' | 'kb_search'
-  | 'k8s_workload' | 'aws_audit' | 'azure_audit' | 'gcp_audit' | 'security_alerts' | 'vendor_dynatrace' | 'vendor_servicenow' | 'copilot_issue'
+  | 'k8s_workload' | 'aws_audit' | 'azure_audit' | 'gcp_audit' | 'security_alerts' | 'vendor_dynatrace' | 'vendor_servicenow' | 'vendor_aws' | 'vendor_azure' | 'vendor_gcp' | 'vendor_k8sgpt' | 'copilot_issue'
 
 export interface ToolCandidate {
   tool: string
@@ -115,6 +115,37 @@ export const DEFAULT_TOOL_MAP: Record<Op, OpSpec> = {
       { tool: 'incident_resolution_recommendation', args: (p) => ({ short_description: p.question }) },
     ],
   },
+  // AWS DevOps Agent: read its investigation journal through the AWS MCP Server (call_aws runs the CLI command)
+  vendor_aws: {
+    source: 'aws',
+    candidates: [
+      { tool: 'call_aws', args: (p) => ({ cli_command: `aws devops-agent list-journal-records --agent-space-id ${p.agentSpace || '$AGENT_SPACE_ID'} --task-id ${p.taskId || '$TASK_ID'}` }) },
+      { tool: 'aws___call_aws', args: (p) => ({ cli_command: `aws devops-agent list-journal-records --agent-space-id ${p.agentSpace || '$AGENT_SPACE_ID'} --task-id ${p.taskId || '$TASK_ID'}` }) },
+    ],
+  },
+  // Azure SRE Agent: tools ship inside the Azure MCP Server with the sreagent_ prefix
+  vendor_azure: {
+    source: 'azure',
+    candidates: [
+      { tool: 'sreagent_threads_create', args: (p) => ({ agent: p.agent, message: p.question }) },
+    ],
+  },
+  // Gemini Cloud Assist investigation: tool names to confirm for your setup
+  vendor_gcp: {
+    source: 'gcp',
+    candidates: [
+      { tool: 'create_investigation', args: (p) => ({ title: p.question.slice(0, 120), description: p.question }) },
+      { tool: 'run_investigation', args: (p) => ({ issue: p.question }) },
+    ],
+  },
+  // K8sGPT analyze (JSON results per object); tool names to confirm for your k8sgpt version
+  vendor_k8sgpt: {
+    source: 'kubernetes',
+    candidates: [
+      { tool: 'analyze', args: (p) => ({ namespace: p.namespace, explain: true }) },
+      { tool: 'k8sgpt_analyze', args: (p) => ({ namespace: p.namespace, explain: true }) },
+    ],
+  },
   // write: only runs when allowlisted (AGENT_WRITE_ALLOWLIST=github:create_issue) and after a person approves
   copilot_issue: {
     source: 'github',
@@ -149,6 +180,12 @@ export function resolveOp(
   if (!server) return { error: `no MCP server configured for ${spec.source}` }
   const tools = available.get(server)!
   const c = spec.candidates.find((x) => tools.has(x.tool))
-  if (!c) return { error: `${server} exposes none of: ${spec.candidates.map((x) => x.tool).join(', ')}` }
-  return { server, tool: c.tool, args: c.args(params) }
+  if (c) return { server, tool: c.tool, args: c.args(params) }
+  // vendor agents often live on a second server for the same source (AWS MCP Server next to the CloudTrail one,
+  // Azure MCP Server next to AKS): any configured server that exposes a candidate tool answers
+  for (const [other, ts] of available) {
+    const alt = spec.candidates.find((x) => ts.has(x.tool))
+    if (alt) return { server: other, tool: alt.tool, args: alt.args(params) }
+  }
+  return { error: `${server} exposes none of: ${spec.candidates.map((x) => x.tool).join(', ')}` }
 }

@@ -1,7 +1,7 @@
 // Dummy payloads for the signals the agent reads beyond the collector's sources, in each tool's
 // native schema: Grail records (logs, spans, Kubernetes metrics, security events), core/v1 PodList,
 // CloudTrail LookupEvents, Azure Activity Log, Cloud Logging entries, GitHub code-scanning alerts and
-// the two vendor agents. Generated from the analysis so each failure has evidence that fits it.
+// the vendor agents (Dynatrace Intelligence, Now Assist, AWS DevOps Agent, Azure SRE Agent, Gemini Cloud Assist, K8sGPT). Generated from the analysis so each failure has evidence that fits it.
 // Used only when a signal has no live path (no Dynatrace token, no MCP server for that tool).
 
 import type { Analysis, FailureFinding } from '@pj/core'
@@ -10,6 +10,14 @@ const ms = (iso: string) => Date.parse(iso)
 const iso = (t: number) => new Date(t).toISOString()
 const h = (s: string) => { let x = 2166136261; for (let i = 0; i < s.length; i++) x = Math.imul(x ^ s.charCodeAt(i), 16777619); return (x >>> 0).toString(16).padStart(8, '0') }
 
+const K8S_TEXT: Record<string, string> = {
+  'FX-OOM': 'Container was OOMKilled: memory usage reached the 512Mi memory limit under load.',
+  'FX-CRASHLOOP': 'Back-off restarting failed container: the process exits at startup because an environment variable is missing.',
+  'FX-CONFIG-MISSING': 'CreateContainerConfigError: a referenced configmap or secret was not found.',
+  'FX-IMAGE-PULL': 'ErrImagePull: manifest unknown for the image tag in the pod spec.',
+  'FX-READINESS': 'Readiness probe failed: the health endpoint waits on an upstream dependency and hits a timeout.',
+}
+
 export function signalSnapshots(a: Analysis) {
   const products = a.dataset.products
   const productOfService = (svc: string) => products.find((p) => p.services.includes(svc))
@@ -17,6 +25,19 @@ export function signalSnapshots(a: Analysis) {
   const near = (pid: string | undefined, from: string, to: string, pad = 0) =>
     a.failures.filter((f) => f.productId === pid && ms(f.at) >= ms(from) - pad && ms(f.at) <= ms(to) + pad)
   const rule = (f: FailureFinding) => f.recommendation.ruleId
+  const failureAt = (pid: string, at: string) => a.failures.find((f) => f.productId === pid && f.at === at) ?? a.failures.filter((f) => f.productId === pid && Math.abs(ms(f.at) - ms(at)) < 3_600_000)[0]
+  const deployOf = (f: FailureFinding) => a.dataset.deployments.find((d) => d.id === f.linkedDeploymentId)
+  /** What a cloud or Kubernetes agent would conclude for this failure, in its own words */
+  const causeText = (f: FailureFinding, cloud?: 'aws' | 'azure' | 'gcp'): string => {
+    const r = rule(f), v = deployOf(f)?.version
+    if (r === 'FX-NON-CHANGE') return cloud === 'azure' ? 'App Service configuration was changed (sites/config/write) shortly before the errors began; connection failures to the database followed.'
+      : cloud === 'gcp' ? 'Cloud Run service was updated (UpdateService) shortly before the errors began; requests to the backing database timed out.'
+      : 'The RDS instance class was changed by ModifyDBInstance with ApplyImmediately shortly before the problem; the database failover dropped connections and requests failed.'
+    if (r === 'FX-REGRESSION-SLOW') return `Latency rose right after the deployment of ${v ?? 'the new version'}; database calls per request increased (N+1 pattern in the new code).`
+    if (r === 'FX-REGRESSION-ERRORS') return `Errors started with the deployment of ${v ?? 'the new version'}; the new release throws NullPointerException on POST /v1/orders.`
+    if (r === 'FX-DB-MIGRATION') return `The deployment of ${v ?? 'the new version'} ran a schema migration that the running version could not read.`
+    return K8S_TEXT[r] ?? `${f.category}: ${f.evidence.slice(0, 160)}`
+  }
 
   return {
     logs(service: string, ns: string, from: string, to: string) {
@@ -115,8 +136,49 @@ export function signalSnapshots(a: Analysis) {
       if (!pr) return null
       return { answer: `Davis root cause for ${pr.displayId}: ${pr.rootCauseText ?? pr.title}. Affected: ${pr.affectedEntities.join(', ')}.`, source: 'Dynatrace Intelligence (snapshot)', question: question.slice(0, 160) }
     },
-    vendorServiceNow(question: string) {
-      return { answer: 'Now Assist found similar incidents; see the knowledge base matches for the cited records.', source: 'ServiceNow Now Assist (snapshot)', question: question.slice(0, 160) }
+    /** Now Assist: similar past incidents and their resolution (response shape assumed: ServiceNow does not publish one) */
+    vendorServiceNow(productId: string, at: string) {
+      const f = failureAt(productId, at)
+      const past = a.failures.filter((x) => x.productId === productId && ms(x.at) < ms(at) - 3_600_000).sort((x, y) => ms(y.at) - ms(x.at))
+      const prev = (f && past.find((x) => rule(x) === rule(f))) ?? past[0]
+      if (!prev) return { result: { similar_incidents: [], recommendation: null } }
+      const inc = `INC00${parseInt(h(prev.id).slice(0, 5), 16) % 90000 + 10000}`
+      return { result: {
+        similar_incidents: [{ number: inc, short_description: `${prev.category} on ${productId}`, close_notes: `Past incident ${inc} had the same signature. ${causeText(prev)}`, sys_created_on: prev.at.replace('T', ' ').slice(0, 19) }],
+        recommendation: { probable_cause: `Past incident ${inc} had the same signature. ${causeText(prev)}`, resolution: prev.recommendation.fixNow[0] ?? '' },
+      } }
+    },
+    /** AWS DevOps Agent journal records for the investigation it opened on the alarm */
+    vendorAws(productId: string, at: string) {
+      const f = failureAt(productId, at)
+      if (!f) return { records: [] }
+      return { taskId: `task-${h(f.id).slice(0, 8)}`, status: 'COMPLETED', records: [
+        { recordType: 'observation_md', createdAt: iso(ms(f.at) + 4 * 60_000), content: `Alarm on ${productId}: ${f.category}.` },
+        { recordType: 'root_cause_analysis_md', createdAt: iso(ms(f.at) + 9 * 60_000), content: causeText(f, 'aws') },
+        { recordType: 'mitigation_summary_md', createdAt: iso(ms(f.at) + 11 * 60_000), content: f.recommendation.fixNow[0] ?? '' },
+      ] }
+    },
+    /** Azure SRE Agent thread (Azure MCP Server sreagent_threads_create) */
+    vendorAzure(productId: string, at: string, question: string) {
+      const f = failureAt(productId, at)
+      return { threadId: f ? `thr-${h(f.id).slice(0, 10)}` : '', messages: [{ role: 'user', content: question.slice(0, 200) }, ...(f ? [{ role: 'assistant', content: causeText(f, 'azure') }] : [])] }
+    },
+    /** Gemini Cloud Assist investigation: ranked observations and hypotheses */
+    vendorGcp(productId: string, at: string) {
+      const f = failureAt(productId, at)
+      if (!f) return { observations: [], hypotheses: [] }
+      return { name: `projects/${productId.toLowerCase()}-prod/locations/global/investigations/${h(f.id)}`, state: 'COMPLETED',
+        observations: [{ title: f.category, text: f.evidence.slice(0, 200) }],
+        hypotheses: [{ title: f.category, text: causeText(f, 'gcp'), confidence: 0.7, remediation: f.recommendation.fixNow[0] ?? '' }] }
+    },
+    /** k8sgpt analyze --explain -o json: one result per broken object; nothing for problems outside Kubernetes */
+    vendorK8sgpt(namespace: string, at: string) {
+      const p = productOfNs(namespace)
+      const f = p ? failureAt(p.id, at) : undefined
+      const text = f ? K8S_TEXT[rule(f)] : undefined
+      if (!f || !text) return { provider: 'openai', errors: null, status: 'OK', problems: 0, results: [] }
+      const svc = p!.services[0] ?? namespace
+      return { provider: 'openai', errors: null, status: 'ProblemDetected', problems: 1, results: [{ kind: 'Pod', name: `${namespace}/${svc}-${h(f.id).slice(0, 5)}`, error: [{ Text: text, KubernetesDoc: '', Sensitive: [] }], details: f.recommendation.fixNow[0] ?? '', parentObject: `Deployment/${svc}` }] }
     },
   }
 }

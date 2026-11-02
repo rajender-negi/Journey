@@ -31,6 +31,7 @@ Generated from `packages/core/src/signals.ts` by `npm run docs:signals`. Paths a
 | --- | --- | --- | --- | --- |
 | Warning events | reason (CrashLoopBackOff, OOMKilled, ImagePullBackOff), message, involved object, time | 1. **dynatrace** fetch events | filter k8s.namespace.name _(listed, not called by the app yet)_<br>2. **mcp** kubernetes MCP (`events_list`, `list_events`)<br>3. **rest** core/v1 events API | collector: kubernetes; agent: k8s_events | Built |
 | Pods, containers, nodes (state) | phase, ready, restartCount, lastState.terminated.reason, node, resource limits | 1. **dynatrace** see dt-k8s<br>2. **mcp** kubernetes / EKS / AKS / GKE MCP servers (`pods_list`, `list_k8s_resources`)<br>3. **rest** core/v1 pods and nodes API _(listed, not called by the app yet)_ | agent: k8s_workload | Built |
+| K8sGPT analysis _(vendor-agent)_ | one result per broken object: kind, name, error text, details | 1. **mcp** k8sgpt MCP server (tool names to confirm) (`analyze`, `k8sgpt_analyze`)<br>2. **rest** k8sgpt analyze --explain -o json _(listed, not called by the app yet)_ | agent: vendor_assessment | Built, opt-in |
 
 ## AWS
 
@@ -40,6 +41,7 @@ Generated from `packages/core/src/signals.ts` by `npm run docs:signals`. Paths a
 | CloudTrail: who changed what | EventName, EventTime, Username, EventSource, Resources | 1. **mcp** AWS MCP servers (CloudTrail, or the AWS API server) (`lookup_events`, `lookup_cloudtrail_events`, `call_aws`)<br>2. **dynatrace** fetch logs | filter log.source == "aws.cloudtrail" (if forwarded) _(listed, not called by the app yet)_ | agent: cloud_changes | Built |
 | CloudWatch metrics and alarms | alarms, metrics for managed services (RDS, SQS, ALB) | 1. **dynatrace** Dynatrace AWS integration: cloud.aws.* metrics _(listed, not called by the app yet)_<br>2. **mcp** AWS MCP servers (CloudWatch) (`get_metric_data`, `describe_alarms`) _(listed, not called by the app yet)_ | not used yet: next candidate evidence for managed-service failures (RDS, SQS, ALB) | Catalogued, not consumed yet |
 | EKS clusters and node groups | cluster version, node group scaling, instance types | 1. **dynatrace** Dynatrace Operator on EKS<br>2. **mcp** Amazon EKS MCP server (`list_k8s_resources`) | agent: k8s_workload | Built |
+| AWS DevOps Agent investigation _(vendor-agent)_ | journal records: observations, root cause analysis, mitigation plan | 1. **mcp** AWS MCP Server (call_aws runs devops-agent list-journal-records) (`call_aws`, `aws___call_aws`) | agent: vendor_assessment | Built, opt-in |
 
 ## Azure
 
@@ -48,6 +50,7 @@ Generated from `packages/core/src/signals.ts` by `npm run docs:signals`. Paths a
 | Cost by product tag | service, tag, environment, pre-tax cost | 1. **rest** Cost Management query API<br>2. **mcp** Azure MCP server (`cost_query`) _(listed, not called by the app yet)_ | collector: azure | Built |
 | Activity Log: who changed what | operationName, caller, status, resourceId, eventTimestamp | 1. **mcp** Azure MCP server / AKS MCP server (`monitor_activitylog_list`, `az_monitor_activity_log`, `call_az`)<br>2. **dynatrace** fetch logs | filter azure.resource.id (if forwarded) _(listed, not called by the app yet)_ | agent: cloud_changes | Built |
 | Azure Monitor and AKS | AKS node and pod state, Monitor metrics | 1. **dynatrace** Dynatrace Azure integration and Operator on AKS<br>2. **mcp** AKS MCP server (preview) (`list_k8s_resources`) | agent: k8s_workload | Built |
+| Azure SRE Agent thread _(vendor-agent)_ | the agent's investigation answer in a thread | 1. **mcp** Azure MCP Server (sreagent_ tools) (`sreagent_threads_create`) | agent: vendor_assessment | Built, opt-in |
 
 ## Google Cloud
 
@@ -56,6 +59,7 @@ Generated from `packages/core/src/signals.ts` by `npm run docs:signals`. Paths a
 | Cost by product label (Billing export) | service, sku, usage_start_time, labels, cost | 1. **rest** BigQuery jobs.query on the billing export<br>2. **mcp** Google Cloud BigQuery MCP server (`execute_sql`, `query`) _(listed, not called by the app yet)_ | collector: gcp | Built |
 | Cloud Audit Logs: who changed what | protoPayload.methodName, authenticationInfo.principalEmail, resourceName, timestamp | 1. **mcp** Google Cloud Logging MCP server (`list_log_entries`, `query_logs`)<br>2. **dynatrace** fetch logs | filter gcp.resource.type (if forwarded) _(listed, not called by the app yet)_ | agent: cloud_changes | Built |
 | GKE, Cloud Monitoring, Cloud Trace | GKE workload state, metrics, traces | 1. **dynatrace** Dynatrace Google Cloud integration and Operator on GKE<br>2. **mcp** Google Cloud GKE MCP server (`list_k8s_resources`) | agent: k8s_workload | Built |
+| Gemini Cloud Assist investigation _(vendor-agent)_ | ranked observations and hypotheses | 1. **mcp** Cloud Assist investigations (tool names to confirm) (`create_investigation`, `run_investigation`)<br>2. **rest** Gemini Cloud Assist investigations API _(listed, not called by the app yet)_ | agent: vendor_assessment | Built, opt-in |
 
 ## GitHub
 

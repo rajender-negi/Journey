@@ -58,6 +58,18 @@
         "AWS_REGION": "${env:AWS_REGION}"
       }
     },
+    "aws-api": {
+      "command": "uvx",
+      "args": [
+        "mcp-proxy-for-aws@latest",
+        "https://aws-mcp.us-east-1.api.aws/mcp",
+        "--metadata",
+        "AWS_REGION=${env:AWS_REGION}"
+      ],
+      "env": {
+        "AWS_PROFILE": "${env:AWS_PROFILE}"
+      }
+    },
     "azure-aks": {
       "command": "docker",
       "args": [
@@ -67,6 +79,15 @@
         "mcp/aks",
         "--access-level",
         "readonly"
+      ]
+    },
+    "azure-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@azure/mcp@latest",
+        "server",
+        "start"
       ]
     },
     "gcp-logging": {
@@ -86,6 +107,13 @@
       "headers": {
         "Authorization": "Bearer ${env:SNOW_TOKEN}"
       }
+    },
+    "k8sgpt": {
+      "command": "k8sgpt",
+      "args": [
+        "serve",
+        "--mcp"
+      ]
     },
     "inhouse-deploys": {
       "command": "npx",
@@ -116,6 +144,7 @@
   "_notes": [
     "Order of use for every signal: Dynatrace DQL first (if Dynatrace already collects it), then the tool's official MCP server, then REST. See docs/INTEGRATIONS.md.",
     "Entries with <placeholders> must be filled from each vendor's docs; delete any you don't use. Tool names are matched against candidates in packages/agent/src/toolmap.ts; override per server under toolMap.",
-    "Writes are refused unless listed in AGENT_WRITE_ALLOWLIST (for example github:create_issue for the Copilot hand-off). Dynatrace is never written to."
+    "Writes are refused unless listed in AGENT_WRITE_ALLOWLIST (for example github:create_issue for the Copilot hand-off). Dynatrace is never written to.",
+    "Vendor agents: aws-api is the AWS MCP Server (call_aws reads AWS DevOps Agent journal records); azure-mcp is the Azure MCP Server (sreagent_ tools for Azure SRE Agent); k8sgpt serve --mcp exposes K8sGPT. Each vendor op is answered by whichever configured server exposes its tool, so these can sit next to the per-source servers. Check the exact commands against each vendor's current docs."
   ]
 }

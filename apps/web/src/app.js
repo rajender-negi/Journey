@@ -207,6 +207,12 @@
       var s = v.state
       html += '<div class="ai-engine">' + chip(v.status.replace('_', ' '), RUN_TONE[v.status]) + (s.hypothesis ? chip('confidence ' + s.hypothesis.confidence, '') : '') + (s.verification ? chip(s.verification.passed ? 'verified' : 'not fully verified', s.verification.passed ? 'tone-good' : 'tone-warn') : '') + '</div>'
       if (s.recommendation) html += '<p class="ai-headline">' + esc(s.recommendation.headline) + '</p>'
+      var df = s.recommendation && s.recommendation.designFix
+      if (df) html += '<div class="dfix"><div class="eyebrow">Design fix: stop it recurring</div><b>' + esc(df.name) + '</b>' + (df.also ? ' <span class="muted small">+ ' + esc(df.also.name) + '</span>' : '') + '<p class="small">' + esc(df.solution) + '</p><p class="small muted">' + esc(df.why) + '</p>' +
+        (df.codeFindings.length ? '<ul class="factors">' + df.codeFindings.map(function (c) { return '<li>' + esc(c.title) + (c.file ? ' <code>' + esc(c.file) + '</code>' : '') + ' <span class="muted">· ' + esc(c.ruleId) + '</span></li>' }).join('') + '</ul>' : '') +
+        (df.references && df.references[0] ? '<p class="small"><a href="' + esc(df.references[0].url) + '" target="_blank" rel="noopener">' + esc(df.references[0].title) + '</a></p>' : '') + '</div>'
+      var VTONE = { corroborated: 't-good', overruled: 't-warn', unsupported: 't-crit' }
+      if (s.hypothesis && s.hypothesis.vendors && s.hypothesis.vendors.length) html += '<h4>Vendor agents: what each said, and whether raw data backs it</h4><ul class="factors">' + s.hypothesis.vendors.map(function (x) { return '<li><b>' + esc(x.name) + '</b> <code>' + esc(x.evidenceId) + '</code> <span class="' + VTONE[x.status] + '">' + esc(x.status) + '</span> <span class="muted">· ' + esc(x.category) + ' · ' + esc(x.note) + '</span><div class="small">' + esc(x.cause.slice(0, 220)) + '</div></li>' }).join('') + '</ul>'
       if (s.hypothesis) html += '<h4>Root cause chain</h4><ol class="ai-actions">' + s.hypothesis.chain.map(function (c) { return '<li><span class="ai-action">' + esc(c.step) + '</span><span class="ai-meta">' + c.evidenceIds.map(function (x) { return '<code>' + esc(x) + '</code>' }).join(' ') + '</span></li>' }).join('') + '</ol>'
       html += '<h4>Evidence</h4><ul class="factors">' + (s.evidence || []).map(function (e) { return '<li><code>' + esc(e.id) + '</code> ' + (e.ok ? '' : '<span class="t-crit">unavailable</span> ') + esc(e.source) + (e.tool ? ' · <code>' + esc(e.server + ':' + e.tool) + '</code>' : '') + ' <span class="muted">· ' + esc(e.summary) + '</span>' + (e.flags && e.flags.length ? ' <span class="t-warn">' + esc(e.flags.join(', ')) + '</span>' : '') + (e.kind === 'kb_similar' && e.ok ? kbHits(e.data) : '') + '</li>' }).join('') + '</ul>'
       if (s.verification) html += '<h4>Verification</h4><ul class="factors">' + s.verification.checks.map(function (c) { return '<li>' + (c.ok ? '<span class="t-good">pass</span>' : '<span class="t-crit">fail</span>') + ' ' + esc(c.name) + ' <span class="muted">· ' + esc(c.detail) + '</span></li>' }).join('') + '</ul>'
@@ -412,18 +418,18 @@
 
   // ---------- map: the whole solution on one page; tools light up or go dead with their connections ----------
   var MAP_TOOLS = [
-    ['servicenow', 'ServiceNow', 'Product identity (CMDB), changes, incidents', ['change'], ['classify', 'kb']],
+    ['servicenow', 'ServiceNow', 'Product identity (CMDB), changes, incidents', ['change'], ['classify', 'kb', 'vendor']],
     ['github', 'GitHub', 'Merges, CI, scans, code, Copilot', ['merged', 'build', 'test', 'scan', 'code'], ['gather', 'handoff']],
     ['argocd', 'Argo CD', 'Deployments and sync state', ['staging', 'prod'], ['gather']],
-    ['kubernetes', 'Kubernetes', 'Pods, containers, nodes, events', ['staging', 'prod'], ['gather']],
+    ['kubernetes', 'Kubernetes', 'Pods, containers, nodes, events', ['staging', 'prod'], ['gather', 'vendor']],
     ['dynatrace', 'Dynatrace', 'Hub: problems, logs, traces, DORA', ['prod', 'verified'], ['gather', 'vendor']],
-    ['aws', 'AWS', 'Cost, CloudTrail, EKS', ['cost'], ['gather']],
-    ['azure', 'Azure', 'Cost, Activity Log, AKS', ['cost'], ['gather']],
-    ['gcp', 'Google Cloud', 'Cost, Audit Logs, GKE', ['cost'], ['gather']],
+    ['aws', 'AWS', 'Cost, CloudTrail, EKS', ['cost'], ['gather', 'vendor']],
+    ['azure', 'Azure', 'Cost, Activity Log, AKS', ['cost'], ['gather', 'vendor']],
+    ['gcp', 'Google Cloud', 'Cost, Audit Logs, GKE', ['cost'], ['gather', 'vendor']],
   ]
   var MAP_STAGES = [['merged', 'Merged'], ['build', 'Build'], ['test', 'Test'], ['scan', 'Scan'], ['staging', 'Staging'], ['change', 'Change'], ['prod', 'Prod'], ['verified', 'Verified']]
   var MAP_INSIGHTS = [['code', 'Codebase and design advisor'], ['cost', 'Cost per product']]
-  var MAP_AGENT = [['classify', 'Classify', 'rules'], ['gather', 'Gather evidence', 'MCP or Dynatrace'], ['kb', 'Search past incidents', 'RAG'], ['vendor', 'Ask vendor agents', 'Davis, Now Assist'], ['hypo', 'Hypothesize', 'Claude via LangChain'], ['verify', 'Verify', '6 checks'], ['rec', 'Recommend', 'guarded'], ['approve', 'You approve', 'human gate'], ['handoff', 'Copilot opens the PR', 'opt-in']]
+  var MAP_AGENT = [['classify', 'Classify', 'rules'], ['gather', 'Gather evidence', 'MCP or Dynatrace'], ['kb', 'Search past incidents', 'RAG'], ['vendor', 'Ask vendor agents', 'Davis, Now Assist, AWS, Azure, Gemini, K8sGPT'], ['hypo', 'Referee the answers', 'evidence beats opinion'], ['verify', 'Verify', '7 checks'], ['rec', 'Design fix and actions', 'guarded'], ['approve', 'You approve', 'human gate'], ['handoff', 'Copilot opens the PR', 'opt-in']]
   function demoCard() { return VM.mode === 'demo' }
   function cardOff() { return demoCard() ? (S.cardMode === 'live' ? MAP_TOOLS.map(function (t) { return t[0] }) : S.cardOffList.slice()) : [] }
   function toolState(id) {
@@ -459,22 +465,24 @@
       ['cost', 'Cost', 'Spend per product and service, savings, cost of failed changes', 'core/src/cost.ts', 'AWS Well-Architected cost pillar', '', 'built', ['aws', 'azure', 'gcp']],
     ]],
     ['agent', 'Agent runtime', [
-      ['graph', 'LangGraph graph', 'Classify, plan, gather, hypothesize, verify (loop), recommend, approve; state checkpointed, paused for a person', 'agent/src/graph.ts (server), web.ts (card)', 'Anthropic, Building effective agents: a workflow (prompt chaining) rather than an open-ended agent; in production at Klarna on LangGraph', 'https://www.anthropic.com/research/building-effective-agents', 'built', ['servicenow']],
+      ['graph', 'LangGraph graph', 'Classify, plan, gather, ask vendor agents, referee their answers, verify (loop), design fix, approve; state checkpointed, paused for a person', 'agent/src/graph.ts (server), web.ts (card)', 'Anthropic, Building effective agents: a workflow (prompt chaining) rather than an open-ended agent; in production at Klarna on LangGraph', 'https://www.anthropic.com/research/building-effective-agents', 'built', ['servicenow']],
       ['tools', 'Evidence tools', '13 evidence kinds, each with its paths in order; the model picks kinds, parameters come from the analysis', 'agent/src/evidence.ts, core/src/signals.ts', 'Anthropic: routing (the failure rule picks the evidence plan) and parallelization (evidence fetched in parallel); Uber QueryGPT uses the same focused steps', 'https://www.anthropic.com/research/building-effective-agents', 'built', ['any']],
       ['rag', 'Knowledge base (RAG)', 'Past incidents, runbooks, approved investigations: chunked by shape, keyword + vector search, cited as evidence', 'agent/src/rag/*, providers.ts (Azure AI Search, Bedrock KB)', 'Uber Genie', 'https://www.uber.com/blog/genie-ubers-gen-ai-on-call-copilot', 'built', ['servicenow']],
-      ['vendors', 'Vendor agents', 'Dynatrace Intelligence and ServiceNow Now Assist asked for their assessment, cited like evidence', 'agent/src/toolmap.ts (vendor_*)', 'Dynatrace domain agents', 'https://www.dynatrace.com/news/press-release/dynatrace-introduces-domain-specific-agents/', 'opt-in', ['dynatrace', 'servicenow']],
+      ['vendors', 'Vendor agents investigate', 'We build no investigator of our own: Dynatrace Intelligence, Now Assist, AWS DevOps Agent, Azure SRE Agent, Gemini Cloud Assist and K8sGPT are asked in parallel through their MCP servers', 'agent/src/vendors.ts, toolmap.ts (vendor_*)', 'Buy before build: each vendor\'s own agent, reached through MCP', 'https://learn.microsoft.com/en-us/azure/sre-agent/mcp-server', 'opt-in', ['dynatrace', 'servicenow', 'aws', 'azure', 'gcp', 'kubernetes']],
+      ['design', 'Design fix', 'The corroborated cause mapped to the pattern that stops it recurring (circuit breaker, batch reads, expand and contract, infrastructure through the pipeline), with the product\'s matching code findings; handed to Copilot after approval', 'agent/src/vendors.ts (designFix), core/src/patterns.ts', 'Azure Architecture Center design patterns', 'https://learn.microsoft.com/en-us/azure/architecture/patterns/', 'built', ['servicenow']],
       ['model', 'Model via LangChain', 'Claude (in the Claude app) or Anthropic / any OpenAI-compatible gateway; replies forced into zod schemas; rules path when absent', 'agent/src/llm.ts, web-llm.ts, schemas.ts', 'Structured output', '', 'built', ['model']],
     ]],
     ['trust', 'Trust layer', [
       ['inject', 'Prompt-injection cleaning', 'Tool output is data: instruction-like lines removed and flagged; optional Bedrock Guardrails in front', 'agent/src/guard.ts, providers.ts', 'OWASP LLM Top 10', 'https://owasp.org/www-project-top-10-for-large-language-model-applications/', 'built', ['always']],
-      ['verify', 'Verifier', '6 checks: chain present, citations exist, return data, match the source named, runtime confirmation, no invented figures', 'agent/src/nodes.ts', 'Anthropic: evaluator-optimizer loop (checks in code, not another model); Airbnb used the same validate-and-retry', 'https://www.anthropic.com/research/building-effective-agents', 'built', ['always']],
+      ['referee', 'Referee (ours)', 'Each vendor claim is an opinion until raw data from another tool backs it; when backed claims disagree, the better-supported one wins and the other is shown as overruled', 'agent/src/vendors.ts (judgeClaims)', 'Deterministic arbitration: evidence beats opinion', '', 'built', ['always']],
+      ['verify', 'Verifier', '7 checks: chain present, citations exist, return data, match the source named, runtime confirmation, no invented figures, vendor claims backed', 'agent/src/nodes.ts', 'Anthropic: evaluator-optimizer loop (checks in code, not another model); Airbnb used the same validate-and-retry', 'https://www.anthropic.com/research/building-effective-agents', 'built', ['always']],
       ['guard', 'Two-tier guardrail', 'Cheap check on every recommendation; AI judge only when it flags; failure falls back to rules', 'agent/src/guard.ts', 'DoorDash support guardrail', 'https://careersatdoordash.com/?p=12568', 'built', ['always']],
       ['policy', 'Tool policy', 'Read-only by default; writes only from the allowlist; Dynatrace never written; every call time-limited and audited', 'agent/src/policy.ts', 'Least privilege, gatekeeper', '', 'built', ['always']],
       ['human', 'Human approval', 'Nothing changes in any tool until a person approves', 'graph interrupt / interruptBefore', 'Human in the loop', '', 'built', ['always']],
     ]],
     ['ops', 'Operate and learn', [
       ['trace', 'Tracing', 'A span per run, step, model call and tool call, OpenTelemetry GenAI names, exported to Dynatrace over OTLP', 'agent/src/trace.ts', 'Klarna step traces', 'https://www.langchain.com/blog/customers-klarna', 'built', ['always']],
-      ['eval', 'Evaluation gate', '28 investigations plus adversarial and injection cases, 8 metrics with pass bars, in CI; exportable to LangSmith or Langfuse', 'agent/eval/*', 'Morgan Stanley evaluations', 'https://openai.com/index/morgan-stanley/', 'built', ['always']],
+      ['eval', 'Evaluation gate', '28 investigations plus adversarial and injection cases, 9 metrics with pass bars (including vendor discipline), in CI; exportable to LangSmith or Langfuse', 'agent/eval/*', 'Morgan Stanley evaluations', 'https://openai.com/index/morgan-stanley/', 'built', ['always']],
       ['memory', 'Feedback and memory', 'Approve or reject logged with approval rate; approved runs become precedent in the knowledge base', 'apps/server/src/agent.ts, rag/knowledge.ts', 'Anthropic research agent memory', 'https://www.anthropic.com/engineering/multi-agent-research-system', 'built', ['always']],
       ['copilot', 'Copilot hand-off', 'After approval, an issue assigned to the GitHub Copilot coding agent, which opens the PR', 'agent/src/evidence.ts (copilotIssue), toolmap.ts', 'GitHub Copilot coding agent', 'https://github.blog/changelog/2025-09-25-copilot-coding-agent-is-now-generally-available/', 'opt-in', ['github']],
       ['multi', 'Specialist agents', 'Runtime, delivery, code and cost specialists under a supervisor', 'not built', 'Anthropic: orchestrator-workers; their research system scored 90% better on their test at about 15x the tokens, so we add it only when evaluation shows a gain', 'https://www.anthropic.com/engineering/multi-agent-research-system', 'designed', ['never']],

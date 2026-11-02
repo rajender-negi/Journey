@@ -130,7 +130,7 @@ describe('evaluation gate', () => {
 
 describe('signals beyond the collector: logs, traces, workload, cloud audit, security, vendor agents', () => {
   it('each failure type gets the new evidence it needs, from the first path that answers', async () => {
-    const { snapshotTools, buildContext, fetchEvidence, mayCall, copilotIssue } = await import('../src/index')
+    const { snapshotTools, buildContext, fetchEvidence, fetchVendorEvidence, mayCall, copilotIssue } = await import('../src/index')
     const t = snapshotTools(raw, a)
     const first = (rule: string) => a.failures.find((f) => f.recommendation.ruleId === rule)!
     const ev = async (rule: string, kind: Parameters<typeof fetchEvidence>[0]) => fetchEvidence(kind, buildContext(a, first(rule).id), t, 'E9')
@@ -144,8 +144,9 @@ describe('signals beyond the collector: logs, traces, workload, cloud audit, sec
     assert.ok(change.ok && /ModifyDBInstance|sites\/config\/write|UpdateService/.test(change.data), 'the infrastructure change before a non-deploy problem is found')
     const errs = await ev('FX-REGRESSION-ERRORS', 'dt_logs')
     assert.ok(errs.flags?.some((f) => f.startsWith('injection_removed')) && !/ignore all previous instructions/i.test(errs.data), 'the planted injection line is removed')
-    const vendor = await ev('FX-REGRESSION-ERRORS', 'vendor_assessment')
-    assert.ok(vendor.ok && vendor.data.includes('dynatrace-intelligence'))
+    const vendors = await fetchVendorEvidence(buildContext(a, first('FX-REGRESSION-ERRORS').id), t)
+    const dt = vendors.find((v) => v.claim?.agent === 'dynatrace-intelligence')
+    assert.ok(dt?.ok && dt.claim?.category === 'deployment')
     // Copilot hand-off: an issue for the code part of the fix; a write the policy refuses unless allowlisted
     const ctx = buildContext(a, first('FX-OOM').id)
     const issue = copilotIssue(ctx, { headline: 'Raise memory limit', rootCause: 'OOMKilled at 512Mi', actions: [{ action: 'Raise limit now', ruleId: 'FX-OOM', horizon: 'now' }, { action: 'Set limits from p95', ruleId: 'FX-OOM', horizon: 'this-sprint' }] }, 'inv-1')

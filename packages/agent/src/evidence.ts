@@ -7,6 +7,7 @@ import type { Op } from './toolmap'
 import type { Evidence, EvidenceKind, InvestigationContext, PlanItem, SourceName } from './types'
 import { cap } from './policy'
 import { sanitizeToolText } from './guard'
+import { extractClaim, VENDOR_AGENTS } from './vendors'
 
 export interface ToolRunner {
   op(op: Op, params: Record<string, string>, meta?: { traceId?: string }): Promise<{ ok: boolean; text: string; error?: string; server?: string; tool?: string; args?: Record<string, unknown> }>
@@ -55,12 +56,12 @@ export function analysisEvidence(ctx: InvestigationContext): Evidence {
 const RULE_PLANS: Record<string, EvidenceKind[]> = {
   'FX-REGRESSION-SLOW': ['dt_problem', 'dt_latency', 'dt_traces', 'dt_deployment_events', 'gh_pr_files', 'vendor_assessment', 'kb_similar'],
   'FX-REGRESSION-ERRORS': ['dt_problem', 'dt_error_rate', 'dt_logs', 'dt_traces', 'dt_deployment_events', 'gh_pr_files', 'vendor_assessment', 'kb_similar'],
-  'FX-OOM': ['k8s_events', 'k8s_workload', 'argo_app', 'dt_deployment_events', 'kb_similar'],
-  'FX-CRASHLOOP': ['k8s_events', 'k8s_workload', 'dt_logs', 'argo_app', 'gh_pr_files', 'kb_similar'],
-  'FX-CONFIG-MISSING': ['k8s_events', 'dt_logs', 'argo_app', 'gh_pr_files', 'cloud_changes', 'kb_similar'],
-  'FX-IMAGE-PULL': ['k8s_events', 'k8s_workload', 'argo_app', 'kb_similar'],
-  'FX-READINESS': ['k8s_events', 'k8s_workload', 'dt_logs', 'argo_app', 'dt_error_rate', 'kb_similar'],
-  'FX-DB-MIGRATION': ['argo_app', 'gh_pr_files', 'dt_logs', 'dt_deployment_events', 'kb_similar'],
+  'FX-OOM': ['k8s_events', 'k8s_workload', 'argo_app', 'dt_deployment_events', 'vendor_assessment', 'kb_similar'],
+  'FX-CRASHLOOP': ['k8s_events', 'k8s_workload', 'dt_logs', 'argo_app', 'gh_pr_files', 'vendor_assessment', 'kb_similar'],
+  'FX-CONFIG-MISSING': ['k8s_events', 'dt_logs', 'argo_app', 'gh_pr_files', 'cloud_changes', 'vendor_assessment', 'kb_similar'],
+  'FX-IMAGE-PULL': ['k8s_events', 'k8s_workload', 'argo_app', 'vendor_assessment', 'kb_similar'],
+  'FX-READINESS': ['k8s_events', 'k8s_workload', 'dt_logs', 'argo_app', 'dt_error_rate', 'vendor_assessment', 'kb_similar'],
+  'FX-DB-MIGRATION': ['argo_app', 'gh_pr_files', 'dt_logs', 'dt_deployment_events', 'vendor_assessment', 'kb_similar'],
   'FX-COMPILE': ['gh_job_log', 'gh_pr_files', 'kb_similar'],
   'FX-FLAKY-TEST': ['gh_job_log', 'kb_similar'],
   'FX-VULN-GATE': ['gh_job_log', 'gh_pr_files', 'security_findings', 'kb_similar'],
@@ -91,7 +92,7 @@ export const KIND_DESCRIPTION: Record<EvidenceKind, string> = {
   k8s_workload: 'Pod, container and node state in the namespace (restarts, termination reasons, memory vs limit)',
   cloud_changes: 'Cloud audit logs (CloudTrail, Azure Activity Log, Cloud Audit Logs): who changed what before the failure',
   security_findings: 'Open vulnerabilities for the service (runtime vulnerability analytics, code scanning, Dependabot)',
-  vendor_assessment: "Vendor agents' own assessment of this failure (Dynatrace Intelligence, Now Assist)",
+  vendor_assessment: "Vendor agents' own assessment (Dynatrace Intelligence, Now Assist, AWS DevOps Agent, Azure SRE Agent, Gemini Cloud Assist, K8sGPT): opinions, used only when raw data backs them",
 }
 
 /** Kinds that can actually be fetched for this context (parameters exist). */
@@ -179,10 +180,6 @@ export async function fetchEvidence(kind: EvidenceKind, ctx: InvestigationContex
   if (kind === 'k8s_workload') r = await firstOk([['dql', { query: dql! }], ['k8s_workload', { namespace: ctx.namespace! }]])
   else if (kind === 'security_findings') r = await firstOk([['dql', { query: dql! }], ...(ctx.repo ? [['security_alerts', { repo: ctx.repo }] as [Op, Record<string, string>]] : [])])
   else if (kind === 'cloud_changes') r = await merged((ctx.clouds ?? []).map((c) => [c, `${c}_audit` as Op, { ...window, productId: ctx.productId, service: ctx.service ?? '' }]))
-  else if (kind === 'vendor_assessment') {
-    const question = `${ctx.category} on ${ctx.productName} (${ctx.service ?? ctx.namespace ?? ''}) at ${ctx.at}: ${ctx.evidenceText.slice(0, 300)}. What is the root cause and the fix?`
-    r = await merged([['dynatrace-intelligence', 'vendor_dynatrace', { question, problemId: ctx.problemDisplayId ?? '' }], ['servicenow-now-assist', 'vendor_servicenow', { question }]])
-  }
   else if (dql) r = await tools.op('dql', { query: dql }, meta)
   else if (kind === 'kb_similar') r = await tools.op('kb_search', { query: kbQuery(ctx), productId: ctx.productId, before: ctx.at, exclude: `inc-${ctx.findingId}` }, meta)
   else if (kind === 'argo_app') r = await tools.op('argo_app', { app: ctx.argoApp! }, meta)
@@ -200,12 +197,33 @@ export async function fetchEvidence(kind: EvidenceKind, ctx: InvestigationContex
   }
 }
 
+/** Asks each vendor agent that applies to this failure, in parallel. One evidence item per agent that answered. */
+export async function fetchVendorEvidence(ctx: InvestigationContext, tools: ToolRunner, traceId?: string): Promise<Evidence[]> {
+  const question = `${ctx.category} on ${ctx.productName} (${ctx.service ?? ctx.namespace ?? ''}) at ${ctx.at}: ${ctx.evidenceText.slice(0, 300)}. What is the root cause and the fix?`
+  const params = { question, problemId: ctx.problemDisplayId ?? '', namespace: ctx.namespace ?? '', productId: ctx.productId, service: ctx.service ?? '', at: ctx.at, agent: ctx.productId.toLowerCase() }
+  const agents = VENDOR_AGENTS.filter((a) => a.when(ctx))
+  return Promise.all(agents.map(async (agent): Promise<Evidence> => {
+    const t0 = Date.now()
+    const r = await tools.op(agent.op, params, { traceId })
+    const clean = sanitizeToolText(r.ok ? (r.text ?? '') : '')
+    const claim = r.ok ? extractClaim(agent, safeJson(clean.text)) : null
+    return {
+      id: '', kind: 'vendor_assessment', source: agent.source, server: r.server, tool: r.tool, args: r.args, at: new Date().toISOString(), ms: Date.now() - t0,
+      ok: !!claim, data: cap(clean.text, 4000), ...(claim ? { claim } : {}),
+      ...(clean.removed ? { flags: [`injection_removed:${clean.removed}`] } : {}),
+      summary: claim ? `${agent.name} says: ${claim.cause.slice(0, 160)}` : `${agent.name}: ${r.ok ? 'no root cause in the answer' : `not available: ${r.error}`}`,
+    }
+  }))
+}
+
 /** The GitHub issue handed to the Copilot coding agent after a person approves (title and body only; Copilot writes the PR). */
-export function copilotIssue(ctx: InvestigationContext, rec: { headline: string; rootCause: string; actions: { action: string; ruleId: string; horizon: string }[] }, runId: string) {
+export function copilotIssue(ctx: InvestigationContext, rec: { headline: string; rootCause: string; actions: { action: string; ruleId: string; horizon: string }[]; designFix?: { name: string; solution: string; codeFindings: { ruleId: string; title: string; file?: string }[] } | null }, runId: string) {
+  const fix = rec.designFix
   return {
     repo: ctx.repo ?? '',
     title: `[Product Journey] ${rec.headline}`.slice(0, 120),
     body: [`Approved investigation ${runId} for ${ctx.productName} (${ctx.ruleId}).`, '', `Root cause: ${rec.rootCause}`, '', 'Do in code (the fix-now steps that are operations stay with on-call):',
-      ...rec.actions.filter((a) => a.horizon !== 'now').map((a) => `- [ ] ${a.action} (${a.ruleId})`), '', 'Open a draft pull request; a person reviews before merge.'].join('\n'),
+      ...rec.actions.filter((a) => a.horizon !== 'now').map((a) => `- [ ] ${a.action} (${a.ruleId})`),
+      ...(fix ? ['', `Design fix: ${fix.name}. ${fix.solution}`, ...fix.codeFindings.map((c) => `- [ ] ${c.title}${c.file ? ` in ${c.file}` : ''} (${c.ruleId})`)] : []), '', 'Open a draft pull request; a person reviews before merge.'].join('\n'),
   }
 }
