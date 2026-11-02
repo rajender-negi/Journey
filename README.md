@@ -128,7 +128,7 @@ The **Map** tab is the whole solution on one page: tools, the product journey, t
 
 ## AI patterns: RAG, guardrails, evaluation, tracing, memory
 
-Each follows a published pattern; [docs/AI-PATTERNS.md](docs/AI-PATTERNS.md) maps every capability to its source company and our code.
+Each follows a published pattern; [docs/AI-PATTERNS.md](docs/AI-PATTERNS.md) maps every capability to its source company and our code. [docs/INTERVIEW-GUIDE.md](docs/INTERVIEW-GUIDE.md) explains each capability for interviews, with real-company examples.
 
 - **RAG** (`packages/agent/src/rag`): past incidents, runbooks and approved investigations, chunked by shape, embedded, searched with BM25 + vector and reciprocal rank fusion, filtered by time and product. The agent gets matches as evidence `kb_similar`; `GET /api/kb/search?q=` searches directly. Set `EMBEDDINGS_*` for a real embedding model.
 - **Long-term memory:** approved investigations are added to the knowledge base, so the next similar failure finds them.
