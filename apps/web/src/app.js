@@ -195,8 +195,8 @@
   function agentBox(fid) {
     var st = S.runs[fid] || {}
     var sub = VM.agent.local
-      ? 'LangGraph agent running in this page: plans evidence, fetches it from native-schema snapshots (the same shapes Dynatrace, GitHub, Argo CD and Kubernetes MCP servers return), searches past incidents and runbooks (keyword + vector RAG), tests its hypothesis against the evidence, and waits for your approval. Approved runs are remembered as precedent. Claude is the model through LangChain when you allow it; otherwise rules.'
-      : 'LangGraph agent: plans evidence, fetches it through MCP (read only), tests its hypothesis against the evidence, and waits for your approval. ' + (VM.agent.mcpServers.length ? 'MCP: ' + VM.agent.mcpServers.join(', ') : 'No MCP servers: reads the loaded source data through the same operations') + (VM.agent.llm ? ' · model ' + VM.agent.llm : ' · rules only (no AI key)')
+      ? 'Vendor agents investigate, this agent referees: it asks Dynatrace Intelligence, Now Assist, the cloud agents and K8sGPT, keeps only the claims raw data backs, gives the design fix that stops it recurring, and waits for your approval. Here every tool answers from native-schema demo data; Claude writes the merged story through LangChain when you allow it, otherwise rules.'
+      : 'Vendor agents investigate, this agent referees: evidence and vendor answers through MCP (read only), only claims backed by raw data are used, a design fix is proposed, and nothing changes until you approve. ' + (VM.agent.mcpServers.length ? 'MCP: ' + VM.agent.mcpServers.join(', ') : 'No MCP servers: reads the loaded source data through the same operations') + (VM.agent.llm ? ' · model ' + VM.agent.llm : ' · rules only (no AI key)')
     var html = '<div class="ai agent"><div class="ai-head"><div><div class="eyebrow">Agent investigation</div><div class="ai-sub">' + esc(sub) + '</div></div>'
     if (!st.view || st.view.status === 'failed') html += '<button class="btn primary" data-act="agent" data-id="' + esc(fid) + '"' + (st.busy ? ' disabled' : '') + '>' + (st.busy ? 'Investigating…' : 'Investigate') + '</button>'
     html += '</div>'
