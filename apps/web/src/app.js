@@ -181,7 +181,7 @@
   function kbHits(data) {
     try {
       var m = JSON.parse(data).matches || []
-      return '<ul class="factors small">' + m.slice(0, 5).map(function (h) { return '<li><code>' + esc(h.ref) + '</code> ' + esc(h.source) + (h.sameProduct ? '' : ' · other product') + ' · ' + esc(h.via) + '<br><span class="muted">' + esc((h.resolution || h.snippet || '').slice(0, 160)) + '</span></li>' }).join('') + '</ul>'
+      return '<ul class="factors small">' + m.slice(0, 5).map(function (h) { return '<li><code>' + esc(h.ref) + '</code> ' + esc(h.source) + (h.source === 'runbook' || h.sameProduct ? '' : ' · other product') + ' · ' + esc(h.via) + '<br><span class="muted">' + esc((h.resolution || h.snippet || '').slice(0, 160)) + '</span></li>' }).join('') + '</ul>'
     } catch (x) { return '' }
   }
   var RUN_TONE = { awaiting_approval: 'tone-warn', approved: 'tone-good', rejected: 'sev-critical', failed: 'sev-critical', running: 'tone-accent' }

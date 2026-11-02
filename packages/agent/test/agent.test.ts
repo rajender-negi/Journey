@@ -242,5 +242,20 @@ describe('LangGraph web graph (needs npm install)', async () => {
     const done = await agent.resume(v.id, 'approve', 'rajender')
     assert.equal(done.status, 'approved')
     assert.equal(done.state!.approval!.by, 'rajender')
+    assert.ok(done.trace!.some((t) => t.name === 'execute_tool kb_search'), 'tool calls are traced')
+  })
+  it('closes the loop: an approved investigation is found as precedent by the next similar one', { skip: !lg && 'install dependencies to run' }, async () => {
+    const { createWebAgent } = await import('../src/web')
+    const agent = createWebAgent({ now: Date.parse('2026-11-01T03:30:00Z') })
+    const an = analyze(demoDataset(Date.parse('2026-11-01T03:30:00Z')))
+    const compiles = an.failures.filter((f) => f.recommendation.ruleId === 'FX-COMPILE').sort((x, y) => x.at.localeCompare(y.at))
+    assert.ok(compiles.length >= 2)
+    const first = await agent.start(compiles[0].id)
+    await agent.resume(first.id, 'approve', 'lead')
+    const second = await agent.start(compiles.at(-1)!.id)
+    const kbEv = second.state!.evidence!.find((e) => e.kind === 'kb_similar')!
+    assert.ok(kbEv.ok)
+    const matches = JSON.parse(kbEv.data).matches as { source: string; ref: string }[]
+    assert.ok(matches.some((m) => m.source === 'investigation' && m.ref === first.id), JSON.stringify(matches.map((m) => m.source + ':' + m.ref)))
   })
 })
