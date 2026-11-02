@@ -1,5 +1,5 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": { "types": ["node"], "paths": { "@pj/core": ["../core/src/index.ts"] } },
-  "include": ["src", "test"]
+  "include": ["src", "test", "eval"]
 }

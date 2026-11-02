@@ -37,6 +37,9 @@ jobs:
       - name: Test (core, agent incl. LangGraph wiring, server)
         run: npm test
 
+      - name: Evaluate the agent (golden set, fails under the pass bars)
+        run: npm run eval
+
       - name: Build UI, demo page and in-browser agent
         run: npm run build
 

@@ -129,3 +129,20 @@ flowchart LR
 | Cost and latency | MCP calls time-limited and size-capped; plan/gather/verify loop capped by `AGENT_MAX_ITERATIONS` |
 | Audit | every MCP call logged with server, tool, args, duration and outcome (`GET /api/agent/status`) |
 | Human control | LangGraph `interrupt()` before any recommendation is final |
+
+## AI layer additions: RAG, memory, guardrails, evaluation, tracing
+
+```
+failure -> classify -> plan -> gather ----------------------------> hypothesize -> verify -> recommend -> guard -> approve
+                                 |  MCP or loaded data (snapshot)                                  tier 1 always    |
+                                 |  kb_search -> knowledge base                                     tier 2 if flagged|
+                                 |     incidents (one chunk each)                                                   v
+                                 |     runbooks (by heading)          <-------- approved investigations ---- feedback log
+                                 |     BM25 + vector, RRF, filters                (long-term memory)
+every step, model call and tool call -> Tracer -> OTLP/HTTP -> Dynatrace (OpenTelemetry GenAI attribute names)
+```
+
+- **Knowledge base** (`packages/agent/src/rag`): built from ServiceNow-shaped incident and kb_knowledge records whenever the data is re-collected; dummy records generated from the analysis until ServiceNow is connected. In memory by default; `PGVECTOR_DDL` is the production schema.
+- **Tool output is untrusted:** instruction-like lines are removed before any model sees them and the evidence is flagged.
+- **Evaluation gate:** `npm run eval` in CI; see docs/AI-PATTERNS.md for the metrics and the published pattern behind each capability.
+- **The card runs the same:** knowledge base, local embedder, tracer and memory all run inside the page.

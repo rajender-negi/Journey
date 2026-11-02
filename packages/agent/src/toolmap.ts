@@ -5,7 +5,7 @@
 
 import type { SourceName } from './types'
 
-export type Op = 'dql' | 'pr_files' | 'job_log' | 'argo_app' | 'argo_apps' | 'k8s_events'
+export type Op = 'dql' | 'pr_files' | 'job_log' | 'argo_app' | 'argo_apps' | 'k8s_events' | 'kb_search'
 
 export interface ToolCandidate {
   tool: string
@@ -62,6 +62,8 @@ export const DEFAULT_TOOL_MAP: Record<Op, OpSpec> = {
       { tool: 'list_events', args: (p) => ({ namespace: p.namespace }) },
     ],
   },
+  // served by the app's own knowledge base (RAG), not an MCP server: see rag/index.ts withKnowledge
+  kb_search: { source: 'servicenow', candidates: [] },
 }
 
 /** Which configured MCP server serves a source: by explicit "sources" map, else by server name. */

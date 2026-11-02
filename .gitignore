@@ -4,3 +4,4 @@ apps/web/dist/
 apps/web/dist-demo/
 .env
 mcp.servers.json
+eval-report.json

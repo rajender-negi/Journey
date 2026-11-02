@@ -47,6 +47,19 @@ export const config = {
     writeAllowlist: (env('AGENT_WRITE_ALLOWLIST') ?? '').split(',').map((x) => x.trim()).filter(Boolean),
   },
 
+  rag: {
+    // any OpenAI-compatible /embeddings endpoint; without it a local hashing embedder is used
+    embeddingsBaseUrl: env('EMBEDDINGS_BASE_URL'),
+    embeddingsApiKey: env('EMBEDDINGS_API_KEY'),
+    embeddingsModel: env('EMBEDDINGS_MODEL') ?? 'text-embedding-3-small',
+    embeddingsDims: Number(env('EMBEDDINGS_DIMS') ?? 1536),
+  },
+  otel: {
+    // OTLP/HTTP base, e.g. https://<env>.live.dynatrace.com/api/v2/otlp ; headers "Authorization=Api-Token dt0c01..."
+    endpoint: env('OTEL_EXPORTER_OTLP_ENDPOINT'),
+    headers: env('OTEL_EXPORTER_OTLP_HEADERS') ?? '',
+    serviceName: env('OTEL_SERVICE_NAME') ?? 'product-journey-agent',
+  },
   ai: {
     provider: (env('AI_PROVIDER') ?? 'anthropic') as 'anthropic' | 'openai-compatible',
     apiKey: env('AI_API_KEY'),

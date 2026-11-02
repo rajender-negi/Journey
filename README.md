@@ -110,6 +110,17 @@ START > classify > plan > gather > hypothesize > verify --passed or exhausted-->
 
 Guardrails: MCP tools that look like writes are refused unless listed in `AGENT_WRITE_ALLOWLIST`; Dynatrace is never written to; every call is time-limited, size-capped and audited. Tool names differ across MCP server versions, so `packages/agent/src/toolmap.ts` lists candidates per operation and uses the first one the server exposes.
 
+## AI patterns: RAG, guardrails, evaluation, tracing, memory
+
+Each follows a published pattern; [docs/AI-PATTERNS.md](docs/AI-PATTERNS.md) maps every capability to its source company and our code.
+
+- **RAG** (`packages/agent/src/rag`): past incidents, runbooks and approved investigations, chunked by shape, embedded, searched with BM25 + vector and reciprocal rank fusion, filtered by time and product. The agent gets matches as evidence `kb_similar`; `GET /api/kb/search?q=` searches directly. Set `EMBEDDINGS_*` for a real embedding model.
+- **Long-term memory:** approved investigations are added to the knowledge base, so the next similar failure finds them.
+- **Guardrails** (`guard.ts`): instruction-like text stripped from tool output; two-tier check on every model recommendation (cheap check, then a judge only when flagged).
+- **Evaluation** (`packages/agent/eval`): `npm run eval` scores 28 investigations plus adversarial and injection cases on 8 metrics; CI fails under the pass bars.
+- **Tracing** (`trace.ts`): a span per run, step, model call and tool call with OpenTelemetry GenAI attribute names; set `OTEL_EXPORTER_OTLP_ENDPOINT` to send them to Dynatrace. The agent panel shows the trace.
+- **Feedback:** every Approve or Reject is logged; `GET /api/agent/feedback` gives the approval rate overall and per rule.
+
 ## Data tiers per source
 
 Each of the seven sources resolves independently; the first available tier wins:

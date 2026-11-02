@@ -19,11 +19,13 @@ export const AGENT_SCHEMAS = {
     actions: z.array(z.object({ priority: z.number().int(), action: z.string(), ruleId: z.string(), horizon: z.enum(['now', 'this-sprint', 'this-quarter']), owner: z.string() })).min(1),
     evidenceUsed: z.array(z.string()),
   }),
+  judge: z.object({ grounded: z.boolean(), score: z.number().min(0).max(5), reason: z.string() }),
 } satisfies Record<SchemaName, z.ZodTypeAny>
 
 /** Compact shape description for models without native structured output. */
 export const SCHEMA_SHAPES: Record<SchemaName, string> = {
   plan: '{"items":[{"kind":"<one of the listed kinds>","why":"<short reason>"}]} (at most 5 items)',
   hypothesis: '{"rootCause":"<one paragraph>","chain":[{"step":"<what happened>","evidenceIds":["E0"]}],"confidence":"high|medium|low"}',
+  judge: '{"grounded":true|false,"score":<0-5>,"reason":"<one sentence>"}',
   recommendation: '{"headline":"<one line>","rootCause":"<short>","impact":"<short>","actions":[{"priority":1,"action":"<imperative>","ruleId":"<allowed rule id>","horizon":"now|this-sprint|this-quarter","owner":"<team>"}],"evidenceUsed":["E0"]}',
 }

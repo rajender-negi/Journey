@@ -14,6 +14,7 @@ export type EvidenceKind =
   | 'gh_pr_files'
   | 'gh_job_log'
   | 'k8s_events'
+  | 'kb_similar'
 
 export interface InvestigationContext {
   findingId: string
@@ -61,6 +62,10 @@ export interface Evidence {
   summary: string
   data: string
   at: string
+  /** milliseconds the fetch took */
+  ms?: number
+  /** e.g. 'injection_removed:2' when instruction-like lines were stripped from tool output */
+  flags?: string[]
 }
 
 export interface Hypothesis {

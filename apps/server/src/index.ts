@@ -7,7 +7,7 @@ import { SOURCES, config, type SourceName } from './config'
 import { collect, testSource, writeSnapshot } from './collector'
 import { store } from './store'
 import { brief } from './ai'
-import { agent, agentStatus, initAgent } from './agent'
+import { agent, agentStatus, feedbackSummary, initAgent, knowledgeBase } from './agent'
 
 const WEB_DIST = new URL('../../web/dist/', import.meta.url).pathname
 const TYPES: Record<string, string> = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml' }
@@ -127,6 +127,15 @@ async function route(req: IncomingMessage, res: ServerResponse) {
   // ---- agentic investigation (LangGraph + MCP) ----
   if (p === '/api/agent/status') return send(res, 200, await agentStatus())
   if (p === '/api/mcp/tools') return send(res, 200, agent.hub?.tools() ?? {})
+  // feedback loop: approve and reject decisions, approval rate overall and per rule
+  if (p === '/api/agent/feedback') return send(res, 200, feedbackSummary())
+  // RAG: search the knowledge base directly (the agent uses the same search as evidence kb_similar)
+  if (p === '/api/kb/search') {
+    const kb = await knowledgeBase()
+    if (!kb) return send(res, 503, { error: 'knowledge base not built' })
+    const q = url.searchParams.get('q') ?? ''
+    return send(res, 200, { embedder: kb.embedder.name, docs: kb.docs, chunks: kb.size, hits: await kb.search(q, { k: Number(url.searchParams.get('k') ?? 5), productId: url.searchParams.get('product') ?? undefined }) })
+  }
   if (p.startsWith('/api/agent/')) {
     if (!agent.runs || !(await agent.runs.ready())) return send(res, 503, { error: agent.runs?.loadError ?? 'agent not initialised' })
     if (p === '/api/agent/investigate' && req.method === 'POST') {

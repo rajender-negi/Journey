@@ -2,10 +2,12 @@
 // LangGraph is imported lazily so the server starts (and reports a clear error) before `npm install`.
 
 import type { AgentDeps, AgentState } from './nodes'
+import { newTraceId, traceSummary } from './trace'
 
 export type RunStatus = 'running' | 'awaiting_approval' | 'approved' | 'rejected' | 'failed'
-export interface RunInfo { id: string; findingId: string; status: RunStatus; startedAt: string; updatedAt: string; error?: string }
-export interface RunView extends RunInfo { state: Partial<AgentState> | null; interrupt?: unknown }
+export interface RunInfo { id: string; findingId: string; traceId: string; status: RunStatus; startedAt: string; updatedAt: string; error?: string }
+export interface RunView extends RunInfo { state: Partial<AgentState> | null; interrupt?: unknown; trace?: ReturnType<typeof traceSummary> }
+export interface RunHooks { onDecision?: (view: RunView) => void | Promise<void> }
 
 type Graph = {
   invoke: (input: unknown, cfg: { configurable: { thread_id: string } }) => Promise<unknown>
@@ -18,7 +20,7 @@ export class AgentRuns {
   private CommandCtor: (new (a: { resume: unknown }) => unknown) | null = null
   loadError: string | null = null
 
-  constructor(private deps: AgentDeps) {}
+  constructor(private deps: AgentDeps, private hooks: RunHooks = {}) {}
 
   async ready(): Promise<boolean> {
     if (this.graph) return true
@@ -41,12 +43,16 @@ export class AgentRuns {
   async start(findingId: string): Promise<RunView> {
     if (!(await this.ready())) throw new Error(this.loadError!)
     const id = `inv-${findingId}-${Date.now().toString(36)}`
-    const info: RunInfo = { id, findingId, status: 'running', startedAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+    const traceId = newTraceId()
+    const info: RunInfo = { id, findingId, traceId, status: 'running', startedAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
     this.runs.set(id, info)
+    const root = this.deps.tracer?.begin(traceId, 'invoke_agent product-journey-investigator', { 'gen_ai.operation.name': 'invoke_agent', 'gen_ai.agent.name': 'product-journey-investigator', 'app.finding_id': findingId, 'app.run_id': id })
     try {
-      await this.graph!.invoke({ findingId }, { configurable: { thread_id: id } })
+      await this.graph!.invoke({ findingId, traceId }, { configurable: { thread_id: id } })
+      if (root) await this.deps.tracer!.finish(root)
     } catch (e) {
       Object.assign(info, { status: 'failed', error: (e as Error).message, updatedAt: new Date().toISOString() })
+      if (root) await this.deps.tracer!.finish(root, 'error', (e as Error).message)
     }
     return this.view(id)
   }
@@ -55,8 +61,12 @@ export class AgentRuns {
     const info = this.runs.get(id)
     if (!info) throw new Error(`run ${id} not found`)
     if (info.status !== 'awaiting_approval') throw new Error(`run ${id} is ${info.status}, not awaiting approval`)
+    const root = this.deps.tracer?.begin(info.traceId, 'human_approval', { 'gen_ai.operation.name': 'invoke_agent', 'app.decision': decision, 'app.run_id': id })
     await this.graph!.invoke(new this.CommandCtor!({ resume: { decision, by, note } }), { configurable: { thread_id: id } })
-    return this.view(id)
+    if (root) await this.deps.tracer!.finish(root)
+    const v = await this.view(id)
+    await Promise.resolve(this.hooks.onDecision?.(v)).catch(() => undefined)
+    return v
   }
 
   async view(id: string): Promise<RunView> {
@@ -69,6 +79,6 @@ export class AgentRuns {
       info.status = pending.length ? 'awaiting_approval' : snap.values.approval ? (snap.values.approval.decision === 'approve' ? 'approved' : 'rejected') : snap.next.length ? 'running' : info.status
       info.updatedAt = new Date().toISOString()
     }
-    return { ...info, state: snap.values, interrupt: pending[0]?.value }
+    return { ...info, state: snap.values, interrupt: pending[0]?.value, trace: this.deps.tracer ? traceSummary(this.deps.tracer.spans(info.traceId)) : undefined }
   }
 }

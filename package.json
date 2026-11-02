@@ -14,7 +14,8 @@
     "fixtures": "npm run fixtures -w @pj/server",
     "typecheck": "tsc -p packages/core && tsc -p packages/agent && tsc -p apps/server && tsc -p apps/web",
     "pretest": "npm run build",
-    "test": "tsx --test packages/core/test/*.test.ts packages/agent/test/*.test.ts apps/server/test/*.test.ts"
+    "test": "tsx --test packages/core/test/*.test.ts packages/agent/test/*.test.ts apps/server/test/*.test.ts",
+    "eval": "tsx packages/agent/eval/run.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

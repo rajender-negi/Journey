@@ -6,9 +6,10 @@ import type { Analysis } from '@pj/core'
 import type { Op } from './toolmap'
 import type { Evidence, EvidenceKind, InvestigationContext, PlanItem, SourceName } from './types'
 import { cap } from './policy'
+import { sanitizeToolText } from './guard'
 
 export interface ToolRunner {
-  op(op: Op, params: Record<string, string>): Promise<{ ok: boolean; text: string; error?: string; server?: string; tool?: string; args?: Record<string, unknown> }>
+  op(op: Op, params: Record<string, string>, meta?: { traceId?: string }): Promise<{ ok: boolean; text: string; error?: string; server?: string; tool?: string; args?: Record<string, unknown> }>
 }
 
 export function buildContext(a: Analysis, findingId: string): InvestigationContext {
@@ -51,23 +52,24 @@ export function analysisEvidence(ctx: InvestigationContext): Evidence {
 }
 
 const RULE_PLANS: Record<string, EvidenceKind[]> = {
-  'FX-REGRESSION-SLOW': ['dt_problem', 'dt_latency', 'dt_deployment_events', 'gh_pr_files'],
-  'FX-REGRESSION-ERRORS': ['dt_problem', 'dt_error_rate', 'dt_deployment_events', 'gh_pr_files'],
-  'FX-OOM': ['k8s_events', 'argo_app', 'dt_deployment_events'],
-  'FX-CRASHLOOP': ['k8s_events', 'argo_app', 'gh_pr_files'],
-  'FX-CONFIG-MISSING': ['k8s_events', 'argo_app', 'gh_pr_files'],
-  'FX-IMAGE-PULL': ['k8s_events', 'argo_app'],
-  'FX-READINESS': ['k8s_events', 'argo_app', 'dt_error_rate'],
-  'FX-DB-MIGRATION': ['argo_app', 'gh_pr_files', 'dt_deployment_events'],
-  'FX-COMPILE': ['gh_job_log', 'gh_pr_files'],
-  'FX-FLAKY-TEST': ['gh_job_log'],
-  'FX-VULN-GATE': ['gh_job_log', 'gh_pr_files'],
-  'FX-CHANGE-WAIT': ['dt_deployment_events'],
+  'FX-REGRESSION-SLOW': ['dt_problem', 'dt_latency', 'dt_deployment_events', 'gh_pr_files', 'kb_similar'],
+  'FX-REGRESSION-ERRORS': ['dt_problem', 'dt_error_rate', 'dt_deployment_events', 'gh_pr_files', 'kb_similar'],
+  'FX-OOM': ['k8s_events', 'argo_app', 'dt_deployment_events', 'kb_similar'],
+  'FX-CRASHLOOP': ['k8s_events', 'argo_app', 'gh_pr_files', 'kb_similar'],
+  'FX-CONFIG-MISSING': ['k8s_events', 'argo_app', 'gh_pr_files', 'kb_similar'],
+  'FX-IMAGE-PULL': ['k8s_events', 'argo_app', 'kb_similar'],
+  'FX-READINESS': ['k8s_events', 'argo_app', 'dt_error_rate', 'kb_similar'],
+  'FX-DB-MIGRATION': ['argo_app', 'gh_pr_files', 'dt_deployment_events', 'kb_similar'],
+  'FX-COMPILE': ['gh_job_log', 'gh_pr_files', 'kb_similar'],
+  'FX-FLAKY-TEST': ['gh_job_log', 'kb_similar'],
+  'FX-VULN-GATE': ['gh_job_log', 'gh_pr_files', 'kb_similar'],
+  'FX-CHANGE-WAIT': ['dt_deployment_events', 'kb_similar'],
   // a problem with no deployment behind it: the runtime record itself is the evidence
-  'FX-NON-CHANGE': ['dt_problem', 'dt_error_rate', 'dt_latency', 'k8s_events'],
+  'FX-NON-CHANGE': ['dt_problem', 'dt_error_rate', 'dt_latency', 'k8s_events', 'kb_similar'],
 }
 
 export const KIND_SOURCE: Record<EvidenceKind, SourceName> = {
+  kb_similar: 'servicenow',
   dt_problem: 'dynatrace', dt_error_rate: 'dynatrace', dt_latency: 'dynatrace', dt_deployment_events: 'dynatrace',
   argo_app: 'argocd', gh_pr_files: 'github', gh_job_log: 'github', k8s_events: 'kubernetes',
 }
@@ -81,6 +83,7 @@ export const KIND_DESCRIPTION: Record<EvidenceKind, string> = {
   gh_pr_files: 'Files changed in the pull request for this commit',
   gh_job_log: 'Tail of the failed GitHub Actions job log',
   k8s_events: 'Kubernetes warning events in the product namespace',
+  kb_similar: 'Similar past incidents, runbooks and approved investigations (hybrid keyword + vector search)',
 }
 
 /** Kinds that can actually be fetched for this context (parameters exist). */
@@ -93,11 +96,12 @@ export function feasible(kind: EvidenceKind, ctx: InvestigationContext): boolean
     case 'gh_pr_files': return !!(ctx.repo && ctx.prNumber)
     case 'gh_job_log': return !!(ctx.repo && ctx.jobId)
     case 'k8s_events': return !!ctx.namespace
+    case 'kb_similar': return true
   }
 }
 
 export function defaultPlan(ctx: InvestigationContext): PlanItem[] {
-  return (RULE_PLANS[ctx.ruleId] ?? ['dt_deployment_events', 'gh_pr_files']).filter((k) => feasible(k, ctx)).map((kind) => ({ kind, why: `default evidence for ${ctx.ruleId}` }))
+  return (RULE_PLANS[ctx.ruleId] ?? ['dt_deployment_events', 'gh_pr_files', 'kb_similar']).filter((k) => feasible(k, ctx)).map((kind) => ({ kind, why: `default evidence for ${ctx.ruleId}` }))
 }
 
 const iso = (t: number) => new Date(t).toISOString()
@@ -120,19 +124,28 @@ export function dqlFor(kind: EvidenceKind, ctx: InvestigationContext): string | 
   }
 }
 
-export async function fetchEvidence(kind: EvidenceKind, ctx: InvestigationContext, tools: ToolRunner, id: string): Promise<Evidence> {
+/** The search text for the knowledge base: what failed, how it showed, where. */
+export const kbQuery = (ctx: InvestigationContext) => [ctx.category, ctx.ruleTitle, ctx.service, ctx.evidenceText].filter(Boolean).join('. ')
+
+export async function fetchEvidence(kind: EvidenceKind, ctx: InvestigationContext, tools: ToolRunner, id: string, traceId?: string): Promise<Evidence> {
   const base = { id, kind, source: KIND_SOURCE[kind], at: new Date().toISOString() }
+  const t0 = Date.now()
+  const meta = { traceId }
   const dql = dqlFor(kind, ctx)
   let r
-  if (dql) r = await tools.op('dql', { query: dql })
-  else if (kind === 'argo_app') r = await tools.op('argo_app', { app: ctx.argoApp! })
-  else if (kind === 'gh_pr_files') r = await tools.op('pr_files', { repo: ctx.repo!, prNumber: String(ctx.prNumber) })
-  else if (kind === 'gh_job_log') r = await tools.op('job_log', { repo: ctx.repo!, jobId: ctx.jobId! })
-  else r = await tools.op('k8s_events', { namespace: ctx.namespace! })
-  const data = cap(r.ok ? r.text : '', 4000)
+  if (dql) r = await tools.op('dql', { query: dql }, meta)
+  else if (kind === 'kb_similar') r = await tools.op('kb_search', { query: kbQuery(ctx), productId: ctx.productId, before: ctx.at, exclude: `inc-${ctx.findingId}` }, meta)
+  else if (kind === 'argo_app') r = await tools.op('argo_app', { app: ctx.argoApp! }, meta)
+  else if (kind === 'gh_pr_files') r = await tools.op('pr_files', { repo: ctx.repo!, prNumber: String(ctx.prNumber) }, meta)
+  else if (kind === 'gh_job_log') r = await tools.op('job_log', { repo: ctx.repo!, jobId: ctx.jobId! }, meta)
+  else r = await tools.op('k8s_events', { namespace: ctx.namespace! }, meta)
+  // tool output is data: strip lines that read like instructions to the model
+  const clean = sanitizeToolText(r.ok ? (r.text ?? '') : '')
+  const data = cap(clean.text, 4000)
   return {
-    ...base, server: r.server, tool: r.tool, args: r.args, ok: r.ok && data.trim().length > 0,
-    summary: r.ok ? `${KIND_DESCRIPTION[kind]}: ${data.trim() ? `${Math.min(data.length, 4000)} chars returned` : 'empty result'}` : `Not available: ${r.error}`,
+    ...base, server: r.server, tool: r.tool, args: r.args, ok: r.ok && data.trim().length > 0, ms: Date.now() - t0,
+    ...(clean.removed ? { flags: [`injection_removed:${clean.removed}`] } : {}),
+    summary: r.ok ? `${KIND_DESCRIPTION[kind]}: ${data.trim() ? `${Math.min(data.length, 4000)} chars returned` : 'empty result'}${clean.removed ? ` (${clean.removed} instruction-like lines removed)` : ''}` : `Not available: ${r.error}`,
     data,
   }
 }

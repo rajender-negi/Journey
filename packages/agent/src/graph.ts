@@ -15,6 +15,7 @@ const last = <T>() => Annotation<T>({ reducer: (_a: T, b: T) => b, default: () =
 
 export const InvestigationState = Annotation.Root({
   findingId: Annotation<string>(),
+  traceId: Annotation<string>({ reducer: (_a: string, b: string) => b, default: () => '' }),
   context: last<InvestigationContext | null>(),
   plan: Annotation<PlanItem[]>({ reducer: (_a: PlanItem[], b: PlanItem[]) => b, default: () => [] }),
   evidence: Annotation<Evidence[]>({ reducer: (a: Evidence[], b: Evidence[]) => a.concat(b), default: () => [] }),
@@ -30,6 +31,8 @@ type GS = typeof InvestigationState.State
 
 export function buildInvestigationGraph(deps: AgentDeps) {
   const S = (s: GS) => s as unknown as AgentState
+  // each step is a span in the run's trace (no-op without a tracer)
+  const T = <R>(name: string, fn: (s: GS) => Promise<R>) => (s: GS) => (deps.tracer ? deps.tracer.step(s.traceId || undefined, name, () => fn(s)) : fn(s))
   const approve = async (s: GS) => {
     const r = s.recommendation!
     // pauses the run; resumed with Command({ resume: { decision, by, note } })
@@ -46,14 +49,14 @@ export function buildInvestigationGraph(deps: AgentDeps) {
   }
 
   return new StateGraph(InvestigationState)
-    .addNode('classify', (s: GS) => classify(S(s), deps))
+    .addNode('classify', T('classify', (s: GS) => classify(S(s), deps)))
     // node id differs from the 'plan' state channel: LangGraph forbids a node and a channel sharing a name
-    .addNode('plan_evidence', (s: GS) => plan(S(s), deps))
-    .addNode('gather', (s: GS) => gather(S(s), deps))
-    .addNode('hypothesize', (s: GS) => hypothesize(S(s), deps))
-    .addNode('verify', (s: GS) => verify(S(s)))
-    .addNode('recommend', (s: GS) => recommend(S(s), deps))
-    .addNode('approve', approve)
+    .addNode('plan_evidence', T('plan_evidence', (s: GS) => plan(S(s), deps)))
+    .addNode('gather', T('gather', (s: GS) => gather(S(s), deps)))
+    .addNode('hypothesize', T('hypothesize', (s: GS) => hypothesize(S(s), deps)))
+    .addNode('verify', T('verify', (s: GS) => verify(S(s))))
+    .addNode('recommend', T('recommend', (s: GS) => recommend(S(s), deps)))
+    .addNode('approve', T('approve', approve))
     .addEdge(START, 'classify')
     .addEdge('classify', 'plan_evidence')
     .addEdge('plan_evidence', 'gather')

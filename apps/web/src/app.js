@@ -177,11 +177,18 @@
       : agentCall('api/agent/runs/' + encodeURIComponent(cur.view.id) + '/resume', { decision: decision, by: 'web user' })
     job.then(function (v) { S.runs[fid] = { view: v } }, function (e) { S.runs[fid] = { view: cur.view, error: e.message } }).then(render)
   }
+  // knowledge-base matches (RAG) shown under their evidence line
+  function kbHits(data) {
+    try {
+      var m = JSON.parse(data).matches || []
+      return '<ul class="factors small">' + m.slice(0, 5).map(function (h) { return '<li><code>' + esc(h.ref) + '</code> ' + esc(h.source) + (h.sameProduct ? '' : ' · other product') + ' · ' + esc(h.via) + '<br><span class="muted">' + esc((h.resolution || h.snippet || '').slice(0, 160)) + '</span></li>' }).join('') + '</ul>'
+    } catch (x) { return '' }
+  }
   var RUN_TONE = { awaiting_approval: 'tone-warn', approved: 'tone-good', rejected: 'sev-critical', failed: 'sev-critical', running: 'tone-accent' }
   function agentBox(fid) {
     var st = S.runs[fid] || {}
     var sub = VM.agent.local
-      ? 'LangGraph agent running in this page: plans evidence, fetches it from native-schema snapshots (the same shapes Dynatrace, GitHub, Argo CD and Kubernetes MCP servers return), tests its hypothesis against the evidence, and waits for your approval. Claude is the model through LangChain when you allow it; otherwise rules.'
+      ? 'LangGraph agent running in this page: plans evidence, fetches it from native-schema snapshots (the same shapes Dynatrace, GitHub, Argo CD and Kubernetes MCP servers return), searches past incidents and runbooks (keyword + vector RAG), tests its hypothesis against the evidence, and waits for your approval. Approved runs are remembered as precedent. Claude is the model through LangChain when you allow it; otherwise rules.'
       : 'LangGraph agent: plans evidence, fetches it through MCP (read only), tests its hypothesis against the evidence, and waits for your approval. ' + (VM.agent.mcpServers.length ? 'MCP: ' + VM.agent.mcpServers.join(', ') : 'No MCP servers: reads the loaded source data through the same operations') + (VM.agent.llm ? ' · model ' + VM.agent.llm : ' · rules only (no AI key)')
     var html = '<div class="ai agent"><div class="ai-head"><div><div class="eyebrow">Agent investigation</div><div class="ai-sub">' + esc(sub) + '</div></div>'
     if (!st.view || st.view.status === 'failed') html += '<button class="btn primary" data-act="agent" data-id="' + esc(fid) + '"' + (st.busy ? ' disabled' : '') + '>' + (st.busy ? 'Investigating…' : 'Investigate') + '</button>'
@@ -194,11 +201,15 @@
       html += '<div class="ai-engine">' + chip(v.status.replace('_', ' '), RUN_TONE[v.status]) + (s.hypothesis ? chip('confidence ' + s.hypothesis.confidence, '') : '') + (s.verification ? chip(s.verification.passed ? 'verified' : 'not fully verified', s.verification.passed ? 'tone-good' : 'tone-warn') : '') + '</div>'
       if (s.recommendation) html += '<p class="ai-headline">' + esc(s.recommendation.headline) + '</p>'
       if (s.hypothesis) html += '<h4>Root cause chain</h4><ol class="ai-actions">' + s.hypothesis.chain.map(function (c) { return '<li><span class="ai-action">' + esc(c.step) + '</span><span class="ai-meta">' + c.evidenceIds.map(function (x) { return '<code>' + esc(x) + '</code>' }).join(' ') + '</span></li>' }).join('') + '</ol>'
-      html += '<h4>Evidence</h4><ul class="factors">' + (s.evidence || []).map(function (e) { return '<li><code>' + esc(e.id) + '</code> ' + (e.ok ? '' : '<span class="t-crit">unavailable</span> ') + esc(e.source) + (e.tool ? ' · <code>' + esc(e.server + ':' + e.tool) + '</code>' : '') + ' <span class="muted">· ' + esc(e.summary) + '</span></li>' }).join('') + '</ul>'
+      html += '<h4>Evidence</h4><ul class="factors">' + (s.evidence || []).map(function (e) { return '<li><code>' + esc(e.id) + '</code> ' + (e.ok ? '' : '<span class="t-crit">unavailable</span> ') + esc(e.source) + (e.tool ? ' · <code>' + esc(e.server + ':' + e.tool) + '</code>' : '') + ' <span class="muted">· ' + esc(e.summary) + '</span>' + (e.flags && e.flags.length ? ' <span class="t-warn">' + esc(e.flags.join(', ')) + '</span>' : '') + (e.kind === 'kb_similar' && e.ok ? kbHits(e.data) : '') + '</li>' }).join('') + '</ul>'
       if (s.verification) html += '<h4>Verification</h4><ul class="factors">' + s.verification.checks.map(function (c) { return '<li>' + (c.ok ? '<span class="t-good">pass</span>' : '<span class="t-crit">fail</span>') + ' ' + esc(c.name) + ' <span class="muted">· ' + esc(c.detail) + '</span></li>' }).join('') + '</ul>'
       if (s.recommendation) html += '<h4>Actions</h4><ol class="ai-actions">' + s.recommendation.actions.map(function (x) { return '<li><span class="ai-action">' + esc(x.action) + '</span><span class="ai-meta"><code>' + esc(x.ruleId) + '</code> · ' + esc(String(x.horizon).replace('-', ' ')) + ' · ' + esc(x.owner) + '</span></li>' }).join('') + '</ol>'
       if (v.status === 'awaiting_approval') html += '<div class="nav-row"><button class="btn primary" data-act="agent-ok" data-id="' + esc(fid) + '"' + (st.busy ? ' disabled' : '') + '>Approve</button> <button class="btn" data-act="agent-no" data-id="' + esc(fid) + '"' + (st.busy ? ' disabled' : '') + '>Reject</button></div>'
       if (s.log && s.log.length) html += '<details><summary class="muted small">Agent log (' + s.log.length + ' steps)</summary><pre class="evidence">' + esc(s.log.join('\n')) + '</pre></details>'
+      if (v.trace && v.trace.length) {
+        var depth = {}, lines = v.trace.map(function (t) { depth[t.id] = t.parent && depth[t.parent] != null ? depth[t.parent] + 1 : 0; var at = t.attrs || {}; return new Array(depth[t.id] + 1).join('  ') + t.name + (t.ms != null ? '  ' + t.ms + ' ms' : '') + (t.status === 'error' ? '  ERROR ' + (t.error || '') : '') + (at['gen_ai.request.model'] ? '  model ' + at['gen_ai.request.model'] : '') + (at['app.tool.server'] ? '  via ' + at['app.tool.server'] : '') })
+        html += '<details><summary class="muted small">Trace (' + v.trace.length + ' spans, OpenTelemetry GenAI names)</summary><pre class="evidence">' + esc(lines.join('\n')) + '</pre></details>'
+      }
     }
     return html + '</div>'
   }
