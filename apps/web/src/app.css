@@ -241,3 +241,31 @@ details summary { cursor: pointer; }
 .advice .group-hit[disabled] { cursor: default; }
 .paste { width: 100%; font: 12px var(--f-data); background: var(--sunken); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin: 6px 0; }
 .integ h4 { margin: 8px 0 2px; }
+/* map: tools -> journey -> agent; state colours read as connected / demo / dead */
+.mode-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.mode-row .fchip{white-space:normal;text-align:left}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.mcol{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:8px}
+.mcol h4{margin:0}
+.mgrid{display:grid;gap:8px}
+.mgrid.tools{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.mgrid.stages{grid-template-columns:repeat(auto-fill,minmax(84px,1fr))}
+.mgrid.insights{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.mgrid.agent{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+.mnode{position:relative;display:flex;flex-direction:column;gap:2px;align-items:flex-start;text-align:left;padding:8px 10px 8px 26px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font:inherit;color:inherit;min-width:0}
+button.mnode{cursor:pointer}
+.mnode b{font-size:13.5px}
+.mnode span{font-size:11.5px;color:var(--muted);overflow-wrap:anywhere}
+.mdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--pending)}
+.mnode .mdot{position:absolute;left:10px;top:13px}
+.mdot.st-on,.st-on .mdot{background:var(--good)}
+.mdot.st-demo,.st-demo .mdot{background:var(--warn)}
+.mdot.st-dead,.st-dead .mdot{background:var(--pending)}
+.mnode.st-on{border-color:var(--good);box-shadow:inset 3px 0 0 var(--good)}
+.mnode.st-demo{border-color:var(--warn);border-style:dashed}
+.mnode.st-dead{opacity:.5;background:var(--sunken)}
+.mnode.st-dead b{text-decoration:line-through;text-decoration-color:var(--muted)}
+.mnode.faded{opacity:.25}
+.mnode.hot{outline:2px solid var(--accent);outline-offset:1px;opacity:1}
+.marrow{text-align:center;color:var(--muted);font-size:13px;margin:-2px 0}
+.tool-panel{border-top:1px solid var(--line);padding-top:8px;font-size:13.5px}

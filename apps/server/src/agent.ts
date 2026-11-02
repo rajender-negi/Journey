@@ -5,11 +5,12 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
-  AgentRuns, McpHub, Tracer, buildKnowledgeBase, copilotIssue, type ToolRunner, createAgentLlm, hashingEmbedder, loadMcpConfig, openAiCompatibleEmbedder, otlpHttpExporter,
+  AgentRuns, McpHub, Tracer, discoverMcp, type Discovery, buildKnowledgeBase, copilotIssue, type ToolRunner, createAgentLlm, hashingEmbedder, openAiCompatibleEmbedder, otlpHttpExporter,
   azureAiSearchProvider, bedrockKnowledgeBaseProvider, withBedrockGuardrail, type KnowledgeSearch,
   parseOtlpHeaders, snapshotTools, tracedLlm, tracedTools, withKnowledge, withSnapshot, type KnowledgeBase, type RunView, type ServerStatus,
 } from '@pj/agent'
-import { config } from './config'
+import { config, fromRoot } from './config'
+import { getSettings } from './settings'
 import { store } from './store'
 
 export const agent: {
@@ -20,11 +21,18 @@ export const agent: {
   notes: string[]
   tracer: Tracer | null
   embedder: string
-} = { hub: null, servers: [], runs: null, llm: null, notes: [], tracer: null, embedder: '' }
+  discovery: Discovery | null
+} = { hub: null, servers: [], runs: null, llm: null, notes: [], tracer: null, embedder: '', discovery: null }
 
 export async function initAgent(): Promise<void> {
-  const cfg = loadMcpConfig(config.mcpConfigPath)
-  if (cfg && Object.keys(cfg.mcpServers).length) {
+  // MCP servers: the ones your IDEs already have (Cursor, VS Code, Kiro, Claude Desktop, Windsurf) plus mcp.servers.json
+  const settings = getSettings()
+  const disc = discoverMcp({ root: fromRoot('.'), appConfigPath: config.mcpConfigPath, disabled: settings.mcpOff, ideDiscovery: settings.ideDiscovery, extraPaths: (process.env.PJ_MCP_EXTRA_PATHS ?? '').split(',').map((x) => x.trim()).filter(Boolean) })
+  agent.discovery = disc
+  for (const f of disc.files) agent.notes.push(`MCP config found: ${f.app} (${f.scope}) ${f.path}: ${f.servers.length} server(s)${f.error ? `, unreadable: ${f.error}` : ''}`)
+  for (const s of disc.skipped) agent.notes.push(`MCP server ${s.server} from ${s.app} skipped: ${s.reason}`)
+  const cfg = Object.keys(disc.config.mcpServers).length ? disc.config : undefined
+  if (cfg) {
     const hub = new McpHub(cfg, config.agent.writeAllowlist)
     try {
       agent.servers = await hub.connect()
@@ -33,7 +41,7 @@ export async function initAgent(): Promise<void> {
       agent.notes.push((e as Error).message)
     }
   } else {
-    agent.notes.push(`No MCP config at ${config.mcpConfigPath}; the agent reads the loaded source data (dummy until sources are configured) through the same operations.`)
+    agent.notes.push(`No MCP servers found (IDE configs or ${config.mcpConfigPath}); the agent reads the loaded source data through the same operations.`)
   }
   const llm = await createAgentLlm(config.ai).catch((e: Error) => {
     agent.notes.push(`LLM not loaded: ${e.message}`)
@@ -132,5 +140,28 @@ export async function agentStatus() {
     notes: agent.notes, audit: agent.hub?.audit.slice(-50) ?? [],
     rag: await knowledgeBase().then((kb) => (kb ? { docs: kb.docs, chunks: kb.size, embedder: kb.embedder.name } : null)),
     tracing: config.otel.endpoint ? 'otlp' : 'memory',
+  }
+}
+
+/** Rebuilds the MCP connections after the user changes what is switched on. */
+export async function reinitAgent(): Promise<void> {
+  await agent.hub?.close().catch(() => undefined)
+  Object.assign(agent, { hub: null, servers: [], runs: null, llm: null, notes: [], discovery: null })
+  await initAgent()
+}
+
+/** MCP servers as the Integrations screen shows them: where each came from, on or off, connected or not. */
+export function mcpInventory() {
+  const settings = getSettings()
+  const d = agent.discovery
+  const names = new Set([...Object.keys(d?.origin ?? {}), ...settings.mcpOff])
+  return {
+    ideDiscovery: settings.ideDiscovery,
+    files: d?.files ?? [],
+    skipped: d?.skipped ?? [],
+    servers: [...names].map((name) => {
+      const st = agent.servers.find((x) => x.name === name)
+      return { name, from: d?.origin[name]?.app ?? 'switched off', path: d?.origin[name]?.path ?? '', on: !settings.mcpOff.includes(name), connected: !!st?.ok, tools: st?.tools ?? 0, transport: st?.transport, error: st?.error }
+    }),
   }
 }

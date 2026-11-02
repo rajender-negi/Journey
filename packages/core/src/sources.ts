@@ -736,3 +736,29 @@ function hash(s: string): string {
   for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619)
   return (h >>> 0).toString(16).toUpperCase().padStart(8, '0')
 }
+
+export type SourceKey = Exclude<keyof RawBundle, 'meta'>
+export const SOURCE_KEYS: SourceKey[] = ['servicenow', 'github', 'dynatrace', 'argocd', 'kubernetes', 'aws', 'azure', 'gcp']
+
+/** The native payload a switched-off (or unconnected) source contributes: the right shape, no records. */
+export function emptySource<K extends SourceKey>(s: K): NonNullable<RawBundle[K]> {
+  const dq = (q: string): DqlResult => ({ state: 'SUCCEEDED', result: { records: [], metadata: { grail: { query: q } } } } as unknown as DqlResult)
+  const empty: { [P in SourceKey]: NonNullable<RawBundle[P]> } = {
+    servicenow: { businessApps: [], changes: [] },
+    github: { pulls: [], prCommits: {}, jobs: [], annotations: {}, contents: {} },
+    dynatrace: { problems: dq(DQL.problems), sdlcEvents: dq(DQL.sdlcEvents), serviceMetrics: dq(DQL.serviceMetrics), workloads: dq(DQL.workloads), dora: dq(DQL.dora), billing: dq(DQL.billing) },
+    argocd: { applications: [] },
+    kubernetes: { events: [] },
+    aws: { costExplorer: [], commitmentCoverage: {} },
+    azure: { costManagement: { properties: { columns: [], rows: [] } } as unknown as AzureCostQuery },
+    gcp: { billingExport: [] },
+  }
+  return empty[s] as NonNullable<RawBundle[K]>
+}
+
+/** A bundle with the given sources switched off. */
+export function withSourcesOff(raw: RawBundle, off: SourceKey[]): RawBundle {
+  const out = { ...raw } as RawBundle
+  for (const s of off) (out as unknown as Record<string, unknown>)[s] = emptySource(s)
+  return out
+}

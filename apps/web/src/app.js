@@ -8,9 +8,9 @@
   // published card: the LangGraph agent runs in this page (agent.js, loaded on first Investigate)
   if (VM && !VM.agent) VM.agent = { enabled: true, local: true, llm: null, mcpServers: [] }
   var NOW = Date.now()
-  var S = { pid: 'all', tab: 'overview', outcome: 'all', pillar: 'all', limit: 20, openJ: {}, openG: null, ai: {}, runs: {}, openA: null, itest: {}, paste: {} }
+  var S = { pid: 'all', tab: 'map', cfg: null, cardMode: 'demo', cardOffList: [], openTool: null, mapBusy: false, outcome: 'all', pillar: 'all', limit: 20, openJ: {}, openG: null, ai: {}, runs: {}, openA: null, itest: {}, paste: {} }
   var h = location.hash.replace('#', '')
-  var TABS = [['overview', 'Overview'], ['journeys', 'Journeys'], ['fixes', 'Fixes'], ['prevent', 'Prevent'], ['advisor', 'Advisor'], ['code', 'Codebase'], ['cost', 'Cost'], ['practices', 'Practices'], ['integrations', 'Integrations']]
+  var TABS = [['map', 'Map'], ['overview', 'Overview'], ['journeys', 'Journeys'], ['fixes', 'Fixes'], ['prevent', 'Prevent'], ['advisor', 'Advisor'], ['code', 'Codebase'], ['cost', 'Cost'], ['practices', 'Practices'], ['integrations', 'Integrations']]
   if (TABS.some(function (t) { return t[0] === h })) S.tab = h
 
   // ---------- helpers ----------
@@ -139,18 +139,25 @@
       .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || ('HTTP ' + r.status)); return j }) })
   }
   // in-page agent (published card): load agent.js once, Claude via the sample capability when allowed
-  var localAgentPromise = null
-  function localAgent() {
-    if (!localAgentPromise) {
-      localAgentPromise = new Promise(function (resolve, reject) {
+  var localAgentPromise = null, agentLibPromise = null
+  function agentLib() {
+    if (!agentLibPromise) {
+      agentLibPromise = new Promise(function (resolve, reject) {
         if (window.PJAgent) return resolve(window.PJAgent)
         var sc = document.createElement('script')
         sc.src = 'agent.js'
         sc.onload = function () { window.PJAgent ? resolve(window.PJAgent) : reject(new Error('agent.js loaded without PJAgent')) }
         sc.onerror = function () { reject(new Error('Could not load agent.js')) }
         document.head.appendChild(sc)
-      }).then(function (A) {
-        return getSample().then(function (sample) { return A.create({ now: Date.parse(VM.at), sample: sample }) })
+      })
+      agentLibPromise.catch(function () { agentLibPromise = null })
+    }
+    return agentLibPromise
+  }
+  function localAgent() {
+    if (!localAgentPromise) {
+      localAgentPromise = agentLib().then(function (A) {
+        return getSample().then(function (sample) { return A.create({ now: Date.parse(VM.at), sample: sample, off: cardOff() }) })
       })
       localAgentPromise.catch(function () { localAgentPromise = null })
     }
@@ -403,9 +410,115 @@
     return out
   }
 
+  // ---------- map: the whole solution on one page; tools light up or go dead with their connections ----------
+  var MAP_TOOLS = [
+    ['servicenow', 'ServiceNow', 'Product identity (CMDB), changes, incidents', ['change'], ['classify', 'kb']],
+    ['github', 'GitHub', 'Merges, CI, scans, code, Copilot', ['merged', 'build', 'test', 'scan', 'code'], ['gather', 'handoff']],
+    ['argocd', 'Argo CD', 'Deployments and sync state', ['staging', 'prod'], ['gather']],
+    ['kubernetes', 'Kubernetes', 'Pods, containers, nodes, events', ['staging', 'prod'], ['gather']],
+    ['dynatrace', 'Dynatrace', 'Hub: problems, logs, traces, DORA', ['prod', 'verified'], ['gather', 'vendor']],
+    ['aws', 'AWS', 'Cost, CloudTrail, EKS', ['cost'], ['gather']],
+    ['azure', 'Azure', 'Cost, Activity Log, AKS', ['cost'], ['gather']],
+    ['gcp', 'Google Cloud', 'Cost, Audit Logs, GKE', ['cost'], ['gather']],
+  ]
+  var MAP_STAGES = [['merged', 'Merged'], ['build', 'Build'], ['test', 'Test'], ['scan', 'Scan'], ['staging', 'Staging'], ['change', 'Change'], ['prod', 'Prod'], ['verified', 'Verified']]
+  var MAP_INSIGHTS = [['code', 'Codebase and design advisor'], ['cost', 'Cost per product']]
+  var MAP_AGENT = [['classify', 'Classify', 'rules'], ['gather', 'Gather evidence', 'MCP or Dynatrace'], ['kb', 'Search past incidents', 'RAG'], ['vendor', 'Ask vendor agents', 'Davis, Now Assist'], ['hypo', 'Hypothesize', 'Claude via LangChain'], ['verify', 'Verify', '6 checks'], ['rec', 'Recommend', 'guarded'], ['approve', 'You approve', 'human gate'], ['handoff', 'Copilot opens the PR', 'opt-in']]
+  function demoCard() { return VM.mode === 'demo' }
+  function cardOff() { return demoCard() ? (S.cardMode === 'live' ? MAP_TOOLS.map(function (t) { return t[0] }) : S.cardOffList.slice()) : [] }
+  function toolState(id) {
+    var it = null; for (var i = 0; i < VM.integrations.length; i++) if (VM.integrations[i].id === id) it = VM.integrations[i]
+    if (demoCard() && cardOff().indexOf(id) >= 0) return 'dead'
+    if (!it || it.tier === 'off') return 'dead'
+    return it.tier === 'dummy' ? 'demo' : 'on'
+  }
+  var RANK = { dead: 0, demo: 1, on: 2 }, STATE_LABEL = { on: 'connected', demo: 'demo data', dead: 'off' }
+  function bestOf(states) { var b = 'dead'; states.forEach(function (x) { if (RANK[x] > RANK[b]) b = x }); return b }
+  function stateOfTarget(tid, col) {
+    if (toolState('servicenow') === 'dead' && tid !== 'handoff') return 'dead' // no product identity: nothing joins
+    var feeders = MAP_TOOLS.filter(function (t) { return t[col].indexOf(tid) >= 0 }).map(function (t) { return toolState(t[0]) })
+    if (tid === 'hypo' || tid === 'verify' || tid === 'rec' || tid === 'approve') feeders.push(stateOfTarget('gather', 4))
+    return feeders.length ? bestOf(feeders) : 'dead'
+  }
+  function node(cls, state, label, sub, hot, act, id) {
+    return '<' + (act ? 'button data-act="' + act + '" data-id="' + id + '"' : 'div') + ' class="mnode ' + cls + ' st-' + state + (hot === false ? ' faded' : hot ? ' hot' : '') + '"><b>' + esc(label) + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '<i class="mdot"></i></' + (act ? 'button' : 'div') + '>'
+  }
+  function map() {
+    var open = S.openTool, ot = null
+    MAP_TOOLS.forEach(function (t) { if (t[0] === open) ot = t })
+    var hot = function (tid, col) { return ot ? ot[col].indexOf(tid) >= 0 || (col === 4 && ['hypo', 'verify', 'rec', 'approve'].indexOf(tid) >= 0 && ot[4].indexOf('gather') >= 0) : null }
+    var mode = demoCard() ? S.cardMode : (S.cfg ? S.cfg.settings.mode : null)
+    var on = MAP_TOOLS.filter(function (t) { return toolState(t[0]) === 'on' }).length, demo = MAP_TOOLS.filter(function (t) { return toolState(t[0]) === 'demo' }).length
+    var out = '<section class="section"><div class="section-head"><h2>How it works, end to end</h2><span class="muted small">' + on + ' connected · ' + demo + ' on demo data · ' + (MAP_TOOLS.length - on - demo) + ' off</span></div>' +
+      '<p class="small">Tools feed the product journey. When something fails, the agent gathers evidence from the same tools, checks its own answer and waits for you. Tap a tool to see what it lights up.</p>' +
+      '<div class="mode-row"><span class="muted small">Mode</span>' + ['demo', 'live'].map(function (m) { return '<button class="fchip' + (mode === m ? ' on' : '') + '" data-act="mode" data-id="' + m + '"' + (S.mapBusy ? ' disabled' : '') + '>' + (m === 'demo' ? 'Demo: dummy data for tools not connected' : 'Live: real connections only') + '</button>' }).join('') + (S.mapBusy ? '<span class="muted small">Updating…</span>' : '') + '</div>' +
+      '<div class="legend small"><span><i class="mdot st-on"></i>connected</span><span><i class="mdot st-demo"></i>demo data</span><span><i class="mdot st-dead"></i>off or not connected</span></div>'
+    out += '<div class="mcol"><h4>1 · Tools</h4><div class="mgrid tools">' + MAP_TOOLS.map(function (t) { return node('tool', toolState(t[0]), t[1], t[2] + ' · ' + STATE_LABEL[toolState(t[0])], open ? t[0] === open : null, 'tool', t[0]) }).join('') + '</div>'
+    if (ot) {
+      var st = toolState(ot[0]), sig = (VM.signals || []).filter(function (x) { return x.tool === ot[0] || (ot[0] === 'kubernetes' && x.tool === 'kubernetes') })
+      out += '<div class="tool-panel"><b>' + esc(ot[1]) + '</b> · ' + esc(STATE_LABEL[st]) + ' · ' + sig.length + ' signals · feeds ' + esc(ot[3].concat(ot[4]).join(', ')) +
+        '<div class="nav-row"><button class="btn" data-act="tool-toggle" data-id="' + ot[0] + '"' + (S.mapBusy ? ' disabled' : '') + '>' + (st === 'dead' && (demoCard() ? S.cardOffList.indexOf(ot[0]) >= 0 : S.cfg && S.cfg.settings.sourcesOff.indexOf(ot[0]) >= 0) ? 'Switch on' : 'Switch off') + '</button> <button class="btn" data-act="tab" data-id="integrations">Signals and connection details</button></div>' +
+        (ot[0] === 'servicenow' ? '<p class="small muted">ServiceNow defines the products; switching it off makes the whole map dead.</p>' : '') + '</div>'
+    }
+    out += '</div><div class="marrow">↓</div><div class="mcol"><h4>2 · Product journey</h4><div class="mgrid stages">' + MAP_STAGES.map(function (x) { return node('stage', stateOfTarget(x[0], 3), x[1], '', hot(x[0], 3)) }).join('') + '</div>' +
+      '<div class="mgrid insights">' + MAP_INSIGHTS.map(function (x) { return node('stage', stateOfTarget(x[0], 3), x[1], '', hot(x[0], 3)) }).join('') + '</div></div>'
+    out += '<div class="marrow">↓ a failure</div><div class="mcol"><h4>3 · Agent (LangGraph)</h4><div class="mgrid agent">' + MAP_AGENT.map(function (x) { return node('step', x[0] === 'approve' ? 'on' : stateOfTarget(x[0], 4), x[1], x[2], hot(x[0], 4)) }).join('') + '</div>' +
+      '<p class="small muted">Verification fails send it back for more evidence (at most twice). Nothing changes in any tool until you approve. Dynatrace is never written to.</p></div></section>'
+    if (!demoCard() && S.cfg) out += mcpPanel()
+    if (!demoCard() && !S.cfg) loadSettings()
+    return out
+  }
+  function mcpPanel() {
+    var m = S.cfg.mcp
+    var out = '<section class="section"><div class="section-head"><h2>MCP servers</h2><span class="muted small">found in ' + m.files.length + ' config file(s)</span></div>' +
+      '<p class="small">Read from your IDEs (Cursor, VS Code, Kiro, Claude Desktop, Windsurf) and mcp.servers.json, so MCP is configured once. <button class="btn" data-act="ide-toggle">' + (m.ideDiscovery ? 'Stop reading IDE configs' : 'Read IDE configs') + '</button></p>'
+    out += m.servers.length ? '<ul class="factors">' + m.servers.map(function (x) { return '<li><b>' + esc(x.name) + '</b> ' + chip(x.on ? (x.connected ? 'connected · ' + x.tools + ' tools' : 'not connected') : 'off', x.on && x.connected ? 'tone-good' : x.on ? 'tone-warn' : '') + ' <span class="muted small">from ' + esc(x.from) + (x.error ? ' · ' + esc(x.error) : '') + '</span> <button class="btn" data-act="mcp-toggle" data-id="' + esc(x.name) + '">' + (x.on ? 'Switch off' : 'Switch on') + '</button></li>' }).join('') + '</ul>' : '<p class="muted small">No MCP servers found. Add them in your IDE or in mcp.servers.json.</p>'
+    if (m.skipped.length) out += '<p class="small muted">Skipped: ' + esc(m.skipped.map(function (s) { return s.server + ' (' + s.app + '): ' + s.reason }).join('; ')) + '</p>'
+    return out + '</section>'
+  }
+  function loadSettings() {
+    if (S.cfgLoading) return
+    S.cfgLoading = true
+    fetch('api/integrations/settings').then(function (r) { return r.json() }).then(function (c) { S.cfg = c; S.cfgLoading = false; render() }, function () { S.cfgLoading = false })
+  }
+  function putSettings(patch) {
+    S.mapBusy = true; render()
+    fetch('api/integrations/settings', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(patch) })
+      .then(function (r) { return r.json() }).then(function (c) { S.cfg = c; return fetchVm() }).then(function (vm) { VM = vm; NOW = Date.now() })
+      .then(function () { S.mapBusy = false; render() }, function () { S.mapBusy = false; render() })
+  }
+  // the phone card has no server: switching recomputes the same view model in the page (agent.js)
+  function rebuildCard() {
+    S.mapBusy = true; render()
+    var agentMeta = VM.agent
+    agentLib().then(function (A) { VM = A.rebuild({ now: Date.parse(VM.at), off: cardOff() }); VM.agent = agentMeta; localAgentPromise = null; S.runs = {} })
+      .then(function () { S.mapBusy = false; if (!VM.products.length) S.pid = 'all'; render() }, function (e) { S.mapBusy = false; render(); alertNote(e) })
+  }
+  function alertNote(e) { var n = document.createElement('p'); n.className = 'note'; n.textContent = 'Could not switch: ' + (e && e.message); app.prepend(n) }
+  function setMode(m) {
+    if (demoCard()) { S.cardMode = m; rebuildCard() } else putSettings({ mode: m })
+  }
+  function toggleTool(id) {
+    if (demoCard()) {
+      if (S.cardMode === 'live') S.cardMode = 'demo'
+      var i = S.cardOffList.indexOf(id)
+      if (i >= 0) S.cardOffList.splice(i, 1); else S.cardOffList.push(id)
+      rebuildCard()
+    } else {
+      var off = (S.cfg ? S.cfg.settings.sourcesOff : []).slice(), j = off.indexOf(id)
+      if (j >= 0) off.splice(j, 1); else off.push(id)
+      putSettings({ sourcesOff: off })
+    }
+  }
+  function toggleMcp(name) {
+    var off = S.cfg.settings.mcpOff.slice(), j = off.indexOf(name)
+    if (j >= 0) off.splice(j, 1); else off.push(name)
+    putSettings({ mcpOff: off })
+  }
+
   // ---------- integrations ----------
-  var TIER_TONE = { live: 'tone-good', mcp: 'tone-accent', 'mcp-snapshot': 'tone-accent', dummy: 'tone-warn' }
-  var TIER_LABEL = { live: 'live API', mcp: 'live MCP', 'mcp-snapshot': 'MCP snapshot', dummy: 'dummy data', unknown: 'unknown' }
+  var TIER_TONE = { live: 'tone-good', mcp: 'tone-accent', 'mcp-snapshot': 'tone-accent', dummy: 'tone-warn', off: 'sev-low' }
+  var TIER_LABEL = { live: 'live API', mcp: 'live MCP', 'mcp-snapshot': 'MCP snapshot', dummy: 'dummy data', off: 'off', unknown: 'unknown' }
   function integrationTest(id) {
     S.itest[id] = { busy: true }
     render()
@@ -466,13 +579,13 @@
   // ---------- shell ----------
   function render() {
     var p = prod(S.pid)
-    var views = { overview: overview, journeys: journeys, fixes: fixes, prevent: prevent, advisor: advisor, code: code, cost: cost, practices: practices, integrations: integrations }
+    var views = { map: map, overview: overview, journeys: journeys, fixes: fixes, prevent: prevent, advisor: advisor, code: code, cost: cost, practices: practices, integrations: integrations }
     document.getElementById('app').innerHTML =
       '<header class="top"><div class="wrap top-row"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><div><div class="brand-name">Product Journey</div><div class="brand-sub">' + (VM.mode === 'demo' ? 'Demo · dummy data in native source schemas' : 'Updated ' + ago(VM.at)) + '</div></div></div>' +
       '<label class="select"><span class="sr">Product</span><select id="product" data-act="select"><option value="all"' + (S.pid === 'all' ? ' selected' : '') + '>All products</option>' +
       VM.products.map(function (x) { return '<option value="' + x.id + '"' + (S.pid === x.id ? ' selected' : '') + '>' + esc(x.n) + ' · T' + x.tier + '</option>' }).join('') + '</select></label></div>' +
       '<nav class="wrap tabs">' + TABS.map(function (t) { return '<button class="tab' + (S.tab === t[0] ? ' on' : '') + '" data-act="tab" data-id="' + t[0] + '">' + t[1] + '</button>' }).join('') + '</nav></header>' +
-      '<main class="wrap view">' + (p ? '<div class="product-bar"><b>' + esc(p.n) + '</b><span class="muted small">' + esc(p.o) + ' · ' + esc(p.t) + ' · tier ' + p.tier + ' · ' + esc(p.repos.join(', ')) + '</span></div>' : '') + views[S.tab]() + '</main>'
+      '<main class="wrap view">' + (p ? '<div class="product-bar"><b>' + esc(p.n) + '</b><span class="muted small">' + esc(p.o) + ' · ' + esc(p.t) + ' · tier ' + p.tier + ' · ' + esc(p.repos.join(', ')) + '</span></div>' : '') + (VM.products.length || S.tab === 'map' || S.tab === 'integrations' ? views[S.tab]() : '<p class="note">No products. ServiceNow (the CMDB) is off or not connected, so nothing can be joined to a product. Open <a href="#map" data-act="tab" data-id="map">Map</a> to switch it on, or switch to Demo.</p>') + '</main>'
   }
 
   var app = document.getElementById('app')
@@ -488,6 +601,11 @@
     else if (act === 'group') { S.openG = S.openG === id ? '' : id; render() }
     else if (act === 'more') { S.limit += 20; render() }
     else if (act === 'advice') { S.openA = S.openA === id ? null : id; render() }
+    else if (act === 'tool') { S.openTool = S.openTool === id ? null : id; render() }
+    else if (act === 'tool-toggle') toggleTool(id)
+    else if (act === 'mode') setMode(id)
+    else if (act === 'mcp-toggle') toggleMcp(id)
+    else if (act === 'ide-toggle') putSettings({ ideDiscovery: !(S.cfg && S.cfg.settings.ideDiscovery) })
     else if (act === 'itest') integrationTest(id)
     else if (act === 'ipaste') integrationPaste(id)
     else if (act === 'agent') startAgent(id)

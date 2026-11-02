@@ -7,7 +7,8 @@ import { SOURCES, config, type SourceName } from './config'
 import { collect, testSource, writeSnapshot } from './collector'
 import { store } from './store'
 import { brief } from './ai'
-import { agent, agentStatus, feedbackSummary, initAgent, knowledgeBase } from './agent'
+import { agent, agentStatus, feedbackSummary, initAgent, knowledgeBase, mcpInventory, reinitAgent } from './agent'
+import { getSettings, saveSettings } from './settings'
 
 const WEB_DIST = new URL('../../web/dist/', import.meta.url).pathname
 const TYPES: Record<string, string> = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml' }
@@ -128,6 +129,16 @@ async function route(req: IncomingMessage, res: ServerResponse) {
   // ---- agentic investigation (LangGraph + MCP) ----
   if (p === '/api/agent/status') return send(res, 200, await agentStatus())
   if (p === '/api/mcp/tools') return send(res, 200, agent.hub?.tools() ?? {})
+  // what is switched on: demo or live mode, sources, MCP servers (including the ones found in IDE configs)
+  if (p === '/api/integrations/settings') {
+    if (req.method === 'PUT') {
+      const before = getSettings()
+      const next = saveSettings(JSON.parse(await readBody(req)) as Record<string, never>)
+      if (JSON.stringify(before.mcpOff) !== JSON.stringify(next.mcpOff) || before.ideDiscovery !== next.ideDiscovery) await reinitAgent()
+      await collect()
+    }
+    return send(res, 200, { settings: getSettings(), sources: store.ready() ? store.get().status : [], mcp: mcpInventory() })
+  }
   // feedback loop: approve and reject decisions, approval rate overall and per rule
   if (p === '/api/agent/feedback') return send(res, 200, feedbackSummary())
   // RAG: search the knowledge base directly (the agent uses the same search as evidence kb_similar)

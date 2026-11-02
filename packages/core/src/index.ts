@@ -39,8 +39,22 @@ export interface Analysis {
   advice: Record<string, ProductAdvice>
 }
 
+/** Keeps only records a CMDB product owns: with no product identity there is nothing to join (the map goes dead). */
+export function scopeToProducts(ds: Dataset): Dataset {
+  const ids = new Set(ds.products.map((p) => p.id))
+  const repos = new Set(ds.products.flatMap((p) => p.repos))
+  // records carry a productId, or (merges, pipeline runs) only a repo that a product lists
+  const own = <T>(xs: T[]) => xs.filter((x) => { const r = x as { productId?: string; repo?: string }; return r.productId !== undefined ? ids.has(r.productId) : r.repo !== undefined ? repos.has(r.repo) : true })
+  return {
+    ...ds, merges: own(ds.merges), pipelineRuns: own(ds.pipelineRuns), deployments: own(ds.deployments), changeRequests: own(ds.changeRequests),
+    problems: own(ds.problems), runtimeEvents: own(ds.runtimeEvents), serviceMetrics: own(ds.serviceMetrics), workloadUsage: own(ds.workloadUsage),
+    costs: own(ds.costs), repos: own(ds.repos), doraFromDynatrace: own(ds.doraFromDynatrace),
+  }
+}
+
 /** Runs all six phases over a normalized dataset. Pure and deterministic. */
-export function analyze(ds: Dataset): Analysis {
+export function analyze(input: Dataset): Analysis {
+  const ds = scopeToProducts(input)
   const journeys = buildJourneys(ds)
   const failures = detectFailures(ds)
   const code = analyzeCodebases(ds)

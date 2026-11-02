@@ -127,3 +127,20 @@ describe('API', () => {
     assert.ok(r.body.output.headline)
   })
 })
+
+describe('Integrations settings: demo vs live, switching tools off', () => {
+  it('a switched-off source goes dead and comes back; live mode empties unconnected sources', async () => {
+    const put = (body: unknown) => j('/api/integrations/settings', { method: 'PUT', body: JSON.stringify(body) })
+    const off = (await put({ sourcesOff: ['github'] })).body
+    assert.equal(off.sources.find((s: { source: string }) => s.source === 'github').tier, 'off')
+    assert.equal((await j('/api/journeys')).body.length, 0, 'no GitHub, no journeys')
+    const live = (await put({ sourcesOff: [], mode: 'live' })).body
+    // only the snapshot an earlier test pushed counts as a connection; everything else is dead
+    assert.ok(live.sources.every((s: { tier: string }) => s.tier === 'off' || s.tier === 'mcp-snapshot'), JSON.stringify(live.sources.map((s: { source: string; tier: string }) => `${s.source}:${s.tier}`)))
+    assert.ok(live.sources.filter((s: { tier: string }) => s.tier === 'off').length >= 6)
+    const demo = (await put({ mode: 'demo' })).body
+    assert.ok(demo.sources.every((s: { tier: string }) => s.tier === 'dummy' || s.tier === 'mcp-snapshot'))
+    assert.equal((await j('/api/products')).body.length, 5)
+    assert.ok(Array.isArray(demo.mcp.servers) && typeof demo.mcp.ideDiscovery === 'boolean')
+  })
+})

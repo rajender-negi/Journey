@@ -11,11 +11,13 @@ export function scoreDeploymentRisk(ds: Dataset, journeys: Journey[], codeFindin
   const doraCache = new Map<string, ReturnType<typeof computeDora>>()
   const dora = (pid: string) => doraCache.get(pid) ?? doraCache.set(pid, computeDora(ds, pid)).get(pid)!
 
-  return pending.map((j) => {
+  return pending.flatMap((j) => {
     const f: RiskFactor[] = []
     const add = (factor: string, weight: number, detail: string) => f.push({ factor, weight, detail })
     const m = ds.merges.find((x) => x.sha === j.sha && x.repo === j.repo)!
-    const product = ds.products.find((p) => p.id === j.productId)!
+    const product = ds.products.find((p) => p.id === j.productId)
+    // a change that no CMDB product owns (for example ServiceNow switched off) cannot be scored
+    if (!product || !m) return []
     const size = m.additions + m.deletions
     if (size > 800) add('Large change', 25, `${size} lines changed`)
     else if (size > 400) add('Medium-large change', 12, `${size} lines changed`)
@@ -42,9 +44,9 @@ export function scoreDeploymentRisk(ds: Dataset, journeys: Journey[], codeFindin
 
     const score = Math.min(100, f.reduce((a, x) => a + x.weight, 0))
     const level = score >= 60 ? 'high' : score >= 35 ? 'medium' : 'low'
-    return {
+    return [{
       productId: j.productId, sha: j.sha, score, level, factors: f.sort((a, b) => b.weight - a.weight),
       gate: level === 'high' ? 'hold' : level === 'medium' ? 'proceed-with-canary' : 'proceed',
-    }
+    } as DeploymentRisk]
   })
 }

@@ -22,11 +22,12 @@ if (existsSync(envFile)) {
 }
 
 const env = (k: string) => process.env[k]?.trim() || undefined
-const fromRoot = (p: string) => (isAbsolute(p) ? p : resolve(ROOT, p))
+export const fromRoot = (p: string) => (isAbsolute(p) ? p : resolve(ROOT, p))
 
 export const config = {
   port: Number(env('PORT') ?? 8787),
-  mode: (env('PJ_MODE') ?? 'auto') as 'auto' | 'demo', // demo forces dummy data for every source
+  // demo forces dummy data for every source; live means unconnected sources are empty (dead); auto follows the Integrations setting
+  mode: (env('PJ_MODE') ?? 'auto') as 'auto' | 'demo' | 'live',
   windowDays: Number(env('PJ_WINDOW_DAYS') ?? 30),
   collectEveryMin: Number(env('PJ_COLLECT_EVERY_MIN') ?? 15),
   dataDir: fromRoot(env('PJ_DATA_DIR') ?? 'data'),

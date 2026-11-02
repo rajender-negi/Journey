@@ -110,6 +110,16 @@ START > classify > plan > gather > hypothesize > verify --passed or exhausted-->
 
 Guardrails: MCP tools that look like writes are refused unless listed in `AGENT_WRITE_ALLOWLIST`; Dynatrace is never written to; every call is time-limited, size-capped and audited. Tool names differ across MCP server versions, so `packages/agent/src/toolmap.ts` lists candidates per operation and uses the first one the server exposes.
 
+## Map, Demo and Live modes, choosing tools
+
+The **Map** tab is the whole solution on one page: tools, the product journey, the agent's steps, your approval and the Copilot hand-off. Each tool box shows whether it is connected (green), on demo data (amber, dashed) or off (grey); the journey stages and agent steps it feeds light up or go dead with it. Tap a tool to highlight what it feeds and switch it on or off.
+
+- **Demo:** tools that aren't connected run on dummy data in their native schema, so the journey and the agent can be shown with no connections at all.
+- **Live:** real connections only; anything not connected is empty everywhere in the app. ServiceNow defines the products, so with it off the whole map is dead.
+- Settings live in `data/integrations.json` (`GET`/`PUT /api/integrations/settings`). In the phone card, switching recomputes the same view in the page.
+
+**MCP servers are configured once, in your IDE.** At start-up the app reads the MCP configs of Cursor (`~/.cursor/mcp.json`, `.cursor/mcp.json`), VS Code (user `mcp.json`, `.vscode/mcp.json`), Kiro, Claude Desktop and Windsurf, then `mcp.servers.json`, which wins on a name clash and also holds `sources`, `collect` and `toolMap`. `${env:...}` and `${workspaceFolder}` are resolved; servers that need VS Code `${input:...}` prompts are skipped and reported. The Map lists every server, where it came from and whether it connected, with a switch for each. Turn IDE discovery off with `PJ_MCP_DISCOVERY=off`. Note that stdio servers in those files start local processes when the app connects to them.
+
 ## Integrations: every signal, every tool
 
 [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md) lists 31 signals across Dynatrace, Kubernetes (EKS, AKS, GKE), AWS, Azure, Google Cloud, GitHub, Argo CD, ServiceNow and any in-house tool, with the paths tried in order: **Dynatrace DQL** when Dynatrace already collects the signal, then the tool's **official MCP server**, then **REST**, then a **custom MCP server** (`templates/custom-mcp-server`). The Integrations screen shows the same catalogue per tool. Regenerate the doc with `npm run docs:signals`.

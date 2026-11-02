@@ -259,3 +259,25 @@ describe('LangGraph web graph (needs npm install)', async () => {
     assert.ok(matches.some((m) => m.source === 'investigation' && m.ref === first.id), JSON.stringify(matches.map((m) => m.source + ':' + m.ref)))
   })
 })
+
+describe('MCP servers from IDE configs (Cursor, VS Code, Kiro, Claude Desktop, Windsurf)', () => {
+  it('reads every format, resolves env and workspace, skips input prompts, and lets the app file win', async () => {
+    const { discoverMcp } = await import('../src/index')
+    const { mkdirSync } = await import('node:fs')
+    const root = mkdtempSync(join(tmpdir(), 'proj-')), home = mkdtempSync(join(tmpdir(), 'home-'))
+    const w = (p: string, o: unknown) => { mkdirSync(join(p, '..'), { recursive: true }); writeFileSync(p, JSON.stringify(o)) }
+    w(join(home, '.cursor', 'mcp.json'), { mcpServers: { dynatrace: { command: 'npx', args: ['-y', '@dynatrace-oss/dynatrace-mcp-server'], env: { DT_PLATFORM_TOKEN: '${env:DT_T}' } }, old: { command: 'x', disabled: true } } })
+    w(join(root, '.vscode', 'mcp.json'), { servers: { github: { type: 'http', url: 'https://api.githubcopilot.com/mcp/' }, secret: { type: 'stdio', command: 'x', env: { K: '${input:key}' } }, local: { type: 'stdio', command: 'node', args: ['${workspaceFolder}/srv.js'] } } })
+    w(join(home, '.codeium', 'windsurf', 'mcp_config.json'), { mcpServers: { argocd: { serverUrl: 'https://argo.example/mcp' } } })
+    w(join(root, 'mcp.servers.json'), { mcpServers: { dynatrace: { url: 'https://dt.example/mcp' } }, sources: { dynatrace: 'dynatrace' }, collect: ['dynatrace'] })
+    const d = discoverMcp({ root, home, os: 'linux', appConfigPath: join(root, 'mcp.servers.json'), env: { DT_T: 'tok' }, disabled: ['argocd'] })
+    assert.deepEqual(Object.keys(d.config.mcpServers).sort(), ['dynatrace', 'github', 'local'])
+    assert.equal(d.config.mcpServers.dynatrace.url, 'https://dt.example/mcp', 'the app file wins over Cursor')
+    assert.equal(d.origin.github.app, 'VS Code')
+    assert.equal(d.config.mcpServers.local.args![0], `${root}/srv.js`)
+    assert.ok(d.skipped.some((s) => s.server === 'secret' && /input/.test(s.reason)))
+    assert.deepEqual(d.config.collect, ['dynatrace'])
+    assert.ok(d.files.some((f) => f.app === 'Windsurf' && f.servers.includes('argocd')), 'found, then switched off by the user')
+    assert.equal(discoverMcp({ root, home, os: 'linux', ideDiscovery: false }).files.length, 0)
+  })
+})

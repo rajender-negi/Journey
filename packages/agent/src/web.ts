@@ -11,7 +11,7 @@
 // Built with esbuild into apps/web/dist-demo/agent.js and exposed as window.PJAgent.
 
 import { Annotation, END, MemorySaver, START, StateGraph } from '@langchain/langgraph/web'
-import { analyze, buildFixtureDataset, emitRawBundle, mapRawBundle, type Analysis } from '@pj/core'
+import { analyze, buildFixtureDataset, buildViewModel, emitRawBundle, mapRawBundle, withSourcesOff, type Analysis, type SourceKey } from '@pj/core'
 import { classify, gather, hypothesize, plan, recommend, routeAfterVerify, verify, type AgentDeps, type AgentState } from './nodes'
 import type { Approval, Evidence, Hypothesis, InvestigationContext, PlanItem, Recommendation, Verification } from './types'
 import { snapshotTools } from './web-tools'
@@ -78,8 +78,8 @@ export interface WebRunView {
   handoff?: string
 }
 
-export function createWebAgent(opts: { now: number; sample?: SampleText | null; maxIterations?: number }) {
-  const raw = emitRawBundle(buildFixtureDataset(opts.now))
+export function createWebAgent(opts: { now: number; sample?: SampleText | null; maxIterations?: number; off?: SourceKey[] }) {
+  const raw = withSourcesOff(emitRawBundle(buildFixtureDataset(opts.now)), opts.off ?? [])
   const analysis: Analysis = analyze(mapRawBundle(raw))
   const tracer = new Tracer()
   // RAG: past incidents, runbooks and approved investigations, built in the page (local embedder)
@@ -147,4 +147,10 @@ export function createWebAgent(opts: { now: number; sample?: SampleText | null; 
 }
 
 declare const window: Record<string, unknown> | undefined
-if (typeof window !== 'undefined') window.PJAgent = { create: createWebAgent }
+/** The card's view model with some sources switched off: the same build the page ships with, recomputed in the page. */
+export function rebuildViewModel(opts: { now: number; off: SourceKey[] }) {
+  const raw = withSourcesOff(emitRawBundle(buildFixtureDataset(opts.now)), opts.off)
+  return buildViewModel(analyze(mapRawBundle(raw)), { mode: 'demo', maxJourneys: 40, evidenceChars: 180, raw })
+}
+
+if (typeof window !== 'undefined') window.PJAgent = { create: createWebAgent, rebuild: rebuildViewModel }

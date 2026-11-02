@@ -8,7 +8,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { RawBundle } from '@pj/core'
-import { analyze, buildFixtureDataset, emitRawBundle, mapProducts, mapRawBundle } from '@pj/core'
+import { analyze, buildFixtureDataset, emitRawBundle, emptySource, mapProducts, mapRawBundle } from '@pj/core'
+import { getSettings } from './settings'
 import { SOURCES, config, isLive, type SourceName } from './config'
 import { fetchServiceNow } from './adapters/servicenow'
 import { fetchGitHub } from './adapters/github'
@@ -19,7 +20,7 @@ import { MCP_COLLECTORS, serverForSource } from '@pj/agent'
 import { INTEGRATIONS } from '@pj/core'
 import { agent } from './agent'
 
-export type Tier = 'live' | 'mcp' | 'mcp-snapshot' | 'dummy'
+export type Tier = 'live' | 'mcp' | 'mcp-snapshot' | 'dummy' | 'off'
 export interface SourceStatus { source: SourceName; tier: Tier; ok: boolean; at: string; error?: string; records: number }
 
 const inbox = () => join(config.dataDir, 'inbox')
@@ -53,8 +54,15 @@ export async function collect(): Promise<SourceStatus[]> {
   const status: SourceStatus[] = []
   const raw = { meta: { generatedAt: new Date().toISOString(), windowDays: config.windowDays } } as RawBundle
 
+  const settings = getSettings()
   const resolve = async <K extends SourceName>(s: K, live: () => Promise<RawBundle[K]>) => {
     const at = new Date().toISOString()
+    // switched off by the user: the right shape, no records (dead on the map and in every view)
+    if (settings.sourcesOff.includes(s)) {
+      raw[s] = emptySource(s) as RawBundle[K]
+      status.push({ source: s, tier: 'off', ok: true, at, records: 0, error: 'switched off in Integrations' })
+      return
+    }
     if (isLive(s)) {
       try {
         const v = await live()
@@ -87,6 +95,14 @@ export async function collect(): Promise<SourceStatus[]> {
       const prev = status.find((x) => x.source === s)
       if (prev) Object.assign(prev, { tier: 'mcp-snapshot', ok: true, records: count(snap) })
       else status.push({ source: s, tier: 'mcp-snapshot', ok: true, at, records: count(snap) })
+      return
+    }
+    // live mode: a source with no working connection stays dead instead of showing demo data
+    if (settings.mode === 'live' && config.mode !== 'demo') {
+      raw[s] = emptySource(s) as RawBundle[K]
+      const prev = status.find((x) => x.source === s)
+      if (prev) Object.assign(prev, { tier: 'off', records: 0 })
+      else status.push({ source: s, tier: 'off', ok: true, at, records: 0, error: 'not connected (live mode)' })
       return
     }
     raw[s] = dummy[s] as RawBundle[K]

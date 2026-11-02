@@ -148,3 +148,23 @@ describe('design advisor', () => {
   })
 })
 
+
+describe('switching sources off (the connection map goes dead)', () => {
+  it('any source can be off; with ServiceNow off nothing is joined to a product', async () => {
+    const { SOURCE_KEYS, withSourcesOff, buildViewModel } = await import('../src/index')
+    const raw = emitRawBundle(buildFixtureDataset(Date.parse('2026-11-01T03:30:00Z')))
+    for (const s of SOURCE_KEYS) {
+      const a = analyze(mapRawBundle(withSourcesOff(raw, [s])))
+      assert.doesNotThrow(() => JSON.stringify(buildViewModel(a, { mode: 'demo', raw: withSourcesOff(raw, [s]) })), s)
+    }
+    const noCmdb = analyze(mapRawBundle(withSourcesOff(raw, ['servicenow'])))
+    assert.equal(noCmdb.dataset.products.length, 0)
+    assert.equal(noCmdb.journeys.length, 0)
+    assert.equal(noCmdb.failures.length, 0)
+    const noGithub = analyze(mapRawBundle(withSourcesOff(raw, ['github'])))
+    assert.equal(noGithub.journeys.length, 0, 'no merges, no journeys')
+    assert.ok(noGithub.cost.all.currentMonth > 0, 'cost still works')
+    const noCloud = analyze(mapRawBundle(withSourcesOff(raw, ['aws', 'azure', 'gcp'])))
+    assert.ok(noCloud.journeys.length > 0 && noCloud.dataset.costs.every((c) => c.provider === 'dynatrace'))
+  })
+})

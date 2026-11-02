@@ -90,7 +90,7 @@ export const INTEGRATIONS: IntegrationSpec[] = [
 ]
 
 const cap = (v: unknown, max = 900) => {
-  const s = JSON.stringify(v, null, 2)
+  const s = JSON.stringify(v ?? null, null, 2)
   return s.length > max ? `${s.slice(0, max)}\n…` : s
 }
 
