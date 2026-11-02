@@ -10,7 +10,7 @@
   var NOW = Date.now()
   var S = { pid: 'all', tab: 'map', cfg: null, cardMode: 'demo', cardOffList: [], openTool: null, mapBusy: false, outcome: 'all', pillar: 'all', limit: 20, openJ: {}, openG: null, ai: {}, runs: {}, openA: null, itest: {}, paste: {} }
   var h = location.hash.replace('#', '')
-  var TABS = [['map', 'Map'], ['overview', 'Overview'], ['journeys', 'Journeys'], ['fixes', 'Fixes'], ['prevent', 'Prevent'], ['advisor', 'Advisor'], ['code', 'Codebase'], ['cost', 'Cost'], ['practices', 'Practices'], ['integrations', 'Integrations']]
+  var TABS = [['map', 'Home'], ['overview', 'Overview'], ['journeys', 'Journeys'], ['fixes', 'Fixes'], ['prevent', 'Prevent'], ['advisor', 'Advisor'], ['code', 'Codebase'], ['cost', 'Cost'], ['practices', 'Practices'], ['integrations', 'Integrations']]
   if (TABS.some(function (t) { return t[0] === h })) S.tab = h
 
   // ---------- helpers ----------
@@ -443,38 +443,116 @@
   function node(cls, state, label, sub, hot, act, id) {
     return '<' + (act ? 'button data-act="' + act + '" data-id="' + id + '"' : 'div') + ' class="mnode ' + cls + ' st-' + state + (hot === false ? ' faded' : hot ? ' hot' : '') + '"><b>' + esc(label) + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '<i class="mdot"></i></' + (act ? 'button' : 'div') + '>'
   }
+  // band 3: the internal architecture, as layers of components; each lights up with what it depends on
+  var ARCH = [
+    ['access', 'Access: Dynatrace first, then MCP, then REST', [
+      ['dql', 'Dynatrace DQL (hub)', 'One query language for problems, deploy events, logs, traces, Kubernetes, DORA', 'apps/server/src/adapters/dynatrace.ts, agent/src/evidence.ts', 'Dynatrace as the observability hub', '', 'built', ['dynatrace']],
+      ['mcphub', 'MCP hub', 'Client of your MCP servers, read from Cursor, VS Code, Kiro, Claude Desktop, Windsurf and mcp.servers.json; tool names resolved per server version', 'agent/src/mcp/hub.ts, discover.ts, toolmap.ts', 'Model Context Protocol (Block, Apollo first adopters)', 'https://www.anthropic.com/news/model-context-protocol', 'built', ['mcp']],
+      ['rest', 'REST adapters', 'Direct APIs when no MCP server is configured: ServiceNow, GitHub, Argo CD, Kubernetes, AWS, Azure, Google Cloud', 'apps/server/src/adapters/*', 'Ports and adapters (hexagonal)', 'https://alistair.cockburn.us/hexagonal-architecture/', 'built', ['any']],
+      ['demo', 'Demo data', 'Every unconnected tool answers in its own native schema, so nothing downstream changes when a tool goes live', 'core/src/fixtures.ts, agent/src/snapshot-signals.ts', 'Native-schema contract tests', '', 'built', ['demo']],
+    ]],
+    ['engines', 'Rules first: deterministic engines', [
+      ['acl', 'Mappers (anti-corruption layer)', 'Vendor schemas and tenant field names stop at one boundary', 'core/src/sources.ts', 'Anti-corruption layer', 'https://learn.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer', 'built', ['servicenow']],
+      ['journey', 'Journey and DORA', 'Every change from merge to Dynatrace-verified production, per CMDB product', 'core/src/journey.ts, dora.ts', 'DORA metrics', 'https://dora.dev/', 'built', ['github']],
+      ['rules', 'Failure rules and risk gate', '12 failure rules with fix-now and prevention; risk score for changes not yet in production', 'core/src/failures.ts, risk.ts', 'Specification pattern', '', 'built', ['servicenow']],
+      ['advisor', 'Codebase and design advisor', 'Code rules joined with runtime metrics; one best pattern per product with a published formula', 'core/src/codebase.ts, patterns.ts', 'Official pattern catalogues (Azure, AWS, OWASP)', '', 'built', ['github']],
+      ['cost', 'Cost', 'Spend per product and service, savings, cost of failed changes', 'core/src/cost.ts', 'AWS Well-Architected cost pillar', '', 'built', ['aws', 'azure', 'gcp']],
+    ]],
+    ['agent', 'Agent runtime', [
+      ['graph', 'LangGraph graph', 'Classify, plan, gather, hypothesize, verify (loop), recommend, approve; state checkpointed, paused for a person', 'agent/src/graph.ts (server), web.ts (card)', 'Anthropic, Building effective agents: a workflow (prompt chaining) rather than an open-ended agent; in production at Klarna on LangGraph', 'https://www.anthropic.com/research/building-effective-agents', 'built', ['servicenow']],
+      ['tools', 'Evidence tools', '13 evidence kinds, each with its paths in order; the model picks kinds, parameters come from the analysis', 'agent/src/evidence.ts, core/src/signals.ts', 'Anthropic: routing (the failure rule picks the evidence plan) and parallelization (evidence fetched in parallel); Uber QueryGPT uses the same focused steps', 'https://www.anthropic.com/research/building-effective-agents', 'built', ['any']],
+      ['rag', 'Knowledge base (RAG)', 'Past incidents, runbooks, approved investigations: chunked by shape, keyword + vector search, cited as evidence', 'agent/src/rag/*, providers.ts (Azure AI Search, Bedrock KB)', 'Uber Genie', 'https://www.uber.com/blog/genie-ubers-gen-ai-on-call-copilot', 'built', ['servicenow']],
+      ['vendors', 'Vendor agents', 'Dynatrace Intelligence and ServiceNow Now Assist asked for their assessment, cited like evidence', 'agent/src/toolmap.ts (vendor_*)', 'Dynatrace domain agents', 'https://www.dynatrace.com/news/press-release/dynatrace-introduces-domain-specific-agents/', 'opt-in', ['dynatrace', 'servicenow']],
+      ['model', 'Model via LangChain', 'Claude (in the Claude app) or Anthropic / any OpenAI-compatible gateway; replies forced into zod schemas; rules path when absent', 'agent/src/llm.ts, web-llm.ts, schemas.ts', 'Structured output', '', 'built', ['model']],
+    ]],
+    ['trust', 'Trust layer', [
+      ['inject', 'Prompt-injection cleaning', 'Tool output is data: instruction-like lines removed and flagged; optional Bedrock Guardrails in front', 'agent/src/guard.ts, providers.ts', 'OWASP LLM Top 10', 'https://owasp.org/www-project-top-10-for-large-language-model-applications/', 'built', ['always']],
+      ['verify', 'Verifier', '6 checks: chain present, citations exist, return data, match the source named, runtime confirmation, no invented figures', 'agent/src/nodes.ts', 'Anthropic: evaluator-optimizer loop (checks in code, not another model); Airbnb used the same validate-and-retry', 'https://www.anthropic.com/research/building-effective-agents', 'built', ['always']],
+      ['guard', 'Two-tier guardrail', 'Cheap check on every recommendation; AI judge only when it flags; failure falls back to rules', 'agent/src/guard.ts', 'DoorDash support guardrail', 'https://careersatdoordash.com/?p=12568', 'built', ['always']],
+      ['policy', 'Tool policy', 'Read-only by default; writes only from the allowlist; Dynatrace never written; every call time-limited and audited', 'agent/src/policy.ts', 'Least privilege, gatekeeper', '', 'built', ['always']],
+      ['human', 'Human approval', 'Nothing changes in any tool until a person approves', 'graph interrupt / interruptBefore', 'Human in the loop', '', 'built', ['always']],
+    ]],
+    ['ops', 'Operate and learn', [
+      ['trace', 'Tracing', 'A span per run, step, model call and tool call, OpenTelemetry GenAI names, exported to Dynatrace over OTLP', 'agent/src/trace.ts', 'Klarna step traces', 'https://www.langchain.com/blog/customers-klarna', 'built', ['always']],
+      ['eval', 'Evaluation gate', '28 investigations plus adversarial and injection cases, 8 metrics with pass bars, in CI; exportable to LangSmith or Langfuse', 'agent/eval/*', 'Morgan Stanley evaluations', 'https://openai.com/index/morgan-stanley/', 'built', ['always']],
+      ['memory', 'Feedback and memory', 'Approve or reject logged with approval rate; approved runs become precedent in the knowledge base', 'apps/server/src/agent.ts, rag/knowledge.ts', 'Anthropic research agent memory', 'https://www.anthropic.com/engineering/multi-agent-research-system', 'built', ['always']],
+      ['copilot', 'Copilot hand-off', 'After approval, an issue assigned to the GitHub Copilot coding agent, which opens the PR', 'agent/src/evidence.ts (copilotIssue), toolmap.ts', 'GitHub Copilot coding agent', 'https://github.blog/changelog/2025-09-25-copilot-coding-agent-is-now-generally-available/', 'opt-in', ['github']],
+      ['multi', 'Specialist agents', 'Runtime, delivery, code and cost specialists under a supervisor', 'not built', 'Anthropic: orchestrator-workers; their research system scored 90% better on their test at about 15x the tokens, so we add it only when evaluation shows a gain', 'https://www.anthropic.com/engineering/multi-agent-research-system', 'designed', ['never']],
+    ]],
+    ['delivery', 'One format, every screen', [
+      ['vm', 'View model', 'One compact precomputed read model (about 30 KB gzipped)', 'core/src/viewmodel.ts', 'Backends for frontends, CQRS read model', '', 'built', ['servicenow']],
+      ['web', 'Web app', 'Plain JavaScript, no framework, phone first; served with live data or as this card', 'apps/web/src/app.js', 'Progressive enhancement', '', 'built', ['always']],
+    ]],
+  ]
+  function archState(deps) {
+    var ds = deps.map(function (d) {
+      if (d === 'always') return 'on'
+      if (d === 'never') return 'designed'
+      if (d === 'demo') return demoCard() ? (S.cardMode === 'live' ? 'dead' : 'demo') : (S.cfg ? (S.cfg.settings.mode === 'demo' ? 'demo' : 'dead') : 'demo')
+      if (d === 'mcp') return demoCard() ? 'dead' : (S.cfg && S.cfg.mcp.servers.some(function (x) { return x.connected }) ? 'on' : 'dead')
+      if (d === 'model') return demoCard() ? 'on' : (VM.agent && VM.agent.llm ? 'on' : 'dead')
+      if (d === 'any') return bestOf(MAP_TOOLS.map(function (t) { return toolState(t[0]) }))
+      return toolState(d)
+    })
+    if (ds.indexOf('designed') >= 0) return 'designed'
+    return bestOf(ds)
+  }
+  var ARCH_STATUS = { built: 'built', 'opt-in': 'built, opt-in', designed: 'designed, not built' }
+  function setupBand(mode) {
+    var out = '<section class="section"><div class="section-head"><h2>1 · Set up</h2><span class="muted small">' + (demoCard() ? 'in this card nothing is connected: Live shows it dead' : 'saved on the server') + '</span></div>' +
+      '<div class="mode-row"><span class="muted small">Mode</span>' + ['demo', 'live'].map(function (m) { return '<button class="fchip' + (mode === m ? ' on' : '') + '" data-act="mode" data-id="' + m + '"' + (S.mapBusy ? ' disabled' : '') + '>' + (m === 'demo' ? 'Demo: dummy data for tools not connected' : 'Live: real connections only') + '</button>' }).join('') + (S.mapBusy ? '<span class="muted small">Updating…</span>' : '') + '</div>' +
+      '<div class="mode-row"><span class="muted small">Tools</span>' + MAP_TOOLS.map(function (t) { var st = toolState(t[0]); return '<button class="fchip tchip st-' + st + '" data-act="tool-toggle" data-id="' + t[0] + '"' + (S.mapBusy ? ' disabled' : '') + ' title="Switch ' + esc(t[1]) + (st === 'dead' ? ' on' : ' off') + '"><i class="mdot"></i>' + esc(t[1]) + '</button>' }).join('') + '</div>' +
+      '<div class="legend small"><span><i class="mdot st-on"></i>connected</span><span><i class="mdot st-demo"></i>demo data</span><span><i class="mdot st-dead"></i>off or not connected</span><span><i class="mdot st-designed"></i>designed, not built</span></div>'
+    if (!demoCard() && S.cfg) out += mcpPanel(true)
+    return out + '</section>'
+  }
+  function archBand() {
+    var out = '<section class="section"><div class="section-head"><h2>3 · How it is built</h2><span class="muted small">tap a component</span></div>' +
+      '<p class="small">Layers from data access to the screen. Each component lights up or goes dead with the tools above, so the picture always matches what is connected.</p>'
+    ARCH.forEach(function (layer, li) {
+      out += (li ? '<div class="marrow">↓</div>' : '') + '<div class="mcol"><h4>' + esc(layer[1]) + '</h4><div class="mgrid arch">' +
+        layer[2].map(function (c) { var st = archState(c[7]); return node('comp', st, c[1], ARCH_STATUS[c[6]], S.openArch === c[0] ? true : null, 'arch', c[0]) }).join('') + '</div>'
+      layer[2].forEach(function (c) {
+        if (S.openArch !== c[0]) return
+        out += '<div class="tool-panel"><b>' + esc(c[1]) + '</b> · ' + esc(ARCH_STATUS[c[6]]) + '<p class="small">' + esc(c[2]) + '</p><p class="small muted">Code: <code>' + esc(c[3]) + '</code></p>' +
+          (c[4] ? '<p class="small muted">Pattern: ' + (c[5] ? '<a href="' + esc(c[5]) + '" target="_blank" rel="noreferrer">' + esc(c[4]) + '</a>' : esc(c[4])) + '</p>' : '') + '</div>'
+      })
+      out += '</div>'
+    })
+    return out + '</section>'
+  }
   function map() {
     var open = S.openTool, ot = null
     MAP_TOOLS.forEach(function (t) { if (t[0] === open) ot = t })
     var hot = function (tid, col) { return ot ? ot[col].indexOf(tid) >= 0 || (col === 4 && ['hypo', 'verify', 'rec', 'approve'].indexOf(tid) >= 0 && ot[4].indexOf('gather') >= 0) : null }
     var mode = demoCard() ? S.cardMode : (S.cfg ? S.cfg.settings.mode : null)
     var on = MAP_TOOLS.filter(function (t) { return toolState(t[0]) === 'on' }).length, demo = MAP_TOOLS.filter(function (t) { return toolState(t[0]) === 'demo' }).length
-    var out = '<section class="section"><div class="section-head"><h2>How it works, end to end</h2><span class="muted small">' + on + ' connected · ' + demo + ' on demo data · ' + (MAP_TOOLS.length - on - demo) + ' off</span></div>' +
-      '<p class="small">Tools feed the product journey. When something fails, the agent gathers evidence from the same tools, checks its own answer and waits for you. Tap a tool to see what it lights up.</p>' +
-      '<div class="mode-row"><span class="muted small">Mode</span>' + ['demo', 'live'].map(function (m) { return '<button class="fchip' + (mode === m ? ' on' : '') + '" data-act="mode" data-id="' + m + '"' + (S.mapBusy ? ' disabled' : '') + '>' + (m === 'demo' ? 'Demo: dummy data for tools not connected' : 'Live: real connections only') + '</button>' }).join('') + (S.mapBusy ? '<span class="muted small">Updating…</span>' : '') + '</div>' +
-      '<div class="legend small"><span><i class="mdot st-on"></i>connected</span><span><i class="mdot st-demo"></i>demo data</span><span><i class="mdot st-dead"></i>off or not connected</span></div>'
-    out += '<div class="mcol"><h4>1 · Tools</h4><div class="mgrid tools">' + MAP_TOOLS.map(function (t) { return node('tool', toolState(t[0]), t[1], t[2] + ' · ' + STATE_LABEL[toolState(t[0])], open ? t[0] === open : null, 'tool', t[0]) }).join('') + '</div>'
+    var out = '<div class="hero"><h1>Product Journey</h1><p>Every change, from merge to verified production, for each product in the CMDB. When something fails, an agent gathers evidence from your tools, checks its own answer and waits for your approval.</p></div>'
+    out += setupBand(mode)
+    out += '<section class="section"><div class="section-head"><h2>2 · What it does</h2><span class="muted small">' + on + ' connected · ' + demo + ' on demo data · ' + (MAP_TOOLS.length - on - demo) + ' off</span></div>' +
+      '<p class="small">Tools feed the product journey. When something fails, the agent gathers evidence from the same tools. Tap a tool to see what it lights up.</p>'
+    out += '<div class="mcol"><h4>Tools</h4><div class="mgrid tools">' + MAP_TOOLS.map(function (t) { return node('tool', toolState(t[0]), t[1], t[2] + ' · ' + STATE_LABEL[toolState(t[0])], open ? t[0] === open : null, 'tool', t[0]) }).join('') + '</div>'
     if (ot) {
-      var st = toolState(ot[0]), sig = (VM.signals || []).filter(function (x) { return x.tool === ot[0] || (ot[0] === 'kubernetes' && x.tool === 'kubernetes') })
+      var st = toolState(ot[0]), sig = (VM.signals || []).filter(function (x) { return x.tool === ot[0] })
       out += '<div class="tool-panel"><b>' + esc(ot[1]) + '</b> · ' + esc(STATE_LABEL[st]) + ' · ' + sig.length + ' signals · feeds ' + esc(ot[3].concat(ot[4]).join(', ')) +
-        '<div class="nav-row"><button class="btn" data-act="tool-toggle" data-id="' + ot[0] + '"' + (S.mapBusy ? ' disabled' : '') + '>' + (st === 'dead' && (demoCard() ? S.cardOffList.indexOf(ot[0]) >= 0 : S.cfg && S.cfg.settings.sourcesOff.indexOf(ot[0]) >= 0) ? 'Switch on' : 'Switch off') + '</button> <button class="btn" data-act="tab" data-id="integrations">Signals and connection details</button></div>' +
+        '<div class="nav-row"><button class="btn" data-act="tool-toggle" data-id="' + ot[0] + '"' + (S.mapBusy ? ' disabled' : '') + '>' + (st === 'dead' ? 'Switch on' : 'Switch off') + '</button> <button class="btn" data-act="tab" data-id="integrations">Signals and connection details</button></div>' +
         (ot[0] === 'servicenow' ? '<p class="small muted">ServiceNow defines the products; switching it off makes the whole map dead.</p>' : '') + '</div>'
     }
-    out += '</div><div class="marrow">↓</div><div class="mcol"><h4>2 · Product journey</h4><div class="mgrid stages">' + MAP_STAGES.map(function (x) { return node('stage', stateOfTarget(x[0], 3), x[1], '', hot(x[0], 3)) }).join('') + '</div>' +
+    out += '</div><div class="marrow">↓</div><div class="mcol"><h4>Product journey</h4><div class="mgrid stages">' + MAP_STAGES.map(function (x) { return node('stage', stateOfTarget(x[0], 3), x[1], '', hot(x[0], 3)) }).join('') + '</div>' +
       '<div class="mgrid insights">' + MAP_INSIGHTS.map(function (x) { return node('stage', stateOfTarget(x[0], 3), x[1], '', hot(x[0], 3)) }).join('') + '</div></div>'
-    out += '<div class="marrow">↓ a failure</div><div class="mcol"><h4>3 · Agent (LangGraph)</h4><div class="mgrid agent">' + MAP_AGENT.map(function (x) { return node('step', x[0] === 'approve' ? 'on' : stateOfTarget(x[0], 4), x[1], x[2], hot(x[0], 4)) }).join('') + '</div>' +
+    out += '<div class="marrow">↓ a failure</div><div class="mcol"><h4>Agent (LangGraph)</h4><div class="mgrid agent">' + MAP_AGENT.map(function (x) { return node('step', x[0] === 'approve' ? 'on' : stateOfTarget(x[0], 4), x[1], x[2], hot(x[0], 4)) }).join('') + '</div>' +
       '<p class="small muted">Verification fails send it back for more evidence (at most twice). Nothing changes in any tool until you approve. Dynatrace is never written to.</p></div></section>'
-    if (!demoCard() && S.cfg) out += mcpPanel()
+    out += archBand()
     if (!demoCard() && !S.cfg) loadSettings()
     return out
   }
-  function mcpPanel() {
+  function mcpPanel(inline) {
     var m = S.cfg.mcp
-    var out = '<section class="section"><div class="section-head"><h2>MCP servers</h2><span class="muted small">found in ' + m.files.length + ' config file(s)</span></div>' +
+    var out = (inline ? '<div class="mcol"><h4>MCP servers · found in ' + m.files.length + ' config file(s)</h4>' : '<section class="section"><div class="section-head"><h2>MCP servers</h2><span class="muted small">found in ' + m.files.length + ' config file(s)</span></div>') +
       '<p class="small">Read from your IDEs (Cursor, VS Code, Kiro, Claude Desktop, Windsurf) and mcp.servers.json, so MCP is configured once. <button class="btn" data-act="ide-toggle">' + (m.ideDiscovery ? 'Stop reading IDE configs' : 'Read IDE configs') + '</button></p>'
     out += m.servers.length ? '<ul class="factors">' + m.servers.map(function (x) { return '<li><b>' + esc(x.name) + '</b> ' + chip(x.on ? (x.connected ? 'connected · ' + x.tools + ' tools' : 'not connected') : 'off', x.on && x.connected ? 'tone-good' : x.on ? 'tone-warn' : '') + ' <span class="muted small">from ' + esc(x.from) + (x.error ? ' · ' + esc(x.error) : '') + '</span> <button class="btn" data-act="mcp-toggle" data-id="' + esc(x.name) + '">' + (x.on ? 'Switch off' : 'Switch on') + '</button></li>' }).join('') + '</ul>' : '<p class="muted small">No MCP servers found. Add them in your IDE or in mcp.servers.json.</p>'
     if (m.skipped.length) out += '<p class="small muted">Skipped: ' + esc(m.skipped.map(function (s) { return s.server + ' (' + s.app + '): ' + s.reason }).join('; ')) + '</p>'
-    return out + '</section>'
+    return out + (inline ? '</div>' : '</section>')
   }
   function loadSettings() {
     if (S.cfgLoading) return
@@ -602,6 +680,7 @@
     else if (act === 'more') { S.limit += 20; render() }
     else if (act === 'advice') { S.openA = S.openA === id ? null : id; render() }
     else if (act === 'tool') { S.openTool = S.openTool === id ? null : id; render() }
+    else if (act === 'arch') { S.openArch = S.openArch === id ? null : id; render() }
     else if (act === 'tool-toggle') toggleTool(id)
     else if (act === 'mode') setMode(id)
     else if (act === 'mcp-toggle') toggleMcp(id)

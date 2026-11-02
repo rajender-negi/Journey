@@ -1,5 +1,7 @@
 # AI patterns we follow, and where they come from
 
+The agent's shape follows Anthropic's [Building effective agents](https://www.anthropic.com/research/building-effective-agents) (Dec 2024): start with the simplest thing that works and prefer workflows for well-defined tasks. Product Journey is a **workflow** (prompt chaining) with **routing** (the failure rule picks the evidence plan), **parallelization** (evidence fetched together), an **evaluator-optimizer** loop (the verifier, in code) and a human gate; **orchestrator-workers** is designed for specialist agents and added only if evaluation shows a gain. Backend integration follows the Azure Architecture Center patterns listed in DESIGN.md.
+
 Every AI capability in Product Journey follows a pattern a company has published and measured. This page maps each one to its source and to our code, and says what is built and what is designed. Numbers in the "Their result" column are the companies' own published figures; ours come from `npm run eval`.
 
 | Capability | Pattern we follow | Source | Their result | Our implementation | Status |
