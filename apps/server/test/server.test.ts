@@ -57,7 +57,7 @@ after(() => {
 describe('API', () => {
   it('reports every source on the dummy tier when nothing is configured', async () => {
     const { body } = await j('/api/sources')
-    assert.equal(body.status.length, 7)
+    assert.equal(body.status.length, 8, 'servicenow, github, dynatrace, argocd, kubernetes, aws, azure, gcp')
     assert.ok(body.status.every((s: { tier: string }) => s.tier === 'dummy'))
   })
   it('serves all six phases', async () => {

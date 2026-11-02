@@ -13,7 +13,7 @@ import { SOURCES, config, isLive, type SourceName } from './config'
 import { fetchServiceNow } from './adapters/servicenow'
 import { fetchGitHub } from './adapters/github'
 import { fetchDynatrace } from './adapters/dynatrace'
-import { fetchArgo, fetchAws, fetchAzure, fetchK8s } from './adapters/platform'
+import { fetchArgo, fetchAws, fetchAzure, fetchGcp, fetchK8s } from './adapters/platform'
 import { store } from './store'
 import { MCP_COLLECTORS, serverForSource } from '@pj/agent'
 import { INTEGRATIONS } from '@pj/core'
@@ -105,6 +105,7 @@ export async function collect(): Promise<SourceStatus[]> {
     resolve('kubernetes', () => fetchK8s(products.flatMap((p) => p.k8sNamespaces))),
     resolve('aws', () => fetchAws()),
     resolve('azure', () => fetchAzure()),
+    resolve('gcp', () => fetchGcp()),
   ])
 
   // a dummy source joined to live products would produce nonsense joins; say so in status
@@ -132,6 +133,7 @@ export async function testSource(s: SourceName) {
     kubernetes: () => fetchK8s(products.flatMap((p) => p.k8sNamespaces)),
     aws: () => fetchAws(),
     azure: () => fetchAzure(),
+    gcp: () => fetchGcp(),
   }
   if (isLive(s)) {
     try { out.rest = { ok: true, records: count(await live[s]()) } } catch (e) { out.rest = { ok: false, error: (e as Error).message.slice(0, 300) } }

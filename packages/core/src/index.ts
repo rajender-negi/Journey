@@ -13,6 +13,7 @@ export * from './scorecard'
 export * from './ai'
 export * from './patterns'
 export * from './integrations'
+export * from './signals'
 
 import type { CodeFinding, CostSummary, Dataset, DeploymentRisk, DoraMetrics, FailureFinding, Journey, Scorecard } from './types'
 import { buildJourneys } from './journey'

@@ -1,7 +1,7 @@
 // Argo CD, Kubernetes, AWS Cost Explorer and Azure Cost Management.
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
-import type { ArgoApp, AzureCostQuery, CeResponse, K8sEvent, RawBundle } from '@pj/core'
+import type { ArgoApp, AzureCostQuery, CeResponse, GcpBillingRow, K8sEvent, RawBundle } from '@pj/core'
 import { FIELD_MAP } from '@pj/core'
 import { config } from '../config'
 import { getJson } from './http'
@@ -72,4 +72,34 @@ export async function fetchAzure(): Promise<RawBundle['azure']> {
   }
   const costManagement = await getJson<AzureCostQuery>(url, { Authorization: `Bearer ${config.azure.token}`, 'Content-Type': 'application/json' }, { method: 'POST', body: JSON.stringify(body) })
   return { costManagement }
+}
+
+/**
+ * Google Cloud cost from the Cloud Billing export to BigQuery (the documented way to get cost by label).
+ * Token: an OAuth access token with bigquery.jobs.create on the project and read on the export dataset
+ * (for example from a service account via workload identity, or `gcloud auth print-access-token`).
+ */
+export async function fetchGcp(): Promise<NonNullable<RawBundle['gcp']>> {
+  const { start } = monthsBack(6)
+  const table = config.gcp.table!.replace(/[^\w.-]/g, '')
+  const query = `SELECT service, sku, FORMAT_TIMESTAMP('%Y-%m-%dT%H:%M:%SZ', usage_start_time) AS usage_start_time, FORMAT_TIMESTAMP('%Y-%m-%dT%H:%M:%SZ', usage_end_time) AS usage_end_time, project, labels, cost, currency
+FROM \`${table}\` WHERE usage_start_time >= TIMESTAMP('${start}') AND EXISTS (SELECT 1 FROM UNNEST(labels) l WHERE l.key = '${FIELD_MAP.awsCostTagKey}')`
+  const res = await getJson<{ schema: { fields: { name: string }[] }; rows?: { f: { v: unknown }[] }[] }>(
+    `https://bigquery.googleapis.com/bigquery/v2/projects/${encodeURIComponent(config.gcp.project!)}/queries`,
+    { Authorization: `Bearer ${config.gcp.token}`, 'Content-Type': 'application/json' },
+    { method: 'POST', body: JSON.stringify({ query, useLegacySql: false, timeoutMs: 30000, maxResults: 50000 }) },
+  )
+  // BigQuery REST returns rows as {f:[{v}]}, records as nested {f:[{v}]}, repeated as [{v}]
+  const names = res.schema.fields.map((f) => f.name)
+  const v = (x: unknown): unknown => (x && typeof x === 'object' && 'v' in (x as object) ? v((x as { v: unknown }).v) : x)
+  const rec = (x: unknown) => (x as { f: { v: unknown }[] }).f.map((c) => v(c.v))
+  const billingExport: GcpBillingRow[] = (res.rows ?? []).map((r) => {
+    const o = Object.fromEntries(r.f.map((c, i) => [names[i], c.v]))
+    const [sid, sdesc] = rec(o.service) as string[]
+    const [kid, kdesc] = rec(o.sku) as string[]
+    const [pid] = rec(o.project) as string[]
+    const labels = ((o.labels as { v: unknown }[]) ?? []).map((l) => { const [key, value] = rec(v(l)) as string[]; return { key, value } })
+    return { service: { id: sid, description: sdesc }, sku: { id: kid, description: kdesc }, usage_start_time: String(o.usage_start_time), usage_end_time: String(o.usage_end_time), project: { id: pid }, labels, cost: Number(o.cost), currency: String(o.currency) }
+  })
+  return { billingExport }
 }

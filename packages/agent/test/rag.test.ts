@@ -127,3 +127,47 @@ describe('evaluation gate', () => {
     assert.deepEqual(r.failed, [], JSON.stringify(r.metrics))
   })
 })
+
+describe('signals beyond the collector: logs, traces, workload, cloud audit, security, vendor agents', () => {
+  it('each failure type gets the new evidence it needs, from the first path that answers', async () => {
+    const { snapshotTools, buildContext, fetchEvidence, mayCall, copilotIssue } = await import('../src/index')
+    const t = snapshotTools(raw, a)
+    const first = (rule: string) => a.failures.find((f) => f.recommendation.ruleId === rule)!
+    const ev = async (rule: string, kind: Parameters<typeof fetchEvidence>[0]) => fetchEvidence(kind, buildContext(a, first(rule).id), t, 'E9')
+    const oom = await ev('FX-OOM', 'k8s_workload')
+    assert.ok(oom.ok && oom.data.includes('OOMKilled') && oom.tool === 'execute_dql', 'Dynatrace path answers first')
+    const vuln = await ev('FX-VULN-GATE', 'security_findings')
+    assert.ok(vuln.ok && /CVE-\d{4}-\d+/.test(vuln.data))
+    const slow = await ev('FX-REGRESSION-SLOW', 'dt_traces')
+    assert.ok(slow.ok && slow.data.includes('executed 48 times'))
+    const change = await ev('FX-NON-CHANGE', 'cloud_changes')
+    assert.ok(change.ok && /ModifyDBInstance|sites\/config\/write|UpdateService/.test(change.data), 'the infrastructure change before a non-deploy problem is found')
+    const errs = await ev('FX-REGRESSION-ERRORS', 'dt_logs')
+    assert.ok(errs.flags?.some((f) => f.startsWith('injection_removed')) && !/ignore all previous instructions/i.test(errs.data), 'the planted injection line is removed')
+    const vendor = await ev('FX-REGRESSION-ERRORS', 'vendor_assessment')
+    assert.ok(vendor.ok && vendor.data.includes('dynatrace-intelligence'))
+    // Copilot hand-off: an issue for the code part of the fix; a write the policy refuses unless allowlisted
+    const ctx = buildContext(a, first('FX-OOM').id)
+    const issue = copilotIssue(ctx, { headline: 'Raise memory limit', rootCause: 'OOMKilled at 512Mi', actions: [{ action: 'Raise limit now', ruleId: 'FX-OOM', horizon: 'now' }, { action: 'Set limits from p95', ruleId: 'FX-OOM', horizon: 'this-sprint' }] }, 'inv-1')
+    assert.ok(issue.repo && issue.body.includes('Set limits from p95') && !issue.body.includes('Raise limit now'))
+    assert.equal(mayCall('github', 'create_issue').ok, false)
+    assert.equal(mayCall('github', 'create_issue', ['github:create_issue']).ok, true)
+    assert.match((await t.op('copilot_issue', issue)).text, /dryRun/)
+  })
+  it('Google Cloud billing export round-trips through the native schema', () => {
+    assert.ok(raw.gcp!.billingExport.length > 0 && raw.gcp!.billingExport[0].labels.some((l) => l.key === 'product'))
+    assert.ok(a.dataset.costs.some((c) => c.provider === 'gcp' && c.productId === 'BA0005'))
+  })
+  it('a managed retrieval service (Azure AI Search) plugs in behind the same kb_search', async () => {
+    const { azureAiSearchProvider, withKnowledge } = await import('../src/index')
+    let body: Record<string, unknown> = {}
+    const srv = createServer((req, res) => { let b = ''; req.on('data', (c) => (b += c)); req.on('end', () => { body = JSON.parse(b); res.end(JSON.stringify({ value: [{ id: 'INC1', source: 'incident', title: 'OOM on worker', content: 'OOMKilled', product_id: 'BA0005', at: '2026-10-01T00:00:00Z', resolution: 'raised limit', '@search.rerankerScore': 3.2 }] })) }) }).listen(0)
+    try {
+      const p = azureAiSearchProvider({ endpoint: `http://127.0.0.1:${(srv.address() as { port: number }).port}`, index: 'kb', apiKey: 'k', semanticConfig: 'default' })
+      const r = await withKnowledge({ async op() { return { ok: false, text: '' } } }, async () => p).op('kb_search', { query: 'OOMKilled', productId: 'BA0005', before: '2026-11-01T00:00:00Z' })
+      assert.ok(r.ok && r.tool!.includes('azure-ai-search:kb'))
+      assert.equal(body.queryType, 'semantic')
+      assert.match(String(body.filter), /source eq 'runbook' or at lt 2026-11-01/)
+    } finally { srv.close() }
+  })
+})

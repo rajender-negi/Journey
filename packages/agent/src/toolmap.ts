@@ -6,6 +6,7 @@
 import type { SourceName } from './types'
 
 export type Op = 'dql' | 'pr_files' | 'job_log' | 'argo_app' | 'argo_apps' | 'k8s_events' | 'kb_search'
+  | 'k8s_workload' | 'aws_audit' | 'azure_audit' | 'gcp_audit' | 'security_alerts' | 'vendor_dynatrace' | 'vendor_servicenow' | 'copilot_issue'
 
 export interface ToolCandidate {
   tool: string
@@ -62,6 +63,65 @@ export const DEFAULT_TOOL_MAP: Record<Op, OpSpec> = {
       { tool: 'list_events', args: (p) => ({ namespace: p.namespace }) },
     ],
   },
+  // ---- tool names below are the candidates published by each MCP server; confirm with GET /api/mcp/tools
+  //      and override per tenant in mcp.servers.json "toolMap" (first match wins) ----
+  k8s_workload: {
+    source: 'kubernetes',
+    candidates: [
+      { tool: 'pods_list_in_namespace', args: (p) => ({ namespace: p.namespace }) },
+      { tool: 'pods_list', args: (p) => ({ namespace: p.namespace }) },
+      { tool: 'list_k8s_resources', args: (p) => ({ kind: 'Pod', api_version: 'v1', namespace: p.namespace, cluster_name: p.cluster ?? '' }) },
+    ],
+  },
+  aws_audit: {
+    source: 'aws',
+    candidates: [
+      { tool: 'lookup_events', args: (p) => ({ start_time: p.from, end_time: p.to, max_results: 50 }) },
+      { tool: 'call_aws', args: (p) => ({ cli_command: `aws cloudtrail lookup-events --start-time ${p.from} --end-time ${p.to} --max-results 50` }) },
+    ],
+  },
+  azure_audit: {
+    source: 'azure',
+    candidates: [
+      { tool: 'monitor_activitylog_list', args: (p) => ({ start_time: p.from, end_time: p.to }) },
+      { tool: 'call_az', args: (p) => ({ command: `az monitor activity-log list --start-time ${p.from} --end-time ${p.to}` }) },
+    ],
+  },
+  gcp_audit: {
+    source: 'gcp',
+    candidates: [
+      { tool: 'list_log_entries', args: (p) => ({ filter: `logName:"cloudaudit.googleapis.com%2Factivity" AND timestamp>="${p.from}" AND timestamp<="${p.to}"` }) },
+      { tool: 'query_logs', args: (p) => ({ query: `logName:"cloudaudit.googleapis.com%2Factivity" timestamp>="${p.from}"` }) },
+    ],
+  },
+  security_alerts: {
+    source: 'github',
+    candidates: [
+      { tool: 'list_code_scanning_alerts', args: (p) => ({ ...ownerRepo(p), state: 'open' }) },
+      { tool: 'list_dependabot_alerts', args: (p) => ({ ...ownerRepo(p), state: 'open' }) },
+    ],
+  },
+  vendor_dynatrace: {
+    source: 'dynatrace',
+    candidates: [
+      { tool: 'chat_with_davis_copilot', args: (p) => ({ text: p.question }) },
+      { tool: 'davis_copilot_chat', args: (p) => ({ message: p.question }) },
+    ],
+  },
+  vendor_servicenow: {
+    source: 'servicenow',
+    candidates: [
+      { tool: 'now_assist_similar_incidents', args: (p) => ({ query: p.question }) },
+      { tool: 'incident_resolution_recommendation', args: (p) => ({ short_description: p.question }) },
+    ],
+  },
+  // write: only runs when allowlisted (AGENT_WRITE_ALLOWLIST=github:create_issue) and after a person approves
+  copilot_issue: {
+    source: 'github',
+    candidates: [
+      { tool: 'create_issue', args: (p) => ({ ...ownerRepo(p), title: p.title, body: p.body, assignees: ['Copilot'] }) },
+    ],
+  },
   // served by the app's own knowledge base (RAG), not an MCP server: see rag/index.ts withKnowledge
   kb_search: { source: 'servicenow', candidates: [] },
 }
@@ -71,7 +131,7 @@ export function serverForSource(source: SourceName, servers: string[], explicit:
   if (explicit[source] && servers.includes(explicit[source]!)) return explicit[source]
   const re: Record<SourceName, RegExp> = {
     dynatrace: /dynatrace|dt/i, github: /github|gh/i, argocd: /argo/i, kubernetes: /kube|k8s/i,
-    servicenow: /servicenow|snow/i, aws: /aws|cost-explorer/i, azure: /azure/i,
+    servicenow: /servicenow|snow/i, aws: /aws|cost-explorer|cloudtrail|cloudwatch|eks/i, azure: /azure|aks/i, gcp: /gcp|google|gke|bigquery|cloud-logging/i,
   }
   return servers.find((s) => re[source].test(s))
 }

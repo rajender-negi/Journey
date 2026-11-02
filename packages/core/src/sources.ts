@@ -133,6 +133,18 @@ export interface CeResponse {
 }
 
 // Azure Cost Management Query API
+/** One row of the Cloud Billing export to BigQuery (standard usage cost table), as the BigQuery API returns it once flattened. */
+export interface GcpBillingRow {
+  service: { id: string; description: string }
+  sku: { id: string; description: string }
+  usage_start_time: string
+  usage_end_time: string
+  project: { id: string }
+  labels: { key: string; value: string }[]
+  cost: number
+  currency: string
+}
+
 export interface AzureCostQuery {
   properties: { columns: { name: string; type: string }[]; rows: (string | number)[][] }
 }
@@ -146,6 +158,8 @@ export interface RawBundle {
   // GetCostAndUsage allows two GroupBy dimensions, so two calls per environment filter
   aws: { costExplorer: { environment: string; byService: CeResponse; byUsageType: CeResponse }[]; commitmentCoverage: Record<string, number> }
   azure: { costManagement: AzureCostQuery }
+  /** Cloud Billing export (BigQuery). Optional so older snapshots still load. */
+  gcp?: { billingExport: GcpBillingRow[] }
   meta: { generatedAt: string; windowDays: number }
 }
 
@@ -428,6 +442,23 @@ export function mapAzureCosts(q: AzureCostQuery, products: Product[]): CostRecor
   })
 }
 
+export function mapGcpCosts(rows: GcpBillingRow[], products: Product[]): CostRecord[] {
+  const byTag = new Map(products.map((p) => [p.costTags[FIELD_MAP.awsCostTagKey], p.id]))
+  const acc = new Map<string, CostRecord>()
+  for (const r of rows) {
+    const label = (k: string) => r.labels.find((l) => l.key === k)?.value
+    const productId = byTag.get(label(FIELD_MAP.awsCostTagKey) ?? '')
+    if (!productId) continue
+    const month = r.usage_start_time.slice(0, 7)
+    const environment = (label('environment') ?? 'prod') as CostRecord['environment']
+    const key = `${productId}|${r.service.description}|${month}|${environment}`
+    const cur = acc.get(key) ?? { productId, provider: 'gcp' as const, service: r.service.description, month, amount: 0, environment }
+    cur.amount += Number(r.cost)
+    acc.set(key, cur)
+  }
+  return [...acc.values()].map((c) => ({ ...c, amount: Math.round(c.amount * 100) / 100 }))
+}
+
 export function mapDynatraceBilling(res: DqlResult, products: Product[]): CostRecord[] {
   return res.result.records.map((r) => ({
     productId: String(r[FIELD_MAP.sdlc.product] ?? products.find((p) => p.name === r['product.name'])?.id ?? ''),
@@ -471,7 +502,7 @@ export function mapRawBundle(raw: RawBundle): Dataset {
     runtimeEvents: [...k8sEvents, ...argoEvents.filter((a) => !k8sEvents.some((k) => k.productId === a.productId && k.at === a.at))],
     serviceMetrics: mapServiceMetrics(raw.dynatrace.serviceMetrics, products),
     workloadUsage: mapWorkloads(raw.dynatrace.workloads, products),
-    costs: [...mapAwsCosts(raw.aws, products), ...mapAzureCosts(raw.azure.costManagement, products), ...mapDynatraceBilling(raw.dynatrace.billing, products)],
+    costs: [...mapAwsCosts(raw.aws, products), ...mapAzureCosts(raw.azure.costManagement, products), ...mapGcpCosts(raw.gcp?.billingExport ?? [], products), ...mapDynatraceBilling(raw.dynatrace.billing, products)],
     repos: mapContents(raw.github.contents, products),
     doraFromDynatrace: mapDora(raw.dynatrace.dora, products),
   }
@@ -647,6 +678,19 @@ export function emitRawBundle(ds: Dataset): RawBundle {
     },
   }
 
+  const billingExport: GcpBillingRow[] = ds.costs.filter((c) => c.provider === 'gcp').map((c) => {
+    const [y, m] = c.month.split('-').map(Number)
+    const end = new Date(Date.UTC(y, m, 1)).toISOString()
+    return {
+      service: { id: c.service === 'Cloud Run' ? '152E-C115-5142' : '58CD-E7C3-72CA', description: c.service },
+      sku: { id: `${c.service.replace(/\W/g, '').toUpperCase()}-USAGE`, description: `${c.service} usage` },
+      usage_start_time: `${c.month}-01T00:00:00Z`, usage_end_time: end,
+      project: { id: `${prodById.get(c.productId)!.costTags[FIELD_MAP.awsCostTagKey]}-prod` },
+      labels: [{ key: FIELD_MAP.awsCostTagKey, value: prodById.get(c.productId)!.costTags[FIELD_MAP.awsCostTagKey] }, { key: 'environment', value: c.environment ?? 'prod' }],
+      cost: c.amount, currency: 'USD',
+    }
+  })
+
   const events: K8sEvent[] = ds.runtimeEvents.map((e) => ({
     metadata: { name: `${e.workload}.${hash(e.id)}`, namespace: e.namespace ?? '', uid: e.id },
     involvedObject: { kind: 'Pod', name: `${e.workload}-${hash(e.id).slice(0, 5)}`, namespace: e.namespace ?? '' },
@@ -682,6 +726,7 @@ export function emitRawBundle(ds: Dataset): RawBundle {
     kubernetes: { events },
     aws: { costExplorer, commitmentCoverage },
     azure: { costManagement },
+    gcp: { billingExport },
     meta: { generatedAt: ds.generatedAt, windowDays: ds.windowDays },
   }
 }

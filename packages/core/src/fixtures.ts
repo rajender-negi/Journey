@@ -347,6 +347,8 @@ function costs(now: number, r: ReturnType<typeof rng>): CostRecord[] {
     ['BA0005', 'aws', 'EKS compute (EC2)', 5200, 0.0, 'prod', 0, 'c5.2xlarge'],
     ['BA0005', 'aws', 'SQS and SNS', 900, 0.05, 'prod', 0],
     ['BA0005', 'aws', 'EBS', 700, 0, 'prod', 0, 'gp2'],
+    ['BA0005', 'gcp', 'Cloud Run', 1400, 0.02, 'prod', 0],
+    ['BA0005', 'gcp', 'Pub/Sub', 600, 0.03, 'prod', 0],
   ]
   for (const [productId, provider, service, base, growth, environment, coverage, usageType, spikeLast] of lines) {
     months.forEach((month, i) => {

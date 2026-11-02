@@ -15,7 +15,8 @@
     "typecheck": "tsc -p packages/core && tsc -p packages/agent && tsc -p apps/server && tsc -p apps/web",
     "pretest": "npm run build",
     "test": "tsx --test packages/core/test/*.test.ts packages/agent/test/*.test.ts apps/server/test/*.test.ts",
-    "eval": "tsx packages/agent/eval/run.ts"
+    "eval": "tsx packages/agent/eval/run.ts",
+    "docs:signals": "tsx scripts/signals-doc.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

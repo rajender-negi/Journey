@@ -4,7 +4,7 @@
 
 import type { RawBundle } from './sources'
 
-export type IntegrationId = 'servicenow' | 'github' | 'dynatrace' | 'argocd' | 'kubernetes' | 'aws' | 'azure'
+export type IntegrationId = 'servicenow' | 'github' | 'dynatrace' | 'argocd' | 'kubernetes' | 'aws' | 'azure' | 'gcp'
 
 export interface IntegrationSpec {
   id: IntegrationId
@@ -78,7 +78,15 @@ export const INTEGRATIONS: IntegrationSpec[] = [
     connect: [{ mode: 'REST', how: 'Microsoft.CostManagement/query api-version 2023-11-01' }],
     env: ['AZURE_TOKEN', 'AZURE_COST_SCOPE'],
     schemaFile: 'fixtures/raw/azure.json',
+  },  {
+    id: 'gcp', name: 'Google Cloud', role: 'Cost by product label (Cloud Billing export); GKE, logging and audit through MCP or Dynatrace',
+    provides: ['billing export rows: service.description, sku.description, usage_start_time, project.id, labels[] (product, environment), cost, currency'],
+    feeds: ['Cost: spend by product and service', 'Agent: GKE workload state and Cloud Audit Logs (via Dynatrace or the Google Cloud MCP servers)'],
+    connect: [{ mode: 'REST', how: 'BigQuery jobs.query on the Cloud Billing export table' }, { mode: 'MCP', how: 'Google Cloud remote MCP servers: BigQuery, GKE, Cloud Logging, Cloud Monitoring, Cloud Trace; POST /api/ingest/gcp for snapshots' }],
+    env: ['GCP_ACCESS_TOKEN', 'GCP_BILLING_PROJECT', 'GCP_BILLING_TABLE'],
+    schemaFile: 'fixtures/raw/gcp.json',
   },
+
 ]
 
 const cap = (v: unknown, max = 900) => {
@@ -100,5 +108,6 @@ export function integrationSamples(raw: RawBundle): Record<IntegrationId, string
     kubernetes: cap(first(raw.kubernetes?.events)),
     aws: cap(svc ? { environment: raw.aws.costExplorer[0].environment, TimePeriod: svc.TimePeriod, Groups: svc.Groups.slice(0, 2) } : null),
     azure: cap(raw.azure?.costManagement ? { columns: raw.azure.costManagement.properties.columns, rows: raw.azure.costManagement.properties.rows.slice(0, 2) } : null),
+    gcp: cap(raw.gcp?.billingExport?.slice(0, 2) ?? null),
   }
 }

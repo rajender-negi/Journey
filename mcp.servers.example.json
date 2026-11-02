@@ -2,7 +2,10 @@
   "mcpServers": {
     "dynatrace": {
       "command": "npx",
-      "args": ["-y", "@dynatrace-oss/dynatrace-mcp-server@latest"],
+      "args": [
+        "-y",
+        "@dynatrace-oss/dynatrace-mcp-server@latest"
+      ],
       "env": {
         "DT_ENVIRONMENT": "https://<tenant>.apps.dynatrace.com",
         "DT_PLATFORM_TOKEN": "${env:DT_PLATFORM_TOKEN}"
@@ -10,11 +13,17 @@
     },
     "github": {
       "url": "https://api.githubcopilot.com/mcp/",
-      "headers": { "Authorization": "Bearer ${env:PJ_GITHUB_TOKEN}" }
+      "headers": {
+        "Authorization": "Bearer ${env:PJ_GITHUB_TOKEN}"
+      }
     },
     "argocd": {
       "command": "npx",
-      "args": ["-y", "argocd-mcp@latest", "stdio"],
+      "args": [
+        "-y",
+        "argocd-mcp@latest",
+        "stdio"
+      ],
       "env": {
         "ARGOCD_BASE_URL": "https://argocd.<your-domain>",
         "ARGOCD_API_TOKEN": "${env:ARGOCD_TOKEN}",
@@ -23,14 +32,90 @@
     },
     "kubernetes": {
       "command": "npx",
-      "args": ["-y", "kubernetes-mcp-server@latest", "--read-only"]
+      "args": [
+        "-y",
+        "kubernetes-mcp-server@latest",
+        "--read-only"
+      ]
+    },
+    "aws-eks": {
+      "command": "uvx",
+      "args": [
+        "awslabs.eks-mcp-server@latest"
+      ],
+      "env": {
+        "AWS_PROFILE": "${env:AWS_PROFILE}",
+        "AWS_REGION": "${env:AWS_REGION}"
+      }
+    },
+    "aws-cloudtrail": {
+      "command": "uvx",
+      "args": [
+        "awslabs.cloudtrail-mcp-server@latest"
+      ],
+      "env": {
+        "AWS_PROFILE": "${env:AWS_PROFILE}",
+        "AWS_REGION": "${env:AWS_REGION}"
+      }
+    },
+    "azure-aks": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "mcp/aks",
+        "--access-level",
+        "readonly"
+      ]
+    },
+    "gcp-logging": {
+      "url": "<Cloud Logging remote MCP endpoint from docs.cloud.google.com/mcp>",
+      "headers": {
+        "Authorization": "Bearer ${env:GCP_ACCESS_TOKEN}"
+      }
+    },
+    "gcp-gke": {
+      "url": "<GKE remote MCP endpoint from docs.cloud.google.com/mcp>",
+      "headers": {
+        "Authorization": "Bearer ${env:GCP_ACCESS_TOKEN}"
+      }
+    },
+    "servicenow": {
+      "url": "https://<instance>.service-now.com/<MCP Server Console server path>",
+      "headers": {
+        "Authorization": "Bearer ${env:SNOW_TOKEN}"
+      }
+    },
+    "inhouse-deploys": {
+      "command": "npx",
+      "args": [
+        "tsx",
+        "templates/custom-mcp-server/server.ts"
+      ],
+      "env": {
+        "INHOUSE_URL": "${env:INHOUSE_URL}",
+        "INHOUSE_TOKEN": "${env:INHOUSE_TOKEN}"
+      }
     }
   },
   "sources": {
     "dynatrace": "dynatrace",
     "github": "github",
     "argocd": "argocd",
-    "kubernetes": "kubernetes"
+    "kubernetes": "kubernetes",
+    "aws": "aws-cloudtrail",
+    "azure": "azure-aks",
+    "gcp": "gcp-logging",
+    "servicenow": "servicenow"
   },
-  "collect": ["dynatrace", "argocd"]
+  "collect": [
+    "dynatrace",
+    "argocd"
+  ],
+  "_notes": [
+    "Order of use for every signal: Dynatrace DQL first (if Dynatrace already collects it), then the tool's official MCP server, then REST. See docs/INTEGRATIONS.md.",
+    "Entries with <placeholders> must be filled from each vendor's docs; delete any you don't use. Tool names are matched against candidates in packages/agent/src/toolmap.ts; override per server under toolMap.",
+    "Writes are refused unless listed in AGENT_WRITE_ALLOWLIST (for example github:create_issue for the Copilot hand-off). Dynatrace is never written to."
+  ]
 }

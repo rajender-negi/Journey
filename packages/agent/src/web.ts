@@ -17,6 +17,7 @@ import type { Approval, Evidence, Hypothesis, InvestigationContext, PlanItem, Re
 import { snapshotTools } from './web-tools'
 import { buildKnowledgeBase, withKnowledge, type KnowledgeBase } from './rag'
 import { newTraceId, Tracer, tracedLlm, tracedTools, traceSummary } from './trace'
+import { copilotIssue } from './evidence'
 import { langchainClaudeLlm, type SampleText } from './web-llm'
 
 // ---------- the graph (web entry point) ----------
@@ -73,6 +74,8 @@ export interface WebRunView {
   id: string; findingId: string; status: 'running' | 'awaiting_approval' | 'approved' | 'rejected' | 'failed'
   startedAt: string; updatedAt: string; error?: string; state: Partial<AgentState> | null
   traceId: string; trace?: ReturnType<typeof traceSummary>
+  /** what happened to the code fix after approval (dry run in the card) */
+  handoff?: string
 }
 
 export function createWebAgent(opts: { now: number; sample?: SampleText | null; maxIterations?: number }) {
@@ -82,7 +85,7 @@ export function createWebAgent(opts: { now: number; sample?: SampleText | null; 
   // RAG: past incidents, runbooks and approved investigations, built in the page (local embedder)
   let kb: KnowledgeBase | null = null
   const kbReady = buildKnowledgeBase(analysis).then((k) => (kb = k))
-  const tools = tracedTools(withKnowledge(snapshotTools(raw), () => kbReady.then(() => kb)), tracer)
+  const tools = tracedTools(withKnowledge(snapshotTools(raw, analysis), () => kbReady.then(() => kb)), tracer)
   const llm = opts.sample ? tracedLlm(langchainClaudeLlm(opts.sample), tracer, 'anthropic') : null
   const deps: AgentDeps = { analysis: () => analysis, tools, llm, maxIterations: opts.maxIterations ?? 2, tracer }
   const graph = buildWebGraph(deps)
@@ -131,6 +134,10 @@ export function createWebAgent(opts: { now: number; sample?: SampleText | null; 
       await tracer.finish(root)
       // long-term memory: approved investigations become precedent for the next search
       const v = (await graph.getState(cfg(id))).values as WS
+      if (decision === 'approve' && v.recommendation && v.context?.repo) {
+        const r = await tools.op('copilot_issue', copilotIssue(v.context, v.recommendation, id))
+        info.handoff = r.ok ? `Code fix handed to GitHub Copilot coding agent: ${r.tool}` : `Copilot hand-off failed: ${r.error}`
+      }
       if (decision === 'approve' && v.recommendation && v.context && kb) {
         await kb.remember({ runId: id, findingId, productId: v.context.productId, service: v.context.service, ruleId: v.context.ruleId, at: v.context.at, headline: v.recommendation.headline, rootCause: v.recommendation.rootCause, actions: v.recommendation.actions.map((a: { action: string }) => a.action), decision, by })
       }

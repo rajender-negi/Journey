@@ -31,7 +31,7 @@ export async function runEval(perRule = 3) {
   const raw = emitRawBundle(buildFixtureDataset(EVAL_NOW))
   const a = analyze(mapRawBundle(raw))
   const kb = await buildKnowledgeBase(a)
-  const tools = withKnowledge(snapshotTools(raw), async () => kb)
+  const tools = withKnowledge(snapshotTools(raw, a), async () => kb)
   const deps: AgentDeps = { analysis: () => a, tools, llm: null, maxIterations: 2 }
 
   // golden set: up to `perRule` failures per rule

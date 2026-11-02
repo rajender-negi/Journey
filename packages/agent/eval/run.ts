@@ -10,6 +10,11 @@ for (const k of Object.keys(r.metrics) as (keyof typeof r.metrics)[]) {
   console.log(`| ${k} | ${pct(r.metrics[k])} | ${pct(r.thresholds[k])} | ${r.metrics[k] >= r.thresholds[k] ? 'pass' : 'FAIL'} |`)
 }
 writeFileSync('eval-report.json', JSON.stringify(r, null, 2))
+// --export: the golden set as a JSONL dataset (inputs / reference outputs) for LangSmith, Langfuse or promptfoo
+if (process.argv.includes('--export')) {
+  writeFileSync('eval-dataset.jsonl', r.rows.map((x) => JSON.stringify({ inputs: { findingId: x.findingId }, outputs: { ruleId: x.ruleId, mustVerify: true, citationsValid: true, actionsGrounded: true }, metadata: { source: 'product-journey golden set' } })).join('\n') + '\n')
+  console.log(`\nWrote eval-dataset.jsonl (${r.rows.length} cases) for LangSmith, Langfuse or promptfoo`)
+}
 if (r.failed.length) {
   console.error(`\nFailed: ${r.failed.join(', ')}`)
   process.exit(1)

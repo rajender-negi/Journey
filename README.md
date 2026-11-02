@@ -110,6 +110,12 @@ START > classify > plan > gather > hypothesize > verify --passed or exhausted-->
 
 Guardrails: MCP tools that look like writes are refused unless listed in `AGENT_WRITE_ALLOWLIST`; Dynatrace is never written to; every call is time-limited, size-capped and audited. Tool names differ across MCP server versions, so `packages/agent/src/toolmap.ts` lists candidates per operation and uses the first one the server exposes.
 
+## Integrations: every signal, every tool
+
+[docs/INTEGRATIONS.md](docs/INTEGRATIONS.md) lists 31 signals across Dynatrace, Kubernetes (EKS, AKS, GKE), AWS, Azure, Google Cloud, GitHub, Argo CD, ServiceNow and any in-house tool, with the paths tried in order: **Dynatrace DQL** when Dynatrace already collects the signal, then the tool's **official MCP server**, then **REST**, then a **custom MCP server** (`templates/custom-mcp-server`). The Integrations screen shows the same catalogue per tool. Regenerate the doc with `npm run docs:signals`.
+
+**Vendor agents are used, not rebuilt:** the agent asks Dynatrace Intelligence and ServiceNow Now Assist for their assessment through their MCP servers and cites it like other evidence; after approval it can hand the code fix to the GitHub Copilot coding agent (`AGENT_DELEGATE_FIXES=copilot`). **Managed services replace the built-in ones by setting:** `RAG_PROVIDER=azure-ai-search|bedrock-kb`, `GUARDRAIL_PROVIDER=bedrock`, OTLP traces to Dynatrace, and `npm run eval -- --export` writes the test set for LangSmith, Langfuse or promptfoo.
+
 ## AI patterns: RAG, guardrails, evaluation, tracing, memory
 
 Each follows a published pattern; [docs/AI-PATTERNS.md](docs/AI-PATTERNS.md) maps every capability to its source company and our code.

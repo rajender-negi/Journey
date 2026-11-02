@@ -206,6 +206,7 @@
       if (s.recommendation) html += '<h4>Actions</h4><ol class="ai-actions">' + s.recommendation.actions.map(function (x) { return '<li><span class="ai-action">' + esc(x.action) + '</span><span class="ai-meta"><code>' + esc(x.ruleId) + '</code> · ' + esc(String(x.horizon).replace('-', ' ')) + ' · ' + esc(x.owner) + '</span></li>' }).join('') + '</ol>'
       if (v.status === 'awaiting_approval') html += '<div class="nav-row"><button class="btn primary" data-act="agent-ok" data-id="' + esc(fid) + '"' + (st.busy ? ' disabled' : '') + '>Approve</button> <button class="btn" data-act="agent-no" data-id="' + esc(fid) + '"' + (st.busy ? ' disabled' : '') + '>Reject</button></div>'
       if (s.log && s.log.length) html += '<details><summary class="muted small">Agent log (' + s.log.length + ' steps)</summary><pre class="evidence">' + esc(s.log.join('\n')) + '</pre></details>'
+      if (v.handoff) html += '<p class="small t-good">' + esc(v.handoff) + '</p>'
       if (v.trace && v.trace.length) {
         var depth = {}, lines = v.trace.map(function (t) { depth[t.id] = t.parent && depth[t.parent] != null ? depth[t.parent] + 1 : 0; var at = t.attrs || {}; return new Array(depth[t.id] + 1).join('  ') + t.name + (t.ms != null ? '  ' + t.ms + ' ms' : '') + (t.status === 'error' ? '  ERROR ' + (t.error || '') : '') + (at['gen_ai.request.model'] ? '  model ' + at['gen_ai.request.model'] : '') + (at['app.tool.server'] ? '  via ' + at['app.tool.server'] : '') })
         html += '<details><summary class="muted small">Trace (' + v.trace.length + ' spans, OpenTelemetry GenAI names)</summary><pre class="evidence">' + esc(lines.join('\n')) + '</pre></details>'
@@ -439,13 +440,27 @@
         '<div class="muted small">' + esc(it.role) + '</div>' + (it.error ? '<p class="note">' + esc(it.error) + '</p>' : '') +
         '<div class="two"><div><h4>Expected data</h4><ul class="factors">' + it.provides.map(function (x) { return '<li>' + esc(x) + '</li>' }).join('') + '</ul></div><div><h4>Feeds</h4><ul class="factors">' + it.feeds.map(function (x) { return '<li>' + esc(x) + '</li>' }).join('') + '</ul></div></div>' +
         '<h4>Connect</h4><ul class="factors">' + it.connect.map(function (c) { return '<li>' + chip(c.mode, c.mode === 'MCP' ? 'tone-accent' : '') + ' ' + esc(c.how) + '</li>' }).join('') + '<li>Env: <code>' + esc(it.env.join('  ')) + '</code></li>' + (it.mcpTools ? '<li>MCP tools used: <code>' + esc(it.mcpTools.join(', ')) + '</code></li>' : '') + '<li>Schema contract: <code>' + esc(it.schemaFile) + '</code></li></ul>' +
+        signalsFor(it.id === 'kubernetes' ? ['kubernetes'] : [it.id]) +
         '<details><summary class="muted small">Sample record in ' + esc(it.name) + ' schema</summary><pre class="evidence">' + esc(it.sample) + '</pre></details>' +
         (SERVED ? '<div class="nav-row"><button class="btn" data-act="itest" data-id="' + it.id + '"' + (t && t.busy ? ' disabled' : '') + '>Test connection</button></div>' + testResult(t) +
           '<details' + (pz.err ? ' open' : '') + '><summary class="muted small">Paste MCP output (native schema)</summary><textarea id="paste-' + it.id + '" class="paste" rows="5" placeholder="Paste JSON shaped like ' + esc(it.schemaFile) + '">' + esc(pz.text || '') + '</textarea><div class="nav-row"><button class="btn" data-act="ipaste" data-id="' + it.id + '"' + (pz.busy ? ' disabled' : '') + '>Load snapshot</button></div>' +
           (pz.msg ? '<p class="small t-good">' + esc(pz.msg) + '</p>' : '') + (pz.err ? '<p class="note">' + esc(pz.err) + '</p>' : '') + '</details>' : '') +
         '</article>'
     }).join('')
+    var other = (VM.signals || []).filter(function (x) { return x.tool === 'any' })
+    if (other.length) out += '<article class="item integ"><div class="item-top"><b>Any other tool</b></div>' + signalsFor(['any']) + '</article>'
     return out
+  }
+  // signal catalogue: each signal, its paths in the order tried, and what uses it
+  var VIA_TONE = { dynatrace: 'tone-good', mcp: 'tone-accent', rest: '', custom: 'tone-warn' }
+  function signalsFor(tools) {
+    var xs = (VM.signals || []).filter(function (x) { return tools.indexOf(x.tool) >= 0 })
+    if (!xs.length) return ''
+    return '<h4>Signals (' + xs.length + ')</h4><ul class="factors">' + xs.map(function (x) {
+      return '<li><b>' + esc(x.n) + '</b>' + (x.k !== 'signal' ? ' ' + chip(x.k === 'action' ? 'action' : 'vendor agent', 'tone-warn') : '') + (x.s === 'built-optional' ? ' <span class="muted small">opt-in</span>' : x.s === 'catalogued' ? ' <span class="muted small">catalogued, not consumed yet</span>' : '') +
+        '<br><span class="muted small">' + esc(x.f) + '</span><ol class="factors small">' + x.p.map(function (p) { return '<li>' + chip(p[0], VIA_TONE[p[0]]) + ' ' + esc(p[1]) + (p[2] ? ' <code>' + esc(p[2]) + '</code>' : '') + (p[3] ? ' <span class="muted small">listed, not called yet</span>' : '') + '</li>' }).join('') + '</ol>' +
+        '<span class="muted small">Used by: ' + esc(x.u.join('; ')) + '</span></li>'
+    }).join('') + '</ul>'
   }
 
   // ---------- shell ----------

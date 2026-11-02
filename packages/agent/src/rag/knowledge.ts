@@ -60,6 +60,7 @@ export class KnowledgeBase {
   private chunks: Chunk[] = []
   constructor(readonly embedder: Embedder = hashingEmbedder(), private store: VectorStore = new InMemoryVectorStore()) {}
 
+  get name() { return `local hybrid (${this.embedder.name})` }
   get size() { return this.chunks.length }
   get docs() { return new Set(this.chunks.map((c) => c.docId)).size }
 

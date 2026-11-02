@@ -189,7 +189,7 @@ describe('in-browser agent edges (published card)', () => {
     for (const f of an.failures) if (!firstPerRule.has(f.recommendation.ruleId)) firstPerRule.set(f.recommendation.ruleId, f.id)
     assert.ok(firstPerRule.size >= 10)
     for (const [rule, fid] of firstPerRule) {
-      const s = await runWorkflow(fid, { analysis: () => an, tools: snapshotTools(raw), llm: null, maxIterations: 2 })
+      const s = await runWorkflow(fid, { analysis: () => an, tools: snapshotTools(raw, an), llm: null, maxIterations: 2 })
       assert.ok(s.evidence.filter((e) => e.ok).length >= 2, `${rule}: runtime evidence returned`)
       assert.ok(s.evidence.filter((e) => e.server).every((e) => e.server === 'snapshot'), `${rule}: labelled as snapshot`)
       assert.equal(s.verification!.passed, true, `${rule}: ${s.verification!.checks.filter((c) => !c.ok).map((c) => c.name)}`)

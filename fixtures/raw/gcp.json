@@ -1,0 +1,328 @@
+{
+  "billingExport": [
+    {
+      "service": {
+        "id": "152E-C115-5142",
+        "description": "Cloud Run"
+      },
+      "sku": {
+        "id": "CLOUDRUN-USAGE",
+        "description": "Cloud Run usage"
+      },
+      "usage_start_time": "2026-06-01T00:00:00Z",
+      "usage_end_time": "2026-07-01T00:00:00.000Z",
+      "project": {
+        "id": "notifications-prod"
+      },
+      "labels": [
+        {
+          "key": "product",
+          "value": "notifications"
+        },
+        {
+          "key": "environment",
+          "value": "prod"
+        }
+      ],
+      "cost": 1391,
+      "currency": "USD"
+    },
+    {
+      "service": {
+        "id": "152E-C115-5142",
+        "description": "Cloud Run"
+      },
+      "sku": {
+        "id": "CLOUDRUN-USAGE",
+        "description": "Cloud Run usage"
+      },
+      "usage_start_time": "2026-07-01T00:00:00Z",
+      "usage_end_time": "2026-08-01T00:00:00.000Z",
+      "project": {
+        "id": "notifications-prod"
+      },
+      "labels": [
+        {
+          "key": "product",
+          "value": "notifications"
+        },
+        {
+          "key": "environment",
+          "value": "prod"
+        }
+      ],
+      "cost": 1418,
+      "currency": "USD"
+    },
+    {
+      "service": {
+        "id": "152E-C115-5142",
+        "description": "Cloud Run"
+      },
+      "sku": {
+        "id": "CLOUDRUN-USAGE",
+        "description": "Cloud Run usage"
+      },
+      "usage_start_time": "2026-08-01T00:00:00Z",
+      "usage_end_time": "2026-09-01T00:00:00.000Z",
+      "project": {
+        "id": "notifications-prod"
+      },
+      "labels": [
+        {
+          "key": "product",
+          "value": "notifications"
+        },
+        {
+          "key": "environment",
+          "value": "prod"
+        }
+      ],
+      "cost": 1448,
+      "currency": "USD"
+    },
+    {
+      "service": {
+        "id": "152E-C115-5142",
+        "description": "Cloud Run"
+      },
+      "sku": {
+        "id": "CLOUDRUN-USAGE",
+        "description": "Cloud Run usage"
+      },
+      "usage_start_time": "2026-09-01T00:00:00Z",
+      "usage_end_time": "2026-10-01T00:00:00.000Z",
+      "project": {
+        "id": "notifications-prod"
+      },
+      "labels": [
+        {
+          "key": "product",
+          "value": "notifications"
+        },
+        {
+          "key": "environment",
+          "value": "prod"
+        }
+      ],
+      "cost": 1460,
+      "currency": "USD"
+    },
+    {
+      "service": {
+        "id": "152E-C115-5142",
+        "description": "Cloud Run"
+      },
+      "sku": {
+        "id": "CLOUDRUN-USAGE",
+        "description": "Cloud Run usage"
+      },
+      "usage_start_time": "2026-10-01T00:00:00Z",
+      "usage_end_time": "2026-11-01T00:00:00.000Z",
+      "project": {
+        "id": "notifications-prod"
+      },
+      "labels": [
+        {
+          "key": "product",
+          "value": "notifications"
+        },
+        {
+          "key": "environment",
+          "value": "prod"
+        }
+      ],
+      "cost": 1528,
+      "currency": "USD"
+    },
+    {
+      "service": {
+        "id": "152E-C115-5142",
+        "description": "Cloud Run"
+      },
+      "sku": {
+        "id": "CLOUDRUN-USAGE",
+        "description": "Cloud Run usage"
+      },
+      "usage_start_time": "2026-11-01T00:00:00Z",
+      "usage_end_time": "2026-12-01T00:00:00.000Z",
+      "project": {
+        "id": "notifications-prod"
+      },
+      "labels": [
+        {
+          "key": "product",
+          "value": "notifications"
+        },
+        {
+          "key": "environment",
+          "value": "prod"
+        }
+      ],
+      "cost": 1550,
+      "currency": "USD"
+    },
+    {
+      "service": {
+        "id": "58CD-E7C3-72CA",
+        "description": "Pub/Sub"
+      },
+      "sku": {
+        "id": "PUBSUB-USAGE",
+        "description": "Pub/Sub usage"
+      },
+      "usage_start_time": "2026-06-01T00:00:00Z",
+      "usage_end_time": "2026-07-01T00:00:00.000Z",
+      "project": {
+        "id": "notifications-prod"
+      },
+      "labels": [
+        {
+          "key": "product",
+          "value": "notifications"
+        },
+        {
+          "key": "environment",
+          "value": "prod"
+        }
+      ],
+      "cost": 596,
+      "currency": "USD"
+    },
+    {
+      "service": {
+        "id": "58CD-E7C3-72CA",
+        "description": "Pub/Sub"
+      },
+      "sku": {
+        "id": "PUBSUB-USAGE",
+        "description": "Pub/Sub usage"
+      },
+      "usage_start_time": "2026-07-01T00:00:00Z",
+      "usage_end_time": "2026-08-01T00:00:00.000Z",
+      "project": {
+        "id": "notifications-prod"
+      },
+      "labels": [
+        {
+          "key": "product",
+          "value": "notifications"
+        },
+        {
+          "key": "environment",
+          "value": "prod"
+        }
+      ],
+      "cost": 629,
+      "currency": "USD"
+    },
+    {
+      "service": {
+        "id": "58CD-E7C3-72CA",
+        "description": "Pub/Sub"
+      },
+      "sku": {
+        "id": "PUBSUB-USAGE",
+        "description": "Pub/Sub usage"
+      },
+      "usage_start_time": "2026-08-01T00:00:00Z",
+      "usage_end_time": "2026-09-01T00:00:00.000Z",
+      "project": {
+        "id": "notifications-prod"
+      },
+      "labels": [
+        {
+          "key": "product",
+          "value": "notifications"
+        },
+        {
+          "key": "environment",
+          "value": "prod"
+        }
+      ],
+      "cost": 636,
+      "currency": "USD"
+    },
+    {
+      "service": {
+        "id": "58CD-E7C3-72CA",
+        "description": "Pub/Sub"
+      },
+      "sku": {
+        "id": "PUBSUB-USAGE",
+        "description": "Pub/Sub usage"
+      },
+      "usage_start_time": "2026-09-01T00:00:00Z",
+      "usage_end_time": "2026-10-01T00:00:00.000Z",
+      "project": {
+        "id": "notifications-prod"
+      },
+      "labels": [
+        {
+          "key": "product",
+          "value": "notifications"
+        },
+        {
+          "key": "environment",
+          "value": "prod"
+        }
+      ],
+      "cost": 640,
+      "currency": "USD"
+    },
+    {
+      "service": {
+        "id": "58CD-E7C3-72CA",
+        "description": "Pub/Sub"
+      },
+      "sku": {
+        "id": "PUBSUB-USAGE",
+        "description": "Pub/Sub usage"
+      },
+      "usage_start_time": "2026-10-01T00:00:00Z",
+      "usage_end_time": "2026-11-01T00:00:00.000Z",
+      "project": {
+        "id": "notifications-prod"
+      },
+      "labels": [
+        {
+          "key": "product",
+          "value": "notifications"
+        },
+        {
+          "key": "environment",
+          "value": "prod"
+        }
+      ],
+      "cost": 661,
+      "currency": "USD"
+    },
+    {
+      "service": {
+        "id": "58CD-E7C3-72CA",
+        "description": "Pub/Sub"
+      },
+      "sku": {
+        "id": "PUBSUB-USAGE",
+        "description": "Pub/Sub usage"
+      },
+      "usage_start_time": "2026-11-01T00:00:00Z",
+      "usage_end_time": "2026-12-01T00:00:00.000Z",
+      "project": {
+        "id": "notifications-prod"
+      },
+      "labels": [
+        {
+          "key": "product",
+          "value": "notifications"
+        },
+        {
+          "key": "environment",
+          "value": "prod"
+        }
+      ],
+      "cost": 707,
+      "currency": "USD"
+    }
+  ]
+}

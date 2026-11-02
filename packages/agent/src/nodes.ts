@@ -121,7 +121,7 @@ export function verifyHypothesis(ctx: InvestigationContext, h: Hypothesis, ev: E
   const NAMED: [RegExp, string][] = [[/\b(kubernetes|k8s)\b/i, 'kubernetes'], [/\bdynatrace\b/i, 'dynatrace'], [/\bargo(\s?cd)?\b/i, 'argocd'], [/\b(github|pull request|job log)\b/i, 'github'], [/\b(servicenow|runbook|past incident|precedent)\b/i, 'servicenow']]
   const mismatched = h.chain.filter((c) => NAMED.some(([re, src]) => re.test(c.step) && !c.evidenceIds.some((id) => { const e = byId.get(id); return e && (e.source === src || e.source === 'analysis') })))
   checks.push({ name: 'citations match claims', ok: mismatched.length === 0, detail: mismatched.length ? `step cites evidence from another source: "${mismatched[0].step.slice(0, 80)}"` : 'each named source is cited' })
-  const runtimeSources = ['dynatrace', 'kubernetes', 'argocd']
+  const runtimeSources = ['dynatrace', 'kubernetes', 'argocd', 'aws', 'azure', 'gcp']
   const needsRuntime = ['deployment', 'problem', 'runtime'].includes(ctx.source)
   const runtimeOk = ev.some((e) => e.ok && runtimeSources.includes(e.source) && cited.includes(e.id))
   checks.push({ name: 'runtime confirmation', ok: !needsRuntime || runtimeOk, detail: needsRuntime ? (runtimeOk ? 'confirmed by runtime evidence' : 'no cited Dynatrace, Kubernetes or Argo CD evidence') : 'not required for this failure source' })

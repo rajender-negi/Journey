@@ -21,6 +21,7 @@ const SHAPE: Record<SourceName, (x: Record<string, unknown>) => boolean> = {
   kubernetes: (x) => Array.isArray(x.events),
   aws: (x) => Array.isArray(x.costExplorer),
   azure: (x) => Array.isArray((x.costManagement as { properties?: { rows?: unknown } })?.properties?.rows),
+  gcp: (x) => Array.isArray(x.billingExport),
 }
 
 // gzip anything over 1 KB when the client accepts it: the view model drops from ~170 KB to ~30 KB

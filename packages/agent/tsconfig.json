@@ -1,5 +1,5 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": { "types": ["node"], "paths": { "@pj/core": ["../core/src/index.ts"] } },
-  "include": ["src", "test", "eval"]
+  "include": ["src", "test", "eval", "../../templates/custom-mcp-server"]
 }

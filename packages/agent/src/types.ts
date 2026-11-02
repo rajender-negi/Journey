@@ -2,7 +2,7 @@
 
 import type { AiOutput } from '@pj/core'
 
-export type SourceName = 'dynatrace' | 'github' | 'argocd' | 'kubernetes' | 'servicenow' | 'aws' | 'azure'
+export type SourceName = 'dynatrace' | 'github' | 'argocd' | 'kubernetes' | 'servicenow' | 'aws' | 'azure' | 'gcp'
 
 /** Evidence the agent may request. The LLM chooses kinds; parameters are always filled from the analysis, never by the model. */
 export type EvidenceKind =
@@ -15,6 +15,12 @@ export type EvidenceKind =
   | 'gh_job_log'
   | 'k8s_events'
   | 'kb_similar'
+  | 'dt_logs'
+  | 'dt_traces'
+  | 'k8s_workload'
+  | 'cloud_changes'
+  | 'security_findings'
+  | 'vendor_assessment'
 
 export interface InvestigationContext {
   findingId: string
@@ -44,6 +50,8 @@ export interface InvestigationContext {
   problemId?: string
   problemDisplayId?: string
   journeyStages?: string[]
+  /** clouds the product spends on (from cost data): which audit logs to read */
+  clouds?: ('aws' | 'azure' | 'gcp')[]
 }
 
 export interface PlanItem {

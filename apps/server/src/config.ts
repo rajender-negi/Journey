@@ -2,8 +2,8 @@
 // A source is "live" only when its credentials are present; otherwise it falls back to an
 // MCP snapshot file in data/inbox, then to dummy data. Status is reported per source.
 
-export type SourceName = 'servicenow' | 'github' | 'dynatrace' | 'argocd' | 'kubernetes' | 'aws' | 'azure'
-export const SOURCES: SourceName[] = ['servicenow', 'github', 'dynatrace', 'argocd', 'kubernetes', 'aws', 'azure']
+export type SourceName = 'servicenow' | 'github' | 'dynatrace' | 'argocd' | 'kubernetes' | 'aws' | 'azure' | 'gcp'
+export const SOURCES: SourceName[] = ['servicenow', 'github', 'dynatrace', 'argocd', 'kubernetes', 'aws', 'azure', 'gcp']
 
 import { existsSync, readFileSync } from 'node:fs'
 import { isAbsolute, resolve } from 'node:path'
@@ -38,16 +38,25 @@ export const config = {
   kubernetes: { api: env('K8S_API'), token: env('K8S_TOKEN') },
   aws: { enabled: env('AWS_COST_ENABLED') === 'true', profile: env('AWS_PROFILE'), envTagKey: env('AWS_ENV_TAG_KEY') ?? 'environment' },
   azure: { token: env('AZURE_TOKEN'), scope: env('AZURE_COST_SCOPE') },
+  // Cloud Billing export in BigQuery: project to run the query in and the export table (project.dataset.gcp_billing_export_v1_XXXX)
+  gcp: { token: env('GCP_ACCESS_TOKEN'), project: env('GCP_BILLING_PROJECT'), table: env('GCP_BILLING_TABLE') },
 
   // MCP client: same format as Cursor's .cursor/mcp.json (see mcp.servers.example.json)
   mcpConfigPath: fromRoot(env('PJ_MCP_CONFIG') ?? 'mcp.servers.json'),
   agent: {
     maxIterations: Number(env('AGENT_MAX_ITERATIONS') ?? 2),
+    // 'copilot': after approval, open a GitHub issue assigned to the Copilot coding agent (needs AGENT_WRITE_ALLOWLIST=<github server>:create_issue)
+    delegateFixes: env('AGENT_DELEGATE_FIXES') ?? '',
     // explicit server:tool pairs the agent may call that look like writes; Dynatrace is never writable
     writeAllowlist: (env('AGENT_WRITE_ALLOWLIST') ?? '').split(',').map((x) => x.trim()).filter(Boolean),
   },
 
   rag: {
+    // local (built-in hybrid index) | azure-ai-search | bedrock-kb
+    provider: env('RAG_PROVIDER') ?? 'local',
+    azureSearchEndpoint: env('AZURE_SEARCH_ENDPOINT'), azureSearchIndex: env('AZURE_SEARCH_INDEX'), azureSearchKey: env('AZURE_SEARCH_API_KEY'), azureSearchSemanticConfig: env('AZURE_SEARCH_SEMANTIC_CONFIG'),
+    bedrockKnowledgeBaseId: env('BEDROCK_KB_ID'), awsRegion: env('AWS_REGION') ?? 'us-east-1',
+    guardrailProvider: env('GUARDRAIL_PROVIDER') ?? '', bedrockGuardrailId: env('BEDROCK_GUARDRAIL_ID'), bedrockGuardrailVersion: env('BEDROCK_GUARDRAIL_VERSION') ?? 'DRAFT',
     // any OpenAI-compatible /embeddings endpoint; without it a local hashing embedder is used
     embeddingsBaseUrl: env('EMBEDDINGS_BASE_URL'),
     embeddingsApiKey: env('EMBEDDINGS_API_KEY'),
@@ -80,5 +89,6 @@ export function isLive(s: SourceName): boolean {
     case 'kubernetes': return !!config.kubernetes.api && !!config.kubernetes.token
     case 'aws': return config.aws.enabled
     case 'azure': return !!config.azure.token && !!config.azure.scope
+    case 'gcp': return !!config.gcp.token && !!config.gcp.project && !!config.gcp.table
   }
 }

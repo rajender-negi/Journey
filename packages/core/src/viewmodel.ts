@@ -8,6 +8,7 @@ import { PILLARS } from './scorecard'
 import { AI_SYSTEM_PROMPT } from './ai'
 import { SELF_PATTERNS, type Advice } from './patterns'
 import { INTEGRATIONS, integrationSamples } from './integrations'
+import { SIGNALS } from './signals'
 import type { RawBundle } from './sources'
 
 export interface IntegrationStatus { source: string; tier: string; ok: boolean; records: number; error?: string }
@@ -97,6 +98,7 @@ export function buildViewModel(a: Analysis, opts: { mode: 'live' | 'demo'; maxJo
     totalJourneys: a.journeys.length,
     advice: Object.fromEntries(Object.entries(a.advice).map(([pid, ad]) => [pid, { best: ad.best ? adv(ad.best) : null, next: ad.next.map(adv) }])),
     selfPatterns: SELF_PATTERNS.map((x) => ({ n: x.name, where: x.where, why: x.why, refs: refs(x.references) })),
+    signals: SIGNALS.map((x) => ({ id: x.id, tool: x.tool, n: x.name, k: x.kind, f: x.fields, p: x.paths.map((q) => [q.via, q.how, 'tools' in q ? q.tools.join(', ') : '', q.listed ? 1 : 0]), u: x.usedBy, s: x.status })),
     integrations: INTEGRATIONS.map((spec) => {
       const st = opts.status?.find((x) => x.source === spec.id)
       return { ...spec, tier: st?.tier ?? (opts.mode === 'demo' ? 'dummy' : 'unknown'), ok: st?.ok ?? true, records: st?.records ?? null, error: st?.error ?? null, sample: samples?.[spec.id] ?? '' }
