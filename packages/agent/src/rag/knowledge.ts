@@ -106,6 +106,9 @@ export class KnowledgeBase {
     // always takes the second slot (or the first, if it ranks first anyway)
     const firstRunbook = fused.findIndex((x) => x.chunk.source === 'runbook')
     if (firstRunbook > 1) fused.splice(1, 0, fused.splice(firstRunbook, 1)[0])
+    // a human-approved investigation is the strongest precedent: the best matching one goes first
+    const firstApproved = fused.findIndex((x) => x.chunk.source === 'investigation')
+    if (firstApproved > 0) fused.unshift(fused.splice(firstApproved, 1)[0])
     const out: KnowledgeHit[] = []
     const docs = new Set<string>()
     for (const x of fused) {
